@@ -117,30 +117,59 @@
     <h2>CONCERTS</h2>
     
     <style>
-        .concert-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-family: 'Arial', sans-serif; }
-        .concert-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 10px; border-bottom: 1px solid #333; }
+        .concert-table { width: 100%; margin-top: 20px; font-family: 'Arial', sans-serif; }
+        .concert-row { 
+            display: flex; 
+            align-items: center; 
+            padding: 20px 15px; 
+            border-bottom: 1px solid #333; 
+        }
         
-        /* Une ligne sur deux en gris très foncé (#111) */
+        /* Alternance de fond noir / gris très foncé */
         .concert-row:nth-child(even) { background-color: #111; }
         
-        .concert-info { flex: 2; }
+        /* La date en premier, gros et bleu cyan */
+        .concert-date { 
+            flex: 0 0 150px; 
+            font-size: 1.5rem; 
+            font-weight: bold; 
+            color: #12C3FF; 
+            font-family: 'Arial Black', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .concert-info { flex: 1; padding-left: 20px; }
         .concert-lieu { font-size: 1.4rem; font-weight: bold; color: #fff; text-transform: uppercase; display: block; }
         .concert-ville { font-size: 1rem; color: #bbb; }
-        .concert-date { flex: 1; text-align: right; font-size: 1.3rem; font-weight: bold; color: #12C3FF; font-family: 'Arial Black'; }
 
+        /* Ajustement pour mobile */
         @media (max-width: 600px) {
+            .concert-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .concert-date { flex: none; font-size: 1.2rem; }
+            .concert-info { padding-left: 0; }
             .concert-lieu { font-size: 1.1rem; }
-            .concert-date { font-size: 1rem; }
         }
     </style>
 
     <div class="concert-table">
-        <div class="concert-row"><div class="concert-info"><span class="concert-lieu">La Gapette</span><span class="concert-ville">Les Epesses (85)</span></div><div class="concert-date">28/03/2026</div></div>
-        <div class="concert-row"><div class="concert-info"><span class="concert-lieu">Lutin de Travers</span><span class="concert-ville">Nantes (44)</span></div><div class="concert-date">04/04/2026</div></div>
-        <div class="concert-row"><div class="concert-info"><span class="concert-lieu">La Forge</span><span class="concert-ville">Chambretaud (85)</span></div><div class="concert-date">05/04/2026</div></div>
-        <div class="concert-row"><div class="concert-info"><span class="concert-lieu">Concert privé (Dockers)</span><span class="concert-ville">Saint-Gildas-des-Bois</span></div><div class="concert-date">30/04/2026</div></div>
-        <div class="concert-row"><div class="concert-info"><span class="concert-lieu">Brasserie Horizon</span><span class="concert-ville">Questembert (56)</span></div><div class="concert-date">08/05/2026</div></div>
-        <div class="concert-row"><div class="concert-info"><span class="concert-lieu">Concert privé (Jennifer)</span><span class="concert-ville">Hénansal (22)
+        <div class="concert-row"><div class="concert-date">28 MARS</div><div class="concert-info"><span class="concert-lieu">La Gapette</span><span class="concert-ville">Les Epesses (85)</span></div></div>
+        <div class="concert-row"><div class="concert-date">04 AVRIL</div><div class="concert-info"><span class="concert-lieu">Lutin de Travers</span><span class="concert-ville">Nantes (44)</span></div></div>
+        <div class="concert-row"><div class="concert-date">05 AVRIL</div><div class="concert-info"><span class="concert-lieu">La Forge</span><span class="concert-ville">Chambretaud (85)</span></div></div>
+        <div class="concert-row"><div class="concert-date">08 MAI</div><div class="concert-info"><span class="concert-lieu">Brasserie Horizon</span><span class="concert-ville">Questembert (56)</span></div></div>
+        <div class="concert-row"><div class="concert-date">05 JUIN</div><div class="concert-info"><span class="concert-lieu">Fête de la Musique (La Cave et Vous)</span><span class="concert-ville">Mouzillon (44)</span></div></div>
+        <div class="concert-row"><div class="concert-date">13 JUIN</div><div class="concert-info"><span class="concert-lieu">L'Arcadia</span><span class="concert-ville">Fougères (35)</span></div></div>
+        <div class="concert-row"><div class="concert-date">17 JUIN</div><div class="concert-info"><span class="concert-lieu">La Cave et Vous / Hellfest</span><span class="concert-ville">Clisson (44)</span></div></div>
+        <div class="concert-row"><div class="concert-date">02 JUILLET</div><div class="concert-info"><span class="concert-lieu">V and B</span><span class="concert-ville">Poitiers (86)</span></div></div>
+        <div class="concert-row"><div class="concert-date">04 JUILLET</div><div class="concert-info"><span class="concert-lieu">Mille Bornes</span><span class="concert-ville">Redon (35)</span></div></div>
+        <div class="concert-row"><div class="concert-date">11 JUILLET</div><div class="concert-info"><span class="concert-lieu">Breizh PMS Festival</span><span class="concert-ville">Guémené-Penfao (44)</span></div></div>
+        <div class="concert-row"><div class="concert-date">01 AOÛT</div><div class="concert-info"><span class="concert-lieu">Son et Lumière de Bon Repos</span><span class="concert-ville">Bon-Repos (22)</span></div></div>
+        <div class="concert-row"><div class="concert-date">07 AOÛT</div><div class="concert-info"><span class="concert-lieu">La Minute Blonde</span><span class="concert-ville">Fontenay-le-Comte (85)</span></div></div>
+        <div class="concert-row"><div class="concert-date">29 AOÛT</div><div class="concert-info"><span class="concert-lieu">Festival Rock n' Bylette</span><span class="concert-ville">Malville (44)</span></div></div>
+        <div class="concert-row"><div class="concert-date">18 SEPT.</div><div class="concert-info"><span class="concert-lieu">Brasserie Soma</span><span class="concert-ville">Le Loroux-Bottereau (44)</span></div></div>
+    </div>
+    
+    <p style="text-align: center; margin-top: 40px; font-style: italic; color: #12C3FF; font-weight: bold;">Et c'est pas fini, d'autres dates arrivent !</p>
+</section>
 
 <section id="musiques">
     <h2>MUSIQUES</h2>
