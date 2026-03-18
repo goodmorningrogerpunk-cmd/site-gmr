@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Good Morning Roger | Punk Rock</title>
     <style>
-       /* 1. IMPORT DES POLICES */
+      /* 1. IMPORT DES POLICES */
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;700&display=swap');
 
 /* 2. STYLE GLOBAL */
@@ -16,7 +16,12 @@ body {
     padding: 0;
     font-family: 'Roboto', sans-serif;
     line-height: 1.6;
-    overflow-x: hidden;
+}
+
+/* SÉCURITÉ : Empêche les images de déborder partout */
+img {
+    max-width: 100%;
+    height: auto;
 }
 
 /* 3. TITRES (Look Punk-Rock) */
@@ -24,27 +29,24 @@ h1, h2, h3 {
     font-family: 'Bebas Neue', cursive;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: #12C3FF; /* Ton bleu cyan */
+    color: #12C3FF;
     text-align: center;
 }
 
 h2 { 
     font-size: 3.5rem; 
     margin: 60px 0 40px 0;
-    position: relative;
 }
 
-/* Petit trait sous le titre */
-h2::after {
-    content: '';
+/* 4. LE LOGO D'ACCUEIL (On le force à rester raisonnable) */
+.header-logo {
     display: block;
-    width: 60px;
-    height: 4px;
-    background: #12C3FF;
-    margin: 10px auto;
+    margin: 20px auto;
+    width: 300px; /* Ajuste cette valeur selon la taille voulue */
+    height: auto;
 }
 
-/* 4. MENU DE NAVIGATION */
+/* 5. MENU DE NAVIGATION */
 nav {
     background: rgba(0, 0, 0, 0.9);
     padding: 15px;
@@ -61,62 +63,31 @@ nav a {
     margin: 0 15px;
     font-family: 'Bebas Neue', sans-serif;
     font-size: 1.2rem;
-    letter-spacing: 1px;
-    transition: color 0.3s;
-}
-
-nav a:hover {
-    color: #12C3FF;
-}
-
-/* 5. SECTIONS */
-section {
-    padding: 60px 20px;
-    max-width: 1100px;
-    margin: auto;
 }
 
 /* 6. STYLE CONCERTS */
-.concert-table { width: 100%; margin-top: 20px; }
 .concert-row { 
     display: flex; 
-    align-items: center; 
     padding: 20px 15px; 
     border-bottom: 1px solid #222; 
     transition: all 0.3s ease;
+    background: transparent;
 }
 .concert-row:hover {
-    background-color: #161616 !important;
+    background-color: #161616;
     border-left: 5px solid #12C3FF;
 }
-.concert-date { 
-    flex: 0 0 150px; 
-    font-size: 1.8rem; 
-    font-weight: bold; 
-    color: #12C3FF; 
-    font-family: 'Bebas Neue', sans-serif;
-}
-.concert-info { flex: 1; padding-left: 20px; }
-.concert-lieu { font-size: 1.4rem; font-weight: bold; color: #fff; text-transform: uppercase; display: block; }
-.concert-ville { font-size: 1rem; color: #bbb; }
 
-/* 7. EFFETS LOGOS CONTACT */
+/* 7. CONTACT LOGOS */
 #contact img {
+    width: 60px; /* Taille pour les petits logos de réseaux */
+    height: auto;
     transition: all 0.3s ease;
 }
 #contact img:hover {
-    transform: scale(1.1) rotate(2deg);
+    transform: scale(1.1);
     filter: drop-shadow(0px 0px 10px #12C3FF);
 }
-
-/* 8. MOBILE ADAPTATION */
-@media (max-width: 600px) {
-    h2 { font-size: 2.5rem; }
-    .concert-row { flex-direction: column; align-items: flex-start; gap: 5px; }
-    .concert-date { font-size: 1.4rem; }
-    nav a { margin: 0 5px; font-size: 0.9rem; }
-}
-        
     </style>
 </head>
 <body>
