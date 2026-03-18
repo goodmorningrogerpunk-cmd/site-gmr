@@ -3,59 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Good Morning Roger - Punk Rock</title>
+    <title>Good Morning Roger | Punk Rock</title>
     <style>
-        body { background-color: #000; color: #fff; font-family: 'Arial Black', sans-serif; margin: 0; padding: 0; text-transform: uppercase; }
-        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 2px solid #12C3FF; position: sticky; top: 0; background: #000; z-index: 100; }
-        .nav-logo img { height: 60px; }
-        section { padding: 50px 20px; border-bottom: 1px solid #222; max-width: 1000px; margin: auto; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        img { width: 100%; height: auto; border: 2px solid #fff; }
+        /* STYLE GLOBAL */
+        body { background-color: #000; color: #fff; font-family: 'Arial', sans-serif; margin: 0; padding: 0; scroll-behavior: smooth; }
+        
+        /* MENU DE NAVIGATION */
+        nav { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 10px 5%; background: #000; border-bottom: 3px solid #12C3FF;
+            position: sticky; top: 0; z-index: 1000; 
+        }
+        .nav-logo img { height: 50px; }
+        .nav-links { display: flex; gap: 15px; }
+        .nav-links a { color: #fff; text-decoration: none; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
+        .nav-links a:hover { color: #12C3FF; }
+
         /* TITRES DE SECTIONS */
         h2 { 
-            font-size: 2.5rem; 
-            color: #12C3FF; /* Ton nouveau bleu */
-            text-transform: uppercase; 
-            margin-bottom: 30px; 
-            border-left: 8px solid #fff; 
-            padding-left: 15px; 
+            font-size: 2.5rem; color: #12C3FF; text-transform: uppercase; 
+            margin-bottom: 40px; border-left: 8px solid #fff; padding-left: 15px; 
+            font-family: 'Arial Black', sans-serif;
         }
-        .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .photo-grid img { height: 250px; object-fit: cover; }
-        @media (max-width: 768px) { .grid, .photo-grid { grid-template-columns: 1fr; } h2 { font-size: 2rem; } }
+
+        /* SECTIONS */
+        section { padding: 80px 5% 40px; max-width: 1000px; margin: auto; border-bottom: 1px solid #222; }
+
+        /* GRILLE PHOTOS PRÉSENTATION */
+        .photo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 40px; }
+        .photo-grid img { width: 100%; height: 250px; object-fit: cover; border: 1px solid #fff; }
+
+        /* ARTICLES ACTUS */
+        .article { display: flex; flex-wrap: wrap; gap: 30px; margin-bottom: 60px; align-items: center; }
+        .article-reverse { flex-direction: row-reverse; }
+        .article-content { flex: 1; min-width: 300px; }
+        .article-image { flex: 1; min-width: 300px; }
+        .article-image img { width: 100%; border: 2px solid #12C3FF; box-shadow: 8px 8px 0px #12C3FF; }
+        
+        .btn { 
+            display: inline-block; margin-top: 20px; padding: 12px 25px; 
+            background-color: #12C3FF; color: #000; text-decoration: none; 
+            font-weight: bold; border-radius: 5px; text-transform: uppercase; 
+        }
+
+        /* MOBILE */
+        @media (max-width: 768px) {
+            .nav-links { display: none; } /* On cache le menu texte sur mobile pour simplifier */
+            h2 { font-size: 1.8rem; }
+        }
     </style>
 </head>
 <body>
 
 <nav>
-    <div class="nav-logo"><img src="Goodmorningrogerlogo.png" alt="Logo GMR"></div>
-    <div>PUNK ROCK BAND</div>
+    <div class="nav-logo"><img src="Goodmorningrogerlogo.png" alt="GMR"></div>
+    <div class="nav-links">
+        <a href="#presentation">Présentation</a>
+        <a href="#actus">Actus</a>
+        <a href="#concerts">Concerts</a>
+        <a href="#musiques">Musiques</a>
+        <a href="#contact">Contact</a>
+    </div>
 </nav>
 
 <section id="presentation">
     <h2>PRÉSENTATION</h2>
-    
-    <h1 style="font-size: 3.5rem; margin-bottom: 5px; color: #fff;">GOOD MORNING ROGER</h1>
-    <p style="font-size: 1.2rem; font-weight: bold; margin-bottom: 30px; color: #fff;">
-        DES PUNK COVERS, DES TUBES, DES DESSINS ANIMÉS ET DU FUN
-    </p>
+    <h1 style="font-size: 3rem; margin-bottom: 5px; color: #fff; font-family: 'Arial Black';">GOOD MORNING ROGER</h1>
+    <p style="font-size: 1.2rem; font-weight: bold; margin-bottom: 30px;">DES PUNK COVERS, DES TUBES, DES DESSINS ANIMÉS ET DU FUN</p>
 
-    <div style="line-height: 1.8; font-family: 'Arial', sans-serif; text-transform: none; font-size: 1.1rem; max-width: 800px; color: #fff;">
+    <div style="line-height: 1.8; font-size: 1.1rem; max-width: 850px;">
         <p>Good Morning Roger, c’est le groupe qui a eu la (mauvaise ?) idée de mélanger le punk-rock avec tout ce que tu n’assumais pas d’écouter quand tu étais ado.</p>
-        
         <p>Au programme : des tubes légendaires comme <strong>La Tribu de Dana</strong>, <strong>Les Rois du Monde</strong>, <strong>Moi Lolita</strong> et même des génériques culte genre <strong>Denver le dernier dinosaure</strong> ou les classiques du <strong>Club Dorothée</strong>... le tout à la sauce punk-rock déjanté.</p>
-        
-        <p style="font-style: italic; margin-top: 20px; font-weight: bold; color: #fff;">
-            C’est énergique, c’est festif, c’est nostalgique et totalement décomplexé, c'est Good Morning Roger !
-        </p>
+        <p style="font-style: italic; margin-top: 20px; font-weight: bold;">C’est énergique, c’est festif, c’est nostalgique et totalement décomplexé, c'est Good Morning Roger !</p>
     </div>
 
-    <div class="photo-grid" style="margin-top: 40px;">
+    <div class="photo-grid">
         <img src="photo1.jpg" alt="GMR Photo 1">
         <img src="photo2.jpg" alt="GMR Photo 2">
         <img src="photo3.jpg" alt="GMR Photo 3">
         <img src="photo4.jpg" alt="GMR Photo 4">
     </div>
+</section>
+
+<section id="actus">
+    <h2>ACTUS</h2>
+
+    <div class="article">
+        <div class="article-content">
+            <h3 style="color: #12C3FF; font-size: 1.8rem;">ON PRÉPARE UN NOUVEL ALBUM</h3>
+            <p>Dans notre premier album <strong>"Club Roger"</strong> sorti en 2025, on reprenait des génériques de dessins animés.</p>
+            <p>Sauf qu'on s'est rendu compte qu'on n'avait pas fait TOUS les génériques existants... donc on remet ça !</p>
+            <p style="font-weight: bold; color: #12C3FF;">Sortie prévue en 2026 !</p>
+        </div>
+        <div class="article-image">
+            <img src="photo7.jpg" alt="Nouvel Album">
+        </div>
+    </div>
+
+    <div class="article article-reverse">
+        <div class="article-content">
+            <h3 style="color: #12C3FF; font-size: 1.8rem;">PLEIN DE DATES EN 2026 !</h3>
+            <p>On en avait plein en 2025, on en a encore plus en 2026 ! Bars, festoches... on va bien s'éclater.</p>
+            <p>On compte sur toi pour venir chanter avec nous !</p>
+            <a href="#concerts" class="btn">Voir les dates de concerts</a>
+        </div>
+        <div class="article-image">
+            <img src="photo11.jpg" alt="Concerts GMR">
+        </div>
+    </div>
+</section>
+
+<section id="concerts">
+    <h2>CONCERTS</h2>
+    <p>Le calendrier arrive très bientôt...</p>
+</section>
+
+<section id="musiques">
+    <h2>MUSIQUES</h2>
+    <p>Retrouve nos morceaux ici...</p>
+</section>
+
+<section id="contact">
+    <h2>CONTACT</h2>
+    <p>Pour toute demande : gmr-punkrock@email.com</p>
 </section>
 
 </body>
