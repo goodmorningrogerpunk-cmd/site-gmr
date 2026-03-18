@@ -230,9 +230,34 @@ h2 {
     .article-actus { flex-direction: column; align-items: center; text-align: center; }
     .actus-content h3 { text-align: center; }
 }
+        /* --- STYLE DE L'AGRANDISSEMENT (LIGHTBOX) --- */
+#lightbox {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+}
+
+#lightbox img {
+    max-width: 90%;
+    max-height: 80%;
+    border: 3px solid #12C3FF;
+    box-shadow: 0 0 20px rgba(18, 195, 255, 0.5);
+}
+
+/* On change le curseur sur les photos cliquables */
+.presentation-item img, .actus-photo img {
+    cursor: zoom-in;
+}
     </style>
 </head>
 <body>
+    <div id="lightbox" onclick="this.style.display='none'"><img src="" alt="Agrandissement"></div>
     <img src="Goodmorningrogerlogo.png" class="logo-groupe-principal" alt="Good Morning Roger Logo">
 
     <nav>
@@ -446,6 +471,21 @@ h2 {
         </div>
 
         <p style="margin-top: 80px; font-size: 0.7rem; color: #444; text-transform: uppercase; letter-spacing: 2px;">
+<script>
+    // On récupère toutes les images de la présentation et des actus
+    const images = document.querySelectorAll('.presentation-item img, .actus-photo img');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = lightbox.querySelector('img');
 
+    images.forEach(img => {
+        img.addEventListener('click', () => {
+            // On vérifie que ce n'est pas une vidéo (iframe)
+            if (img.src) {
+                lightboxImg.src = img.src;
+                lightbox.style.display = 'flex';
+            }
+        });
+    });
+</script>
 </body>
 </html>
