@@ -115,8 +115,32 @@
 
 <section id="concerts">
     <h2>CONCERTS</h2>
-    <p>Le calendrier arrive très bientôt...</p>
-</section>
+    
+    <style>
+        .concert-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-family: 'Arial', sans-serif; }
+        .concert-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 10px; border-bottom: 1px solid #333; }
+        
+        /* Une ligne sur deux en gris très foncé (#111) */
+        .concert-row:nth-child(even) { background-color: #111; }
+        
+        .concert-info { flex: 2; }
+        .concert-lieu { font-size: 1.4rem; font-weight: bold; color: #fff; text-transform: uppercase; display: block; }
+        .concert-ville { font-size: 1rem; color: #bbb; }
+        .concert-date { flex: 1; text-align: right; font-size: 1.3rem; font-weight: bold; color: #12C3FF; font-family: 'Arial Black'; }
+
+        @media (max-width: 600px) {
+            .concert-lieu { font-size: 1.1rem; }
+            .concert-date { font-size: 1rem; }
+        }
+    </style>
+
+    <div class="concert-table">
+        <div class="concert-row"><div class="concert-info"><span class="concert-lieu">La Gapette</span><span class="concert-ville">Les Epesses (85)</span></div><div class="concert-date">28/03/2026</div></div>
+        <div class="concert-row"><div class="concert-info"><span class="concert-lieu">Lutin de Travers</span><span class="concert-ville">Nantes (44)</span></div><div class="concert-date">04/04/2026</div></div>
+        <div class="concert-row"><div class="concert-info"><span class="concert-lieu">La Forge</span><span class="concert-ville">Chambretaud (85)</span></div><div class="concert-date">05/04/2026</div></div>
+        <div class="concert-row"><div class="concert-info"><span class="concert-lieu">Concert privé (Dockers)</span><span class="concert-ville">Saint-Gildas-des-Bois</span></div><div class="concert-date">30/04/2026</div></div>
+        <div class="concert-row"><div class="concert-info"><span class="concert-lieu">Brasserie Horizon</span><span class="concert-ville">Questembert (56)</span></div><div class="concert-date">08/05/2026</div></div>
+        <div class="concert-row"><div class="concert-info"><span class="concert-lieu">Concert privé (Jennifer)</span><span class="concert-ville">Hénansal (22)
 
 <section id="musiques">
     <h2>MUSIQUES</h2>
