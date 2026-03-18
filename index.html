@@ -25,6 +25,41 @@ body {
     width: 450px;
     height: auto;
     filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.4));
+    /* Transition fluide avec effet ressort */
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s;
+    cursor: pointer;
+}
+
+/* Effet d'inclinaison et de zoom au survol */
+.logo-groupe-principal:hover {
+    transform: scale(1.08) rotate(3deg);
+    filter: drop-shadow(0px 0px 25px rgba(18, 195, 255, 0.7));
+}
+
+nav {
+    background: rgba(0, 0, 0, 0.9);
+    padding: 15px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 2px solid #12C3FF;
+    text-align: center;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 15px;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.4rem;
+    transition: 0.3s;
+    display: inline-block; /* Important pour le scale et rotate */
+}
+
+nav a:hover {
+    color: #12C3FF;
+    text-shadow: 0px 0px 10px rgba(18, 195, 255, 0.7);
+    transform: scale(1.2) rotate(-2deg);
 }
 
 nav {
