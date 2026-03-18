@@ -368,6 +368,18 @@ nav a:hover {
         margin: 50px 0 30px 0;
     }
 }
+        @media (max-width: 768px) {
+    header, .header-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .logo, .chat-icon {
+        margin: 10px auto !important;
+        display: block;
+    }
+}
     </style>
 </head>
 <body>
@@ -393,8 +405,8 @@ nav a:hover {
     <div class="article-video">
         <div class="presentation-item">
             <div class="video-container" style="position: relative; padding-bottom: 177.77%; height: 0; overflow: hidden; border-radius: 8px;">
-                <video autoplay loop muted playsinline controls preload="auto" poster="photo9.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
-    <source src="teasergmrok.mp4" type="video/mp4">
+                <video autoplay loop muted playsinline controls preload="auto" poster="photo9.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background: #000;">
+    <source src="https://goodmorningrogerpunk-cmd.github.io/site-gmr/teasergmrok.mp4" type="video/mp4">
     Votre navigateur ne supporte pas la lecture de vidéos.
 </video>
             </div>
