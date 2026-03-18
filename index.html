@@ -5,27 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Good Morning Roger | Punk Rock</title>
     <style>
-    /* IMPORT DES POLICES */
+    /* 1. IMPORT DES POLICES */
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;700&display=swap');
 
+/* 2. STYLE GLOBAL */
 body {
     background-color: #0a0a0a;
     color: #ffffff;
     margin: 0;
     padding: 0;
     font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
 }
 
-/* LE GRAND LOGO DU GROUPE (PNG) */
+/* 3. LOGO DU GROUPE (PNG) */
 .logo-groupe-principal {
     display: block;
     margin: 40px auto;
-    width: 450px; /* Taille contrôlée pour qu'il ne soit plus immense */
+    width: 450px;
     height: auto;
-    filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.4)); /* Lueur cyan subtile */
+    filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.4));
 }
 
-/* LE MENU DE NAVIGATION */
+/* 4. MENU DE NAVIGATION */
 nav {
     background: rgba(0, 0, 0, 0.9);
     padding: 15px;
@@ -46,13 +48,11 @@ nav a {
 }
 
 nav a:hover {
-    color: #12C3FF; /* Le texte devient bleu cyan */
-    text-shadow: 0px 0px 10px rgba(18, 195, 255, 0.7); /* Petite lueur néon */
-    letter-spacing: 2px; /* Les lettres s'écartent très légèrement */
-    transition: all 0.3s ease; /* Animation fluide */
+    color: #12C3FF;
+    text-shadow: 0px 0px 10px rgba(18, 195, 255, 0.7);
 }
 
-/* TITRES DE SECTIONS */
+/* 5. TITRES DE SECTIONS */
 h2 {
     font-family: 'Bebas Neue', cursive;
     font-size: 3.5rem;
@@ -62,103 +62,173 @@ h2 {
     letter-spacing: 3px;
 }
 
-/* LES PETITS LOGOS DE CONTACT (Facebook, Insta, etc.) */
-.logo-social {
-    width: 60px; /* Taille fixe pour les icônes de contact */
-    height: auto;
-    transition: transform 0.3s ease;
-    border: none; /* On s'assure qu'il n'y a pas de bordure */
+/* 6. BLOC ARTICLE PRÉSENTATION */
+.article-presentation {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 40px;
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
 }
 
-.logo-social:hover {
-    transform: scale(1.1) rotate(3deg);
+.article-video {
+    flex: 0 0 280px; /* Largeur fixe pour le format portrait */
 }
 
-/* ADAPTATION MOBILE */
-@media (max-width: 600px) {
-    .logo-groupe-principal { width: 85%; }
-    h2 { font-size: 2.5rem; }
+.article-content {
+    flex: 1;
+    color: #ffffff;
 }
-        /* --- AJOUT POUR LA GRILLE DE PRÉSENTATION --- */
 
+.article-content h3 {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 2.5rem;
+    margin-top: 0;
+    margin-bottom: 5px;
+    color: #ffffff;
+    text-align: left;
+}
+
+.article-subtitle {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.4rem;
+    color: #ffffff;
+    margin-bottom: 20px;
+    display: block;
+}
+
+/* 7. GRILLE DE PHOTOS PORTRAIT */
 .presentation-grid {
     display: grid;
-    /* Crée des colonnes automatiques de 280px minimum */
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    margin-top: 40px;
-    padding: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
 }
 
 .presentation-item {
-    background: #111;
     border-radius: 8px;
     overflow: hidden;
     border: 1px solid #333;
-    transition: transform 0.3s ease, border-color 0.3s ease;
+    transition: 0.3s;
 }
 
 .presentation-item:hover {
-    transform: translateY(-5px); /* Petit saut vers le haut au survol */
     border-color: #12C3FF;
+    transform: scale(1.03);
 }
 
 .presentation-item img {
     width: 100%;
-    height: auto; /* Empêche de rogner l'image */
+    height: auto;
     display: block;
 }
 
-/* Ratio spécial pour le YouTube Short (9:16) */
+/* CONTENEUR VIDÉO PORTRAIT */
 .video-container {
     position: relative;
     padding-bottom: 177.77%; 
     height: 0;
-    overflow: hidden;
 }
 
 .video-container iframe {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
 }
-        /* Mise en page de l'en-tête de présentation (Vidéo + Texte) */
-.presentation-header {
+
+/* 8. LOGOS SOCIAUX & STREAMING */
+.logo-social {
+    width: 60px;
+    height: auto;
+    transition: 0.3s;
+}
+
+.logo-social:hover {
+    transform: scale(1.1) rotate(3deg);
+    filter: drop-shadow(0px 0px 8px #12C3FF);
+}
+
+/* 9. RESPONSIVE MOBILE */
+@media (max-width: 800px) {
+    .article-presentation { flex-direction: column; align-items: center; text-align: center; }
+    .article-content h3 { text-align: center; }
+    .logo-groupe-principal { width: 80%; }
+    h2 { font-size: 2.5rem; }
+}
+        /* STYLE POUR LES ARTICLES D'ACTUS */
+.news-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #222;
+    padding: 25px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    max-width: 850px;
+    margin-left: auto;
+    margin-right: auto;
+    transition: 0.3s;
+}
+
+.news-item:hover {
+    border-color: #12C3FF;
+    background: rgba(18, 195, 255, 0.02);
+}
+
+.news-date {
+    color: #12C3FF;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.2rem;
+    display: block;
+    margin-bottom: 10px;
+}
+        /* BLOC ARTICLE ACTUS */
+.article-actus {
     display: flex;
-    align-items: center;
-    gap: 40px;
-    margin-bottom: 50px;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 30px;
+    max-width: 900px;
+    margin: 0 auto 60px auto;
+    padding: 20px;
+    border-bottom: 1px solid #222; /* Séparation discrète entre les articles */
+}
+
+.actus-photo {
+    flex: 0 0 300px; /* Largeur fixe pour la photo portrait */
+}
+
+.actus-photo img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    border: 1px solid #333;
+}
+
+.actus-content {
+    flex: 1;
+    color: #ffffff;
     text-align: left;
 }
 
-.presentation-video-side {
-    flex: 1;
-    max-width: 300px; /* On limite la largeur pour le format portrait */
+.actus-content h3 {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 2.2rem;
+    color: #ffffff;
+    margin-top: 0;
+    margin-bottom: 15px;
 }
 
-.presentation-text-side {
-    flex: 2;
+.actus-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
 }
 
-.presentation-text-side p {
-    font-size: 1.15rem;
-    line-height: 1.8;
-    color: #eee;
-    margin-bottom: 20px;
-}
-
-/* Adaptation pour mobile : on empile la vidéo et le texte */
+/* Responsive Mobile */
 @media (max-width: 800px) {
-    .presentation-header {
-        flex-direction: column;
-        text-align: center;
-    }
-    .presentation-video-side {
-        max-width: 100%;
-        width: 250px; /* On garde un format portrait raisonnable sur mobile */
-    }
+    .article-actus { flex-direction: column; align-items: center; text-align: center; }
+    .actus-content h3 { text-align: center; }
 }
     </style>
 </head>
@@ -167,24 +237,22 @@ h2 {
 
     <nav>
         <a href="#presentation">Présentation</a>
+        <a href="#actus">Actus</a>
         <a href="#concerts">Concerts</a>
         <a href="#musiques">Musiques</a>
         <a href="#contact">Contact</a>
     </nav>
 
 <section id="presentation">
-    <h2 style="margin-bottom: 5px;">Good Morning Roger</h2>
-    <p style="text-align: center; color: #12C3FF; font-family: 'Bebas Neue', cursive; font-size: 1.5rem; margin-bottom: 40px; letter-spacing: 1px;">
-        Des punk covers, des tubes, des dessins animés et du fun
-    </p>
+    <h2>PRÉSENTATION</h2>
 
-    <div class="presentation-header">
+    <div class="article-presentation">
         
-        <div class="presentation-video-side">
+        <div class="article-video">
             <div class="presentation-item">
                 <div class="video-container">
                     <iframe src="https://www.youtube.com/embed/aU68X9G9wcE" 
-                        title="Good Morning Roger Video" frameborder="0" 
+                        title="Good Morning Roger" frameborder="0" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                         allowfullscreen>
                     </iframe>
@@ -192,52 +260,62 @@ h2 {
             </div>
         </div>
 
-        <div class="presentation-text-side">
-            <p>
-                <strong>Good Morning Roger</strong>, c’est le groupe qui a eu la (mauvaise ?) idée de mélanger le punk-rock avec tout ce que tu n’assumais pas d’écouter quand tu étais ado.
-            </p>
-            <p>
-                Au programme : des tubes légendaires comme <em>La Tribu de Dana, Les Rois du Monde, Moi Lolita</em> et même des génériques culte genre <em>Denver le dernier dinosaure</em> ou les classiques du <em>Club Dorothée</em>... le tout à la sauce punk-rock déjanté.
-            </p>
-            <p style="font-weight: bold; color: #12C3FF;">
-                C’est énergique, c’est festif, c’est nostalgique et totalement décomplexé, c'est Good Morning Roger !
-            </p>
+        <div class="article-content">
+            <h3>Good Morning Roger</h3>
+            <span class="article-subtitle">Des punk covers, des tubes, des dessins animés et du fun</span>
+            
+            <div class="article-text">
+                <p>
+                    <strong>Good Morning Roger</strong>, c’est le groupe qui a eu la (mauvaise ?) idée de mélanger le punk-rock avec tout ce que tu n’assumais pas d’écouter quand tu étais ado.
+                </p>
+                <p>
+                    Au programme : des tubes légendaires comme <em>La Tribu de Dana, Les Rois du Monde, Moi Lolita</em> et même des génériques culte genre <em>Denver le dernier dinosaure</em> ou les classiques du <em>Club Dorothée</em>... le tout à la sauce punk-rock déjanté.
+                </p>
+                <p>
+                    C’est énergique, c’est festif, c’est nostalgique et totalement décomplexé, c'est Good Morning Roger !
+                </p>
+            </div>
         </div>
     </div>
 
     <div class="presentation-grid">
-        <div class="presentation-item"><img src="photo9.jpg" alt="GMR Photo 1"></div>
-        <div class="presentation-item"><img src="photo1.jpg" alt="GMR Photo 2"></div>
-        <div class="presentation-item"><img src="photo4.jpg" alt="GMR Photo 3"></div>
-        <div class="presentation-item"><img src="photo5.jpg" alt="GMR Photo 4"></div>
-        <div class="presentation-item"><img src="photo10.jpg" alt="GMR Photo 5"></div>
+        <div class="presentation-item"><img src="photo9.jpg" alt="Live GMR"></div>
+        <div class="presentation-item"><img src="photo1.jpg" alt="Live GMR"></div>
+        <div class="presentation-item"><img src="photo4.jpg" alt="Live GMR"></div>
+        <div class="presentation-item"><img src="photo5.jpg" alt="Live GMR"></div>
+        <div class="presentation-item"><img src="photo10.jpg" alt="Live GMR"></div>
     </div>
 </section>
 
 <section id="actus">
     <h2>ACTUS</h2>
 
-    <div class="article">
-        <div class="article-content">
-            <h3 style="color: #12C3FF; font-size: 1.8rem;">ON PRÉPARE UN NOUVEL ALBUM</h3>
-            <p>Dans notre premier album <strong>"Club Roger"</strong> sorti en 2025, on reprenait des génériques de dessins animés.</p>
-            <p>Sauf qu'on s'est rendu compte qu'on n'avait pas fait TOUS les génériques existants... donc on remet ça !</p>
-            <p style="font-weight: bold; color: #12C3FF;">Sortie prévue en 2026 !</p>
+    <div class="article-actus">
+        <div class="actus-photo">
+            <img src="photo7.jpg" alt="Album Club Roger">
         </div>
-        <div class="article-image">
-            <img src="photo7.jpg" alt="Nouvel Album">
+        <div class="actus-content">
+            <h3>On prépare un nouvel album</h3>
+            <div class="actus-text">
+                <p>Dans notre premier album "Club Roger" sorti en 2025 on reprenait des génériques de dessins animés.</p>
+                <p>Sauf qu'on s'est rendu compte, après coup, qu'on avait pas fait TOUS les génériques qui existaient, du coup ben... on va faire un nouvel album avec d'autres génériques de dessins animés.</p>
+                <p style="font-weight: bold; color: #12C3FF;">Sortie prévue en 2026 !</p>
+            </div>
         </div>
     </div>
 
-    <div class="article article-reverse">
-        <div class="article-content">
-            <h3 style="color: #12C3FF; font-size: 1.8rem;">PLEIN DE DATES EN 2026 !</h3>
-            <p>On en avait plein en 2025, on en a encore plus en 2026 ! Bars, festoches... on va bien s'éclater.</p>
-            <p>On compte sur toi pour venir chanter avec nous !</p>
-            <a href="#concerts" class="btn">Voir les dates de concerts</a>
+    <div class="article-actus">
+        <div class="actus-photo">
+            <img src="photo11.jpg" alt="Dates Concerts">
         </div>
-        <div class="article-image">
-            <img src="photo11.jpg" alt="Concerts GMR">
+        <div class="actus-content">
+            <h3>Plein de dates en 2026 !</h3>
+            <div class="actus-text">
+                <p>On avait plein de dates en 2025, eh ben on en a encore plus en 2026, et ça c'est trop cool !</p>
+                <p>Des bars, des festoches... tout ça tout ça, on va bien s'éclater.</p>
+                <p>On compte sur toi pour venir nous voir et chanter avec nous !</p>
+                <p><a href="#concerts" style="color: #12C3FF; text-decoration: underline; font-weight: bold;">Voir les dates de concerts</a> (et c'est pas fini, y en d'autres qui arrivent)</p>
+            </div>
         </div>
     </div>
 </section>
