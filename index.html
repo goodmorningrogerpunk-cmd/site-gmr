@@ -5,281 +5,123 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Good Morning Roger | Punk Rock</title>
     <style>
-        /* 1. POLICES & GLOBAL */
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;700&display=swap');
+        body { background: #0a0a0a; color: #fff; margin: 0; font-family: 'Roboto', sans-serif; overflow-x: hidden; }
+        
+        /* HEADER & ROGER POP */
+        .logo-wrapper { position: relative; max-width: 450px; margin: 40px auto; cursor: pointer; }
+        .logo-groupe-principal { display: block; width: 100%; filter: drop-shadow(0 0 20px rgba(18, 195, 255, 0.8)); transition: 0.4s; position: relative; z-index: 2; }
+        .mascotte-pop { position: absolute; top: -60px; left: 15%; width: 140px; transform: rotate(-15deg) scale(0); opacity: 0; z-index: 1; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .logo-wrapper:hover .logo-groupe-principal { transform: scale(1.05); }
+        .logo-wrapper:hover .mascotte-pop { opacity: 1; transform: rotate(-15deg) scale(1) translateY(-10px); }
 
-        body {
-            background-color: #0a0a0a;
-            color: #ffffff;
-            margin: 0;
-            padding: 0;
-            font-family: 'Roboto', sans-serif;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
+        nav { background: rgba(0,0,0,0.9); padding: 15px; position: sticky; top: 0; z-index: 1000; border-bottom: 3px solid #12C3FF; text-align: center; }
+        nav a { color: #fff; text-decoration: none; margin: 0 15px; font-family: 'Bebas Neue'; font-size: 1.5rem; transition: 0.3s; }
+        nav a:hover { color: #12C3FF; }
 
-        /* 2. LOGO WRAPPER + CHAT ROGER */
-        .logo-wrapper {
-            position: relative;
-            max-width: 450px;
-            margin: 40px auto;
-            cursor: pointer;
-        }
+        h2 { font-family: 'Bebas Neue'; font-size: 3.5rem; color: #12C3FF; text-align: center; margin: 60px 0 30px; letter-spacing: 3px; }
+        
+        .container { max-width: 1000px; margin: auto; padding: 0 20px; }
+        .flex-art { display: flex; gap: 40px; align-items: flex-start; margin-bottom: 50px; }
+        .media { flex: 0 0 280px; }
+        .video-box { position: relative; padding-bottom: 177%; height: 0; border-radius: 10px; overflow: hidden; }
+        .video-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-        .logo-groupe-principal {
-            display: block;
-            width: 100%;
-            height: auto;
-            filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.4));
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            z-index: 2;
-        }
+        /* GRILLE PHOTOS */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 30px; }
+        .grid img { width: 100%; border-radius: 8px; border: 1px solid #333; transition: 0.3s; cursor: zoom-in; }
+        .grid img:hover { border-color: #12C3FF; transform: scale(1.03); }
 
-        .mascotte-pop {
-            position: absolute;
-            top: -60px;
-            left: 20%; /* Position à 1/3 gauche environ */
-            width: 135px;
-            height: auto;
-            transform: rotate(-15deg) scale(0);
-            opacity: 0;
-            z-index: 1;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        /* CONCERTS */
+        .c-row { display: flex; align-items: center; background: #151515; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid #333; transition: 0.3s; text-decoration: none; color: #fff; }
+        .c-row:hover { border-left-color: #12C3FF; transform: translateX(10px); background: #1a1a1a; }
+        .c-date { flex: 0 0 80px; text-align: center; border-right: 1px solid #333; margin-right: 20px; }
+        .c-day { display: block; font-family: 'Bebas Neue'; font-size: 2rem; color: #12C3FF; }
+        .c-lieu { font-family: 'Bebas Neue'; font-size: 1.5rem; }
 
-        .logo-wrapper:hover .logo-groupe-principal {
-            transform: scale(1.08) rotate(3deg);
-        }
-
-        .logo-wrapper:hover .mascotte-pop {
-            opacity: 1;
-            transform: rotate(-15deg) scale(1);
-        }
-
-        /* 3. NAVIGATION */
-        nav {
-            background: rgba(0, 0, 0, 0.9);
-            padding: 15px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 2px solid #12C3FF;
-            text-align: center;
-        }
-
-        nav a {
-            color: #fff;
-            text-decoration: none;
-            margin: 0 15px;
-            font-family: 'Bebas Neue', cursive;
-            font-size: 1.4rem;
-            transition: 0.3s;
-            display: inline-block;
-        }
-
-        nav a:hover { color: #12C3FF; transform: scale(1.1); }
-
-        /* 4. TITRES SECTIONS */
-        h2 {
-            font-family: 'Bebas Neue', cursive;
-            font-size: 3.5rem;
-            color: #12C3FF;
-            text-align: center;
-            margin-top: 60px;
-            letter-spacing: 3px;
-        }
-
-        /* 5. ARTICLES & MISE EN PAGE */
-        .article-presentation, .article-actus {
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            gap: 40px;
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        .article-video, .actus-photo { flex: 0 0 280px; }
-        .article-content, .actus-content { flex: 1; }
-
-        .article-content h3, .actus-content h3 {
-            font-family: 'Bebas Neue', cursive;
-            font-size: 2.5rem;
-            margin: 0 0 10px 0;
-        }
-
-        .article-subtitle {
-            font-family: 'Bebas Neue', cursive;
-            font-size: 1.3rem;
-            color: #12C3FF;
-            display: block;
-            margin-bottom: 15px;
-        }
-
-        .video-container {
-            position: relative;
-            padding-bottom: 177.77%; 
-            height: 0;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .video-container iframe {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-        }
-
-        .presentation-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            max-width: 1100px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        .presentation-item { border-radius: 8px; overflow: hidden; border: 1px solid #333; transition: 0.3s; }
-        .presentation-item img { width: 100%; display: block; cursor: zoom-in; }
-
-        /* 6. CONCERTS */
-        .concert-list { max-width: 900px; margin: 40px auto; padding: 0 20px; }
-        .concert-row-link { text-decoration: none; color: inherit; display: block; margin-bottom: 12px; }
-        .concert-row {
-            display: flex; align-items: center; background: rgba(255,255,255,0.03);
-            padding: 15px; border-radius: 8px; border-left: 4px solid #333; transition: 0.3s;
-        }
-        .concert-row:hover { background: rgba(18,195,255,0.07); border-left-color: #12C3FF; transform: translateX(10px); }
-        .concert-date-box { flex: 0 0 80px; text-align: center; border-right: 1px solid #444; margin-right: 20px; }
-        .date-day { font-family: 'Bebas Neue', cursive; font-size: 2.2rem; color: #12C3FF; display: block; line-height: 1; }
-        .date-month { font-family: 'Bebas Neue', cursive; font-size: 1rem; }
-        .concert-lieu { font-family: 'Bebas Neue', cursive; font-size: 1.5rem; display: block; }
-        .concert-ville { color: #12C3FF; font-size: 0.9rem; }
-
-        /* 7. REVEAL & FOOTER */
-        .reveal { opacity: 0; transform: translateY(30px); transition: 0.8s ease-out; }
+        /* REVEAL */
+        .reveal { opacity: 0; transform: translateY(30px); transition: 0.8s; }
         .reveal.active { opacity: 1; transform: translateY(0); }
-        .logo-social { width: 40px; margin: 0 10px; transition: 0.3s; }
-        .logo-social:hover { transform: scale(1.1); filter: drop-shadow(0px 0px 8px #12C3FF); }
 
-        #lightbox {
-            display: none; position: fixed; z-index: 2000; top: 0; left: 0;
-            width: 100%; height: 100%; background: rgba(0,0,0,0.9); align-items: center; justify-content: center;
-        }
-        #lightbox img { max-width: 90%; max-height: 80%; border: 2px solid #12C3FF; }
+        .social { width: 45px; margin: 10px; transition: 0.3s; }
+        .social:hover { transform: scale(1.2); filter: drop-shadow(0 0 8px #12C3FF); }
 
-        @media (max-width: 800px) {
-            .article-presentation, .article-actus { flex-direction: column; align-items: center; text-align: center; }
-            h2 { font-size: 2.5rem; }
-        }
+        #lb { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
+        #lb img { max-width: 90%; max-height: 80%; border: 2px solid #12C3FF; }
+
+        @media (max-width: 768px) { .flex-art { flex-direction: column; align-items: center; text-align: center; } }
     </style>
 </head>
 <body>
-
-    <div id="lightbox" onclick="this.style.display='none'"><img src="" alt="Zoom"></div>
+    <div id="lb" onclick="this.style.display='none'"><img src=""></div>
 
     <div class="logo-wrapper">
-        <img src="Goodmorningrogerlogo.png" class="logo-groupe-principal" alt="Logo Principal">
-        <img src="rogerchat.png" class="mascotte-pop" alt="Roger le Chat">
+        <img src="Goodmorningrogerlogo.png" class="logo-groupe-principal" alt="Logo">
+        <img src="rogerchat.png" class="mascotte-pop" alt="Roger">
     </div>
 
     <nav>
-        <a href="#presentation">Présentation</a>
-        <a href="#actus">Actus</a>
-        <a href="#concerts">Concerts</a>
-        <a href="#contact">Contact</a>
+        <a href="#presentation">PRÉSENTATION</a>
+        <a href="#actus">ACTUS</a>
+        <a href="#concerts">CONCERTS</a>
+        <a href="#musique">MUSIQUE</a>
+        <a href="#contact">CONTACT</a>
     </nav>
 
-    <section id="presentation" class="reveal">
-        <h2>PRÉSENTATION</h2>
-        <div class="article-presentation">
-            <div class="article-video">
-                <div class="video-container">
-                    <iframe src="https://www.youtube.com/embed/aU68X9G9wcE" frameborder="0" allowfullscreen></iframe>
+    <div class="container">
+        <section id="presentation" class="reveal">
+            <h2>PRÉSENTATION</h2>
+            <div class="flex-art">
+                <div class="media"><div class="video-box"><iframe src="https://www.youtube.com/embed/aU68X9G9wcE" frameborder="0" allowfullscreen></iframe></div></div>
+                <div>
+                    <h3 style="font-family:'Bebas Neue'; font-size:2.5rem; margin:0;">GOOD MORNING ROGER</h3>
+                    <p>Le punk-rock revisite tes tubes préférés. De Moi Lolita aux génériques TV, tout y passe !</p>
                 </div>
             </div>
-            <div class="article-content">
-                <h3>Good Morning Roger</h3>
-                <span class="article-subtitle">Punk covers & tubes décomplexés</span>
-                <p><strong>Good Morning Roger</strong>, c’est le groupe qui mélange le punk-rock avec tout ce que tu n’assumais pas d’écouter ado. De <em>Moi Lolita</em> aux génériques du <em>Club Dorothée</em>, tout y passe !</p>
+            <div class="grid">
+                <img src="photo9.jpg"><img src="photo1.jpg"><img src="photo4.jpg"><img src="photo5.jpg">
             </div>
-        </div>
-        <div class="presentation-grid">
-            <div class="presentation-item"><img src="photo9.jpg" alt="GMR 1"></div>
-            <div class="presentation-item"><img src="photo1.jpg" alt="GMR 2"></div>
-            <div class="presentation-item"><img src="photo4.jpg" alt="GMR 3"></div>
-            <div class="presentation-item"><img src="photo5.jpg" alt="GMR 4"></div>
-        </div>
-    </section>
+        </section>
 
-    <section id="actus" class="reveal">
-        <h2>ACTUS</h2>
-        <div class="article-actus">
-            <div class="actus-photo"><img src="photo7.jpg" style="width:100%; border-radius:5px;" alt="Actu"></div>
-            <div class="actus-content">
-                <h3>Nouvel album en 2026</h3>
-                <p>On prépare la suite de "Club Roger". Encore plus de génériques cultes et de gros sons punk-rock déjantés !</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="concerts" class="reveal">
-        <h2>CONCERTS</h2>
-        <div class="concert-list">
-            <a href="https://www.facebook.com/Gapette/" target="_blank" class="concert-row-link">
-                <div class="concert-row">
-                    <div class="concert-date-box"><span class="date-day">28</span><span class="date-month">MARS</span></div>
-                    <div class="concert-info"><span class="concert-lieu">La Gapette</span><span class="concert-ville">Les Epesses (85)</span></div>
+        <section id="actus" class="reveal">
+            <h2>ACTUS</h2>
+            <div class="flex-art">
+                <div class="media"><img src="photo7.jpg" style="width:100%; border-radius:8px;"></div>
+                <div>
+                    <h3 style="font-family:'Bebas Neue'; font-size:2rem; margin:0;">NOUVEL ALBUM 2026</h3>
+                    <p>On prépare la suite de "Club Roger" ! Plus de punk, plus de fun.</p>
                 </div>
-            </a>
-            <a href="https://www.facebook.com/lelutindetravers/" target="_blank" class="concert-row-link">
-                <div class="concert-row">
-                    <div class="concert-date-box"><span class="date-day">04</span><span class="date-month">AVRIL</span></div>
-                    <div class="concert-info"><span class="concert-lieu">Lutin de Travers</span><span class="concert-ville">Nantes (44)</span></div>
-                </div>
-            </a>
-        </div>
-    </section>
+            </div>
+        </section>
 
-    <section id="contact" class="reveal">
-        <h2>CONTACT</h2>
-        <div style="text-align: center; max-width: 900px; margin: auto; padding-bottom: 60px;">
-            <p style="font-family: 'Bebas Neue'; font-size: 1.8rem; color: #12C3FF;">TU VEUX NOUS PROGRAMMER ?</p>
-            <div style="margin: 30px 0;">
-                <a href="mailto:goodmorningroger.punk@gmail.com" style="text-decoration: none;">
-                    <img src="logo10.jpg" class="logo-social" style="width: 70px;" alt="Email">
-                    <p style="color: #12C3FF; font-weight: bold; text-decoration: underline;">goodmorningroger.punk@gmail.com</p>
-                </a>
+        <section id="concerts" class="reveal">
+            <h2>CONCERTS</h2>
+            <a href="#" class="c-row"><div class="c-date"><span class="c-day">28</span>MARS</div><div><span class="c-lieu">LA GAPETTE</span><br><small>Les Epesses (85)</small></div></a>
+            <a href="#" class="c-row"><div class="c-date"><span class="c-day">04</span>AVRIL</div><div><span class="c-lieu">LUTIN DE TRAVERS</span><br><small>Nantes (44)</small></div></a>
+        </section>
+
+        <section id="musique" class="reveal">
+            <h2>MUSIQUE</h2>
+            <iframe style="border:0; width:100%; height:120px; margin-bottom:10px;" src="https://bandcamp.com/EmbeddedPlayer/album=1414452669/transparent=true/"></iframe>
+            <iframe style="border:0; width:100%; height:120px;" src="https://bandcamp.com/EmbeddedPlayer/album=1871139396/transparent=true/"></iframe>
+        </section>
+
+        <section id="contact" class="reveal" style="text-align:center; padding-bottom:80px;">
+            <h2>CONTACT</h2>
+            <p style="font-family:'Bebas Neue'; font-size:1.5rem;">goodmorningroger.punk@gmail.com</p>
+            <div style="margin:20px 0;">
+                <a href="#"><img src="logo.jpg" class="social"></a>
+                <a href="#"><img src="logo2.jpg" class="social"></a>
+                <a href="#"><img src="logo6.jpg" class="social"></a>
             </div>
-            <div style="margin-top: 40px;">
-                <a href="https://www.facebook.com/GoodMorningRoger/"><img src="logo.jpg" class="logo-social" alt="FB"></a>
-                <a href="https://www.instagram.com/goodmorningroger/"><img src="logo2.jpg" class="logo-social" alt="IG"></a>
-                <a href="https://www.youtube.com/@goodmorningroger"><img src="logo6.jpg" class="logo-social" alt="YT"></a>
-            </div>
-            <p style="margin-top: 80px; font-size: 0.7rem; color: #444;">© 2026 GOOD MORNING ROGER - PUNK ROCK</p>
-        </div>
-    </section>
+            <p style="font-size:0.8rem; color:#444;">© 2026 GOOD MORNING ROGER</p>
+        </section>
+    </div>
 
     <script>
-        // 1. REVEAL AU SCROLL
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) { entry.target.classList.add('active'); }
-            });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.reveal').forEach((s) => observer.observe(s));
-
-        // 2. LIGHTBOX
-        const images = document.querySelectorAll('.presentation-item img, .actus-photo img');
-        const lb = document.getElementById('lightbox');
-        const lbImg = lb.querySelector('img');
-        images.forEach(img => {
-            img.addEventListener('click', () => {
-                lbImg.src = img.src;
-                lb.style.display = 'flex';
-            });
-        });
+        const obs = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add('active')), {threshold:0.1});
+        document.querySelectorAll('.reveal').forEach(s => obs.observe(s));
+        document.querySelectorAll('.grid img, .media img').forEach(i => i.onclick = () => { document.querySelector('#lb img').src = i.src; document.getElementById('lb').style.display='flex'; });
     </script>
 </body>
 </html>
