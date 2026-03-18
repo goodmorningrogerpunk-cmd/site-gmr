@@ -3,116 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Good Morning Roger | Punk Rock</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Good Morning Roger - Punk Rock</title>
     <style>
-        :root { --accent: #ffffff; --bg: #000000; }
-        body { background-color: var(--bg); color: #fff; font-family: 'Courier New', Courier, monospace; margin: 0; line-height: 1.6; }
-        
-        /* Menu */
-        nav { position: fixed; top: 0; width: 100%; background: rgba(0,0,0,0.95); display: flex; justify-content: space-between; align-items: center; padding: 10px 5%; border-bottom: 2px solid #333; z-index: 1000; box-sizing: border-box; }
-        .nav-logo img { height: 60px; filter: grayscale(1); transition: 0.3s; }
-        .nav-links a { color: white; text-decoration: none; margin-left: 20px; font-weight: bold; text-transform: uppercase; font-size: 0.8em; border: 1px solid transparent; padding: 5px 10px; }
-        .nav-links a:hover { border: 1px solid #fff; background: #fff; color: #000; }
-
-        /* Sections */
-        section { padding: 120px 10% 60px 10%; min-height: 80vh; border-bottom: 1px solid #222; }
-        h2 { font-size: 3em; text-transform: uppercase; letter-spacing: -2px; margin-bottom: 40px; border-left: 10px solid #fff; padding-left: 20px; }
-
-        /* Grid pour Présentation & Actus */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .card { border: 1px solid #444; padding: 15px; background: #111; }
-        img { max-width: 100%; height: auto; }
-
-        /* Concerts */
-        .concert-item { display: flex; justify-content: space-between; align-items: center; padding: 20px; border: 1px solid #fff; margin-bottom: 10px; transition: 0.3s; }
-        .concert-item:hover { background: #fff; color: #000; }
-        .btn-ticket { background: #fff; color: #000; padding: 10px 20px; text-decoration: none; font-weight: bold; border: 2px solid #fff; }
-        .concert-item:hover .btn-ticket { background: #000; color: #fff; border-color: #000; }
-
-        /* Musique links */
-        .stream-links { display: flex; gap: 20px; flex-wrap: wrap; }
-        .stream-links a { color: #fff; font-size: 1.5em; text-decoration: none; border: 2px solid #fff; padding: 15px 30px; flex-grow: 1; text-align: center; }
-
-        /* Contact & Footer */
-        .contact-box { text-align: center; padding: 50px; border: 5px double #fff; }
-        .social-icons { margin-top: 30px; font-size: 2.5em; }
-        .social-icons a { color: #fff; margin: 0 15px; transition: 0.3s; }
-        .social-icons a:hover { filter: invert(1); }
-
-        @media (max-width: 768px) {
-            nav { flex-direction: column; padding: 10px; }
-            .nav-links { margin-top: 10px; display: flex; flex-wrap: wrap; justify-content: center; }
-            .nav-links a { margin: 5px; font-size: 0.7em; }
-        }
+        body { background-color: #000; color: #fff; font-family: 'Arial Black', sans-serif; margin: 0; padding: 0; text-transform: uppercase; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 2px solid #fff; position: sticky; top: 0; background: #000; z-index: 100; }
+        .nav-logo img { height: 60px; }
+        section { padding: 50px 20px; border-bottom: 1px solid #222; max-width: 1000px; margin: auto; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        img { width: 100%; height: auto; border: 2px solid #fff; }
+        h2 { font-size: 3rem; color: #ff0000; margin-bottom: 20px; }
+        .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .photo-grid img { height: 250px; object-fit: cover; }
+        @media (max-width: 768px) { .grid, .photo-grid { grid-template-columns: 1fr; } h2 { font-size: 2rem; } }
     </style>
 </head>
 <body>
 
 <nav>
-    <div class="nav-logo"><a href="#"><img src="Goodmorningrogerlogo.jpg" alt="Logo GMR"></a></div>
-    <div class="nav-links">
-        <a href="#presentation">Présentation</a>
-        <a href="#actus">Actus</a>
-        <a href="#concerts">Concerts</a>
-        <a href="#musique">Musiques</a>
-        <a href="#contact">Contact</a>
-    </div>
+    <div class="nav-logo"><img src="Goodmorningrogerlogo.jpg" alt="Logo GMR"></div>
+    <div>PUNK ROCK BAND</div>
 </nav>
 
 <section id="presentation">
-    <h2>Présentation</h2>
+    <h2>GOOD MORNING ROGER</h2>
     <div class="grid">
-        <div class="text">
-            <p><strong>Good Morning Roger</strong>, c'est du punk rock pur jus.</p>
-            <p>Formé en [Année], le groupe enchaîne les riffs acérés et les textes engagés. Une énergie brute à découvrir d'urgence.</p>
+        <div>
+            <p>Punk Rock brut, énergie sans filtre.</p>
+            <p>[TA BIO ICI : Clique sur le stylo pour modifier ce texte]</p>
         </div>
-        <div class="media">
-            <div class="card">
-                <p>Ta Vidéo YouTube ici</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section id="actus">
-    <h2>Actus</h2>
-    <div class="grid">
-        <div class="card">
-            <img src="Goodmorningrogerlogo.jpg" style="height:150px; object-fit:cover; width:100%;" alt="actu">
-            <h3>Dernière Nouvelle</h3>
-            <p>On prépare de nouvelles surprises pour la rentrée ! Restez branchés.</p>
-        </div>
-    </div>
-</section>
-
-<section id="concerts">
-    <h2>Concerts</h2>
-    <div class="concert-item">
-        <div><strong>DATE</strong> - VILLE - LIEU</div>
-        <a href="#" class="btn-ticket">BILLETTERIE</a>
-    </div>
-</section>
-
-<section id="musique">
-    <h2>Écouter</h2>
-    <div class="stream-links">
-        <a href="LIEN_SPOTIFY" target="_blank"><i class="fab fa-spotify"></i> SPOTIFY</a>
-        <a href="LIEN_APPLE" target="_blank"><i class="fab fa-apple"></i> APPLE</a>
-        <a href="LIEN_DEEZER" target="_blank"><i class="fab fa-deezer"></i> DEEZER</a>
-    </div>
-</section>
-
-<section id="contact" style="border-bottom: none;">
-    <div class="contact-box">
-        <h2>Contact</h2>
-        <p>Booking & Infos : <br><strong>goodmorningroger.punk@gmail.com</strong></p>
-        <a href="mailto:goodmorningroger.punk@gmail.com" class="btn-ticket">NOUS ÉCRIRE</a>
-        <div class="social-icons">
-            <a href="LIEN_FB" target="_blank"><i class="fab fa-facebook"></i></a>
-            <a href="LIEN_INSTA" target="_blank"><i class="fab fa-instagram"></i></a>
-            <a href="LIEN_TIKTOK" target="_blank"><i class="fab fa-tiktok"></i></a>
-            <a href="LIEN_YOUTUBE" target="_blank"><i class="fab fa-youtube"></i></a>
+        <div class="photo-grid">
+            <img src="photo1.jpg" alt="Photo 1">
+            <img src="photo2.jpg" alt="Photo 2">
+            <img src="photo3.jpg" alt="Photo 3">
+            <img src="photo4.jpg" alt="Photo 4">
         </div>
     </div>
 </section>
