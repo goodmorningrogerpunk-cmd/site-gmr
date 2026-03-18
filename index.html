@@ -43,24 +43,26 @@ body {
 /* La mascotte Roger le chat (Pop-up) */
 .mascotte-pop {
     position: absolute;
-    /* Positionnement : En haut à droite, derrière le logo */
-    top: -50px;   /* Ajuste cette valeur pour monter/descendre le chat */
-    right: -80px; /* Ajuste cette valeur pour décaler le chat à droite */
-    width: 150px; /* Taille du chat */
+    /* POSITIONNEMENT : 1/3 en partant de la gauche */
+    top: -60px;    /* Ajuste pour qu'il dépasse plus ou moins en hauteur */
+    left: 20%;     /* Environ 1/3 du logo (tu peux tester 15% ou 25% selon le rendu) */
+    width: 140px;  /* Taille du chat */
     height: auto;
     
-    /* Inclinaison par défaut du chat */
-    transform: rotate(15deg) scale(0); /* scale(0) = invisible au départ */
+    /* Inclinaison : on le penche un peu vers la gauche (-15deg) pour le style */
+    transform: rotate(-15deg) scale(0); 
     
-    /* Cache le chat */
     opacity: 0;
+    z-index: 1; /* Reste DERRIÈRE le logo */
     
-    /* Z-index plus faible pour passer DERRIÈRE le logo */
-    z-index: 1;
-    
-    /* Transition fluide pour l'apparition */
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    filter: drop-shadow(0px 0px 10px rgba(18, 195, 255, 0.3));
+    filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.5));
+}
+
+/* L'effet au survol reste le même, mais on s'assure que la rotation finale est cohérente */
+.logo-wrapper:hover .mascotte-pop {
+    opacity: 1;
+    transform: rotate(-15deg) scale(1);
 }
 
 /* --- EFFETS AU SURVOL DU WRAPPER --- */
