@@ -18,7 +18,7 @@ body {
     line-height: 1.6;
 }
 
-/* 3. LOGO DU GROUPE (PNG) */
+/* 3. LOGO & NAV */
 .logo-groupe-principal {
     display: block;
     margin: 40px auto;
@@ -27,7 +27,6 @@ body {
     filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.4));
 }
 
-/* 4. MENU DE NAVIGATION */
 nav {
     background: rgba(0, 0, 0, 0.9);
     padding: 15px;
@@ -47,12 +46,8 @@ nav a {
     transition: 0.3s;
 }
 
-nav a:hover {
-    color: #12C3FF;
-    text-shadow: 0px 0px 10px rgba(18, 195, 255, 0.7);
-}
+nav a:hover { color: #12C3FF; text-shadow: 0px 0px 10px rgba(18, 195, 255, 0.7); }
 
-/* 5. TITRES DE SECTIONS */
 h2 {
     font-family: 'Bebas Neue', cursive;
     font-size: 3.5rem;
@@ -62,8 +57,8 @@ h2 {
     letter-spacing: 3px;
 }
 
-/* 6. BLOC ARTICLE PRÉSENTATION */
-.article-presentation {
+/* 4. ARTICLES (PRÉSENTATION & ACTUS) */
+.article-presentation, .article-actus {
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -73,33 +68,39 @@ h2 {
     padding: 0 20px;
 }
 
-.article-video {
-    flex: 0 0 280px; /* Largeur fixe pour le format portrait */
+.article-video, .actus-photo {
+    flex: 0 0 280px;
 }
 
-.article-content {
+.article-content, .actus-content {
     flex: 1;
     color: #ffffff;
+    text-align: left;
 }
 
-.article-content h3 {
+.article-content h3, .actus-content h3 {
     font-family: 'Bebas Neue', cursive;
     font-size: 2.5rem;
     margin-top: 0;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
     color: #ffffff;
-    text-align: left;
 }
 
 .article-subtitle {
     font-family: 'Bebas Neue', cursive;
     font-size: 1.4rem;
-    color: #ffffff;
     margin-bottom: 20px;
     display: block;
 }
 
-/* 7. GRILLE DE PHOTOS PORTRAIT */
+.actus-photo img {
+    width: 100%;
+    border-radius: 5px;
+    border: 1px solid #333;
+    cursor: zoom-in;
+}
+
+/* 5. GRILLE PHOTOS PRÉSENTATION */
 .presentation-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -116,121 +117,71 @@ h2 {
     transition: 0.3s;
 }
 
-.presentation-item:hover {
-    border-color: #12C3FF;
-    transform: scale(1.03);
-}
+.presentation-item:hover { border-color: #12C3FF; transform: scale(1.03); }
 
-.presentation-item img {
-    width: 100%;
-    height: auto;
-    display: block;
-}
+.presentation-item img { width: 100%; display: block; cursor: zoom-in; }
 
-/* CONTENEUR VIDÉO PORTRAIT */
 .video-container {
     position: relative;
     padding-bottom: 177.77%; 
     height: 0;
 }
 
-.video-container iframe {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-}
+.video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-/* 8. LOGOS SOCIAUX & STREAMING */
-.logo-social {
-    width: 60px;
-    height: auto;
-    transition: 0.3s;
-}
-
-.logo-social:hover {
-    transform: scale(1.1) rotate(3deg);
-    filter: drop-shadow(0px 0px 8px #12C3FF);
-}
-
-/* 9. RESPONSIVE MOBILE */
-@media (max-width: 800px) {
-    .article-presentation { flex-direction: column; align-items: center; text-align: center; }
-    .article-content h3 { text-align: center; }
-    .logo-groupe-principal { width: 80%; }
-    h2 { font-size: 2.5rem; }
-}
-        /* STYLE POUR LES ARTICLES D'ACTUS */
-.news-item {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #222;
-    padding: 25px;
-    border-radius: 10px;
-    margin-bottom: 30px;
-    max-width: 850px;
-    margin-left: auto;
-    margin-right: auto;
-    transition: 0.3s;
-}
-
-.news-item:hover {
-    border-color: #12C3FF;
-    background: rgba(18, 195, 255, 0.02);
-}
-
-.news-date {
-    color: #12C3FF;
-    font-family: 'Bebas Neue', cursive;
-    font-size: 1.2rem;
-    display: block;
-    margin-bottom: 10px;
-}
-        /* BLOC ARTICLE ACTUS */
-.article-actus {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 30px;
+/* 6. SECTION CONCERTS */
+.concert-list {
     max-width: 900px;
-    margin: 0 auto 60px auto;
-    padding: 20px;
-    border-bottom: 1px solid #222; /* Séparation discrète entre les articles */
+    margin: 40px auto;
+    padding: 0 20px;
 }
 
-.actus-photo {
-    flex: 0 0 300px; /* Largeur fixe pour la photo portrait */
-}
-
-.actus-photo img {
-    width: 100%;
-    height: auto;
-    border-radius: 5px;
-    border: 1px solid #333;
-}
-
-.actus-content {
-    flex: 1;
-    color: #ffffff;
-    text-align: left;
-}
-
-.actus-content h3 {
-    font-family: 'Bebas Neue', cursive;
-    font-size: 2.2rem;
-    color: #ffffff;
-    margin-top: 0;
+.concert-row {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
     margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #333;
+    transition: 0.3s;
 }
 
-.actus-text {
-    font-size: 1.1rem;
-    line-height: 1.6;
+.concert-row:hover {
+    background: rgba(18, 195, 255, 0.07);
+    border-left-color: #12C3FF;
+    transform: translateX(10px);
 }
 
-/* Responsive Mobile */
-@media (max-width: 800px) {
-    .article-actus { flex-direction: column; align-items: center; text-align: center; }
-    .actus-content h3 { text-align: center; }
+.concert-date-box {
+    flex: 0 0 80px;
+    text-align: center;
+    border-right: 1px solid #444;
+    margin-right: 25px;
+    padding-right: 15px;
 }
-        /* --- STYLE DE L'AGRANDISSEMENT (LIGHTBOX) --- */
+
+.date-day { font-family: 'Bebas Neue', cursive; font-size: 2.2rem; line-height: 1; color: #12C3FF; display: block; }
+.date-month { font-family: 'Bebas Neue', cursive; font-size: 1rem; color: #fff; display: block; }
+
+.concert-info { flex: 1; text-align: left; }
+.concert-lieu { font-family: 'Bebas Neue', cursive; font-size: 1.5rem; display: block; }
+.concert-ville { color: #12C3FF; font-size: 0.95rem; font-weight: bold; }
+
+.concert-link {
+    color: #12C3FF;
+    text-decoration: none;
+    font-family: 'Bebas Neue', cursive;
+    border: 1px solid #12C3FF;
+    padding: 5px 15px;
+    border-radius: 5px;
+    transition: 0.3s;
+    white-space: nowrap;
+}
+
+.concert-link:hover { background: #12C3FF; color: #000; }
+
+/* 7. LIGHTBOX */
 #lightbox {
     display: none;
     position: fixed;
@@ -238,21 +189,41 @@ h2 {
     top: 0; left: 0;
     width: 100%; height: 100%;
     background-color: rgba(0, 0, 0, 0.9);
-    cursor: pointer;
     align-items: center;
     justify-content: center;
 }
 
-#lightbox img {
-    max-width: 90%;
-    max-height: 80%;
-    border: 3px solid #12C3FF;
-    box-shadow: 0 0 20px rgba(18, 195, 255, 0.5);
-}
+#lightbox img { max-width: 90%; max-height: 80%; border: 3px solid #12C3FF; }
 
-/* On change le curseur sur les photos cliquables */
-.presentation-item img, .actus-photo img {
-    cursor: zoom-in;
+/* 8. RESPONSIVE (MOBILE) */
+@media (max-width: 800px) {
+    h2 { font-size: 2.5rem; }
+    .logo-groupe-principal { width: 80%; }
+    .article-presentation, .article-actus { flex-direction: column; align-items: center; text-align: center; }
+    .article-content h3, .actus-content h3 { text-align: center; }
+    
+    .concert-row { 
+        flex-wrap: wrap; 
+        justify-content: center; 
+        text-align: center; 
+    }
+    
+    .concert-date-box { 
+        border-right: none; 
+        margin-right: 0; 
+        padding-right: 0; 
+        margin-bottom: 10px; 
+        width: 100%; 
+        flex: 0 0 100%;
+    }
+    
+    .concert-info { margin-bottom: 15px; width: 100%; }
+    
+    .concert-link { 
+        width: 100%; 
+        display: block; 
+        box-sizing: border-box; 
+    }
 }
     </style>
 </head>
@@ -347,60 +318,79 @@ h2 {
 
 <section id="concerts">
     <h2>CONCERTS</h2>
-    
-    <style>
-        .concert-table { width: 100%; margin-top: 20px; font-family: 'Arial', sans-serif; }
-        .concert-row { 
-            display: flex; 
-            align-items: center; 
-            padding: 20px 15px; 
-            border-bottom: 1px solid #333; 
-        }
+    <div class="concert-list">
         
-        /* Alternance de fond noir / gris très foncé */
-        .concert-row:nth-child(even) { background-color: #111; }
-        
-        /* La date en premier, gros et bleu cyan */
-        .concert-date { 
-            flex: 0 0 150px; 
-            font-size: 1.5rem; 
-            font-weight: bold; 
-            color: #12C3FF; 
-            font-family: 'Arial Black', sans-serif;
-            text-transform: uppercase;
-        }
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">28</span><span class="date-month">MARS</span></div>
+            <div class="concert-info"><span class="concert-lieu">La Gapette</span><span class="concert-ville">Les Epesses (85)</span></div>
+        </div>
 
-        .concert-info { flex: 1; padding-left: 20px; }
-        .concert-lieu { font-size: 1.4rem; font-weight: bold; color: #fff; text-transform: uppercase; display: block; }
-        .concert-ville { font-size: 1rem; color: #bbb; }
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">04</span><span class="date-month">AVRIL</span></div>
+            <div class="concert-info"><span class="concert-lieu">Lutin de Travers</span><span class="concert-ville">Nantes (44)</span></div>
+        </div>
 
-        /* Ajustement pour mobile */
-        @media (max-width: 600px) {
-            .concert-row { flex-direction: column; align-items: flex-start; gap: 10px; }
-            .concert-date { flex: none; font-size: 1.2rem; }
-            .concert-info { padding-left: 0; }
-            .concert-lieu { font-size: 1.1rem; }
-        }
-    </style>
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">05</span><span class="date-month">AVRIL</span></div>
+            <div class="concert-info"><span class="concert-lieu">La Forge</span><span class="concert-ville">Chambretaud (85)</span></div>
+        </div>
 
-    <div class="concert-table">
-        <div class="concert-row"><div class="concert-date">28 MARS</div><div class="concert-info"><span class="concert-lieu">La Gapette</span><span class="concert-ville">Les Epesses (85)</span></div></div>
-        <div class="concert-row"><div class="concert-date">04 AVRIL</div><div class="concert-info"><span class="concert-lieu">Lutin de Travers</span><span class="concert-ville">Nantes (44)</span></div></div>
-        <div class="concert-row"><div class="concert-date">05 AVRIL</div><div class="concert-info"><span class="concert-lieu">La Forge</span><span class="concert-ville">Chambretaud (85)</span></div></div>
-        <div class="concert-row"><div class="concert-date">08 MAI</div><div class="concert-info"><span class="concert-lieu">Brasserie Horizon</span><span class="concert-ville">Questembert (56)</span></div></div>
-        <div class="concert-row"><div class="concert-date">05 JUIN</div><div class="concert-info"><span class="concert-lieu">Fête de la Musique (La Cave et Vous)</span><span class="concert-ville">Mouzillon (44)</span></div></div>
-        <div class="concert-row"><div class="concert-date">13 JUIN</div><div class="concert-info"><span class="concert-lieu">L'Arcadia</span><span class="concert-ville">Fougères (35)</span></div></div>
-        <div class="concert-row"><div class="concert-date">17 JUIN</div><div class="concert-info"><span class="concert-lieu">La Cave et Vous / Hellfest</span><span class="concert-ville">Clisson (44)</span></div></div>
-        <div class="concert-row"><div class="concert-date">02 JUILLET</div><div class="concert-info"><span class="concert-lieu">V and B</span><span class="concert-ville">Poitiers (86)</span></div></div>
-        <div class="concert-row"><div class="concert-date">04 JUILLET</div><div class="concert-info"><span class="concert-lieu">Mille Bornes</span><span class="concert-ville">Redon (35)</span></div></div>
-        <div class="concert-row"><div class="concert-date">11 JUILLET</div><div class="concert-info"><span class="concert-lieu">Breizh PMS Festival</span><span class="concert-ville">Guémené-Penfao (44)</span></div></div>
-        <div class="concert-row"><div class="concert-date">01 AOÛT</div><div class="concert-info"><span class="concert-lieu">Son et Lumière de Bon Repos</span><span class="concert-ville">Bon-Repos (22)</span></div></div>
-        <div class="concert-row"><div class="concert-date">07 AOÛT</div><div class="concert-info"><span class="concert-lieu">La Minute Blonde</span><span class="concert-ville">Fontenay-le-Comte (85)</span></div></div>
-        <div class="concert-row"><div class="concert-date">29 AOÛT</div><div class="concert-info"><span class="concert-lieu">Festival Rock n' Bylette</span><span class="concert-ville">Malville (44)</span></div></div>
-        <div class="concert-row"><div class="concert-date">18 SEPT.</div><div class="concert-info"><span class="concert-lieu">Brasserie Soma</span><span class="concert-ville">Le Loroux-Bottereau (44)</span></div></div>
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">08</span><span class="date-month">MAI</span></div>
+            <div class="concert-info"><span class="concert-lieu">Brasserie Horizon</span><span class="concert-ville">Questembert (56)</span></div>
+        </div>
+
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">05</span><span class="date-month">JUIN</span></div>
+            <div class="concert-info"><span class="concert-lieu">Fête de la Musique (La Cave et Vous)</span><span class="concert-ville">Mouzillon (44)</span></div>
+        </div>
+
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">13</span><span class="date-month">JUIN</span></div>
+            <div class="concert-info"><span class="concert-lieu">L'Arcadia</span><span class="concert-ville">Fougères (35)</span></div>
+        </div>
+
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">17</span><span class="date-month">JUIN</span></div>
+            <div class="concert-info"><span class="concert-lieu">La Cave et Vous / Hellfest</span><span class="concert-ville">Clisson (44)</span></div>
+        </div>
+
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">02</span><span class="date-month">JUILLET</span></div>
+            <div class="concert-info"><span class="concert-lieu">V and B</span><span class="concert-ville">Poitiers (86)</span></div>
+        </div>
+
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">04</span><span class="date-month">JUILLET</span></div>
+            <div class="concert-info"><span class="concert-lieu">Mille Bornes</span><span class="concert-ville">Redon (35)</span></div>
+        </div>
+
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">11</span><span class="date-month">JUILLET</span></div>
+            <div class="concert-info"><span class="concert-lieu">Breizh PMS Festival</span><span class="concert-ville">Guémené-Penfao (44)</span></div>
+        </div>
+
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">01</span><span class="date-month">AOÛT</span></div>
+            <div class="concert-info"><span class="concert-lieu">Son et Lumière de Bon Repos</span><span class="concert-ville">Bon-Repos (22)</span></div>
+        </div>
+
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">07</span><span class="date-month">AOÛT</span></div>
+            <div class="concert-info"><span class="concert-lieu">La Minute Blonde</span><span class="concert-ville">Fontenay-le-Comte (85)</span></div>
+        </div>
+
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">29</span><span class="date-month">AOÛT</span></div>
+            <div class="concert-info"><span class="concert-lieu">Festival Rock n' Bylette</span><span class="concert-ville">Malville (44)</span></div>
+        </div>
+
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">18</span><span class="date-month">SEPT.</span></div>
+            <div class="concert-info"><span class="concert-lieu">Brasserie Soma</span><span class="concert-ville">Le Loroux-Bottereau (44)</span></div>
+        </div>
+
     </div>
-    
-    <p style="text-align: center; margin-top: 40px; font-style: italic; color: #12C3FF; font-weight: bold;">Et c'est pas fini, d'autres dates arrivent !</p>
 </section>
 
 <section id="musiques">
