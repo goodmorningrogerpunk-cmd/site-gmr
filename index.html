@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Good Morning Roger | Punk Rock</title>
-    <style>
-    /* 1. IMPORT DES POLICES */
+   <style>
+/* 1. IMPORT DES POLICES */
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;700&display=swap');
 
 /* 2. STYLE GLOBAL */
@@ -19,70 +19,57 @@ body {
 }
 
 /* 3. LOGO, MASCOTTE POP & NAV */
-
-/* Le conteneur invisible qui regroupe le logo et le chat */
 .logo-wrapper {
-    position: relative; /* Nécessaire pour positionner le chat par rapport au logo */
-    max-width: 450px;   /* Même largeur que le logo */
-    margin: 40px auto;  /* Centré horizontalement */
+    position: relative;
+    max-width: 450px;
+    margin: 40px auto;
     cursor: pointer;
 }
 
-/* Le logo principal (on lui enlève ses marges car c'est le wrapper qui gère) */
 .logo-groupe-principal {
     display: block;
-    width: 100%; /* Prend toute la largeur du wrapper */
+    width: 100%;
     height: auto;
     filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.4));
-    /* Transition fluide avec effet ressort */
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s;
     position: relative;
-    z-index: 2; /* Passe DEVANT le chat */
+    z-index: 2;
 }
 
-/* La mascotte Roger le chat (Pop-up) */
 .mascotte-pop {
     position: absolute;
-    /* POSITIONNEMENT : 1/3 en partant de la gauche */
-    top: -60px;    /* Ajuste pour qu'il dépasse plus ou moins en hauteur */
-    left: 60%;     /* Environ 1/3 du logo (tu peux tester 15% ou 25% selon le rendu) */
-    width: 140px;  /* Taille du chat */
+    top: -60px;
+    left: 25%; /* Positionné à environ 1/3 gauche */
+    width: 140px;
     height: auto;
-    
-    /* Inclinaison : on le penche un peu vers la gauche (-15deg) pour le style */
-    transform: rotate(-15deg) scale(0); 
-    
+    transform: rotate(-15deg) scale(0);
     opacity: 0;
-    z-index: 1; /* Reste DERRIÈRE le logo */
-    
+    z-index: 1;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.5));
 }
 
-/* L'effet au survol reste le même, mais on s'assure que la rotation finale est cohérente */
+.logo-wrapper:hover .logo-groupe-principal {
+    transform: scale(1.08) rotate(3deg);
+}
+
 .logo-wrapper:hover .mascotte-pop {
     opacity: 1;
     transform: rotate(-15deg) scale(1);
 }
 
-/* --- EFFETS AU SURVOL DU WRAPPER --- */
-
-/* 1. Effet sur le logo (comme avant) */
-.logo-wrapper:hover .logo-groupe-principal {
-    transform: scale(1.08) rotate(3deg);
-    filter: drop-shadow(0px 0px 25px rgba(18, 195, 255, 0.7));
+/* --- TITRES DES SECTIONS (Le code qui manquait) --- */
+h2 {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 3.5rem;
+    color: #12C3FF;
+    text-align: center;
+    margin-top: 60px;
+    letter-spacing: 3px;
+    text-shadow: 0px 0px 10px rgba(18, 195, 255, 0.3);
 }
 
-/* 2. Effet sur le chat : IL POP ! */
-.logo-wrapper:hover .mascotte-pop {
-    opacity: 1;
-    /* Il garde son inclinaison (15deg) et prend sa taille normale (scale(1)) */
-    transform: rotate(15deg) scale(1);
-    /* Optionnel : un petit effet néon sur le chat aussi */
-    filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.6));
-}
-
-/* --- NAVIGATION (Inchangé) --- */
+/* --- NAVIGATION --- */
 nav {
     background: rgba(0, 0, 0, 0.9);
     padding: 15px;
@@ -105,7 +92,6 @@ nav a {
 
 nav a:hover {
     color: #12C3FF;
-    text-shadow: 0px 0px 10px rgba(18, 195, 255, 0.7);
     transform: scale(1.2) rotate(-2deg);
 }
 
@@ -120,39 +106,25 @@ nav a:hover {
     padding: 0 20px;
 }
 
-.article-video, .actus-photo {
-    flex: 0 0 280px;
-}
-
-.article-content, .actus-content {
-    flex: 1;
-    color: #ffffff;
-    text-align: left;
-}
+.article-video, .actus-photo { flex: 0 0 280px; }
+.article-content, .actus-content { flex: 1; color: #ffffff; text-align: left; }
 
 .article-content h3, .actus-content h3 {
     font-family: 'Bebas Neue', cursive;
     font-size: 2.5rem;
     margin-top: 0;
     margin-bottom: 10px;
-    color: #ffffff;
 }
 
 .article-subtitle {
     font-family: 'Bebas Neue', cursive;
     font-size: 1.4rem;
+    color: #12C3FF;
     margin-bottom: 20px;
     display: block;
 }
 
-.actus-photo img {
-    width: 100%;
-    border-radius: 5px;
-    border: 1px solid #333;
-    cursor: zoom-in;
-}
-
-/* 5. GRILLE PHOTOS PRÉSENTATION */
+/* 5. GRILLE PHOTOS & VIDEO */
 .presentation-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -169,186 +141,51 @@ nav a:hover {
     transition: 0.3s;
 }
 
-.presentation-item:hover { border-color: #12C3FF; transform: scale(1.03); }
-
 .presentation-item img { width: 100%; display: block; cursor: zoom-in; }
 
 .video-container {
     position: relative;
     padding-bottom: 177.77%; 
     height: 0;
+    overflow: hidden;
+    border-radius: 8px;
 }
 
 .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-/* 6. SECTION CONCERTS */
-.concert-list {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 0 20px;
-}
-
+/* 6. CONCERTS */
+.concert-list { max-width: 900px; margin: 40px auto; padding: 0 20px; }
 .concert-row {
-    display: flex;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.03);
-    margin-bottom: 15px;
-    padding: 15px;
-    border-radius: 8px;
-    border-left: 4px solid #333;
-    transition: 0.3s;
+    display: flex; align-items: center; background: rgba(255, 255, 255, 0.03);
+    margin-bottom: 15px; padding: 15px; border-radius: 8px; border-left: 4px solid #333; transition: 0.3s;
 }
+.concert-row:hover { background: rgba(18, 195, 255, 0.07); border-left-color: #12C3FF; transform: translateX(10px); }
+.concert-date-box { flex: 0 0 80px; text-align: center; border-right: 1px solid #444; margin-right: 25px; }
+.date-day { font-family: 'Bebas Neue', cursive; font-size: 2.2rem; color: #12C3FF; display: block; }
 
-.concert-row:hover {
-    background: rgba(18, 195, 255, 0.07);
-    border-left-color: #12C3FF;
-    transform: translateX(10px);
-}
+/* 7. REVEAL & CONTACT */
+.reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+.reveal.active { opacity: 1; transform: translateY(0); }
 
-.concert-date-box {
-    flex: 0 0 80px;
-    text-align: center;
-    border-right: 1px solid #444;
-    margin-right: 25px;
-    padding-right: 15px;
-}
+.logo-social { width: 40px; margin: 0 15px; transition: 0.3s; }
+.logo-social:hover { transform: scale(1.1); filter: drop-shadow(0px 0px 8px #12C3FF); }
+.logo-mail { width: 45px; filter: none !important; }
 
-.date-day { font-family: 'Bebas Neue', cursive; font-size: 2.2rem; line-height: 1; color: #12C3FF; display: block; }
-.date-month { font-family: 'Bebas Neue', cursive; font-size: 1rem; color: #fff; display: block; }
-
-.concert-info { flex: 1; text-align: left; }
-.concert-lieu { font-family: 'Bebas Neue', cursive; font-size: 1.5rem; display: block; }
-.concert-ville { color: #12C3FF; font-size: 0.95rem; font-weight: bold; }
-
-.concert-link {
-    color: #12C3FF;
-    text-decoration: none;
-    font-family: 'Bebas Neue', cursive;
-    border: 1px solid #12C3FF;
-    padding: 5px 15px;
-    border-radius: 5px;
-    transition: 0.3s;
-    white-space: nowrap;
-}
-
-.concert-link:hover { background: #12C3FF; color: #000; }
-
-/* 7. LIGHTBOX */
-#lightbox {
-    display: none;
-    position: fixed;
-    z-index: 2000;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.9);
-    align-items: center;
-    justify-content: center;
-}
-
-#lightbox img { max-width: 90%; max-height: 80%; border: 3px solid #12C3FF; }
-
-/* 8. RESPONSIVE (MOBILE) */
-@media (max-width: 800px) {
-    h2 { font-size: 2.5rem; }
-    .logo-groupe-principal { width: 80%; }
-    .article-presentation, .article-actus { flex-direction: column; align-items: center; text-align: center; }
-    .article-content h3, .actus-content h3 { text-align: center; }
-    
-    .concert-row { 
-        flex-wrap: wrap; 
-        justify-content: center; 
-        text-align: center; 
-    }
-    
-    .concert-date-box { 
-        border-right: none; 
-        margin-right: 0; 
-        padding-right: 0; 
-        margin-bottom: 10px; 
-        width: 100%; 
-        flex: 0 0 100%;
-    }
-    
-    .concert-info { margin-bottom: 15px; width: 100%; }
-    
-    .concert-link { 
-        width: 100%; 
-        display: block; 
-        box-sizing: border-box; 
-    }
-}
-        .concert-row-link {
-    text-decoration: none;
-    color: inherit;
-    display: block;
-    margin-bottom: 12px;
-}
-
-.concert-row-link:hover .concert-link {
-    background: #12C3FF;
-    color: #000;
-}
-        /* --- EFFET D'APPARITION AU SCROLL --- */
-.reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.8s ease-out;
-}
-
-/* La classe qui sera ajoutée par le JavaScript quand on scrolle */
-.reveal.active {
-    opacity: 1;
-    transform: translateY(0);
-}
-        /* --- SECTION CONTACT & SOCIAUX --- */
-.contact-container {
-    text-align: center;
-    padding: 40px 20px;
-}
-
-/* On réduit la taille de tous les logos sociaux (Facebook, Insta, etc.) */
-.logo-social {
-    width: 40px; /* Plus petit comme demandé */
-    height: auto;
-    margin: 0 15px;
-    transition: 0.3s;
-    filter: none; /* On enlève les effets par défaut */
-}
-
-.logo-social:hover {
-    transform: scale(1.1);
-    filter: drop-shadow(0px 0px 8px #12C3FF);
-}
-
-/* Cas spécifique du logo mail : on supprime le halo */
-.logo-mail {
-    width: 45px;
-    filter: none !important; /* Supprime le halo même au survol si tu veux */
-}
-
-/* --- BLOC STREAMING (Noir avec contour gris) --- */
 .streaming-box {
-    background-color: #000000; /* Fond noir pur */
-    border: 1px solid #333;    /* Contour gris foncé */
-    border-radius: 12px;
-    padding: 30px;
-    max-width: 600px;
-    margin: 40px auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 25px;
-    flex-wrap: wrap;
+    background-color: #000; border: 1px solid #333; border-radius: 12px;
+    padding: 30px; max-width: 600px; margin: 40px auto; display: flex;
+    justify-content: center; align-items: center; gap: 25px; flex-wrap: wrap;
 }
 
-.streaming-title {
-    font-family: 'Bebas Neue', cursive;
-    font-size: 1.8rem;
-    color: #fff;
-    margin-bottom: 20px;
-    display: block;
-    text-align: center;
+.streaming-title { font-family: 'Bebas Neue', cursive; font-size: 1.8rem; color: #fff; text-align: center; }
+
+/* 8. LIGHTBOX */
+#lightbox {
+    display: none; position: fixed; z-index: 2000; top: 0; left: 0;
+    width: 100%; height: 100%; background: rgba(0,0,0,0.9); align-items: center; justify-content: center;
 }
+#lightbox img { max-width: 90%; max-height: 80%; border: 3px solid #12C3FF; }
+</style>
     </style>
 </head>
 <body>
@@ -565,15 +402,14 @@ nav a:hover {
             </iframe>
         </div>
 
-        <div style="margin-bottom: 20px; border: 2px solid #12C3FF; box-shadow: 0px 0px 15px rgba(18, 195, 255, 0.2); line-height: 0;">
+        <div style="margin-bottom: 30px; border: 2px solid #12C3FF; box-shadow: 0px 0px 15px rgba(18, 195, 255, 0.2); line-height: 0;">
             <iframe style="border: 0; width: 100%; height: 120px;" 
-                src="https://bandcamp.com/EmbeddedPlayer/album=1871139396/size=large/bgcol=333333/linkcol=12C3FF/tracklist=false/artwork=small/track=30679371/transparent=true/" 
+                src="https://bandcamp.com/EmbeddedPlayer/track=2836267431/size=large/bgcol=333333/linkcol=12C3FF/tracklist=false/artwork=small/transparent=true/" 
                 seamless>
-                <a href="https://goodmorningroger.bandcamp.com/album/back-to-90-2000s">Back to 90 - 2000's by Good Morning Roger</a>
             </iframe>
         </div>
-
-        <div style="margin-bottom: 30px; border: 2px solid #12
+    </div>
+</section>
 
 <section id="contact" class="reveal">
     <h2>CONTACT</h2>
