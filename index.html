@@ -18,24 +18,69 @@ body {
     line-height: 1.6;
 }
 
-/* 3. LOGO & NAV */
+/* 3. LOGO, MASCOTTE POP & NAV */
+
+/* Le conteneur invisible qui regroupe le logo et le chat */
+.logo-wrapper {
+    position: relative; /* Nécessaire pour positionner le chat par rapport au logo */
+    max-width: 450px;   /* Même largeur que le logo */
+    margin: 40px auto;  /* Centré horizontalement */
+    cursor: pointer;
+}
+
+/* Le logo principal (on lui enlève ses marges car c'est le wrapper qui gère) */
 .logo-groupe-principal {
     display: block;
-    margin: 40px auto;
-    width: 450px;
+    width: 100%; /* Prend toute la largeur du wrapper */
     height: auto;
     filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.4));
     /* Transition fluide avec effet ressort */
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s;
-    cursor: pointer;
+    position: relative;
+    z-index: 2; /* Passe DEVANT le chat */
 }
 
-/* Effet d'inclinaison et de zoom au survol */
-.logo-groupe-principal:hover {
+/* La mascotte Roger le chat (Pop-up) */
+.mascotte-pop {
+    position: absolute;
+    /* Positionnement : En haut à droite, derrière le logo */
+    top: -50px;   /* Ajuste cette valeur pour monter/descendre le chat */
+    right: -80px; /* Ajuste cette valeur pour décaler le chat à droite */
+    width: 150px; /* Taille du chat */
+    height: auto;
+    
+    /* Inclinaison par défaut du chat */
+    transform: rotate(15deg) scale(0); /* scale(0) = invisible au départ */
+    
+    /* Cache le chat */
+    opacity: 0;
+    
+    /* Z-index plus faible pour passer DERRIÈRE le logo */
+    z-index: 1;
+    
+    /* Transition fluide pour l'apparition */
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    filter: drop-shadow(0px 0px 10px rgba(18, 195, 255, 0.3));
+}
+
+/* --- EFFETS AU SURVOL DU WRAPPER --- */
+
+/* 1. Effet sur le logo (comme avant) */
+.logo-wrapper:hover .logo-groupe-principal {
     transform: scale(1.08) rotate(3deg);
     filter: drop-shadow(0px 0px 25px rgba(18, 195, 255, 0.7));
 }
 
+/* 2. Effet sur le chat : IL POP ! */
+.logo-wrapper:hover .mascotte-pop {
+    opacity: 1;
+    /* Il garde son inclinaison (15deg) et prend sa taille normale (scale(1)) */
+    transform: rotate(15deg) scale(1);
+    /* Optionnel : un petit effet néon sur le chat aussi */
+    filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.6));
+}
+
+/* --- NAVIGATION (Inchangé) --- */
 nav {
     background: rgba(0, 0, 0, 0.9);
     padding: 15px;
@@ -53,59 +98,13 @@ nav a {
     font-family: 'Bebas Neue', cursive;
     font-size: 1.4rem;
     transition: 0.3s;
-    display: inline-block; /* Important pour le scale et rotate */
+    display: inline-block;
 }
 
 nav a:hover {
     color: #12C3FF;
     text-shadow: 0px 0px 10px rgba(18, 195, 255, 0.7);
     transform: scale(1.2) rotate(-2deg);
-}
-
-nav {
-    background: rgba(0, 0, 0, 0.9);
-    padding: 15px;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    border-bottom: 2px solid #12C3FF;
-    text-align: center;
-}
-
-nav a {
-    color: #fff;
-    text-decoration: none;
-    margin: 0 15px;
-    font-family: 'Bebas Neue', cursive;
-    font-size: 1.4rem;
-    transition: 0.3s;
-}
-
-nav a:hover {
-    color: #12C3FF;
-    text-shadow: 0px 0px 10px rgba(18, 195, 255, 0.7);
-    transform: scale(1.2) rotate(-2deg); /* Grossit le texte de 20% */
-    display: inline-block; /* Nécessaire pour que le scale fonctionne bien */
-}
-
-/* Pour que l'animation soit fluide et pas saccadée */
-nav a {
-    color: #fff;
-    text-decoration: none;
-    margin: 0 15px;
-    font-family: 'Bebas Neue', cursive;
-    font-size: 1.4rem;
-    transition: 0.3s; /* Garde bien cette ligne pour la douceur du mouvement */
-    display: inline-block;
-}
-
-h2 {
-    font-family: 'Bebas Neue', cursive;
-    font-size: 3.5rem;
-    color: #12C3FF;
-    text-align: center;
-    margin-top: 60px;
-    letter-spacing: 3px;
 }
 
 /* 4. ARTICLES (PRÉSENTATION & ACTUS) */
@@ -352,7 +351,11 @@ h2 {
 </head>
 <body>
     <div id="lightbox" onclick="this.style.display='none'"><img src="" alt="Agrandissement"></div>
+    <div class="logo-wrapper">
     <img src="Goodmorningrogerlogo.png" class="logo-groupe-principal" alt="Good Morning Roger Logo">
+    
+    <img src="rogerchat.png" class="mascotte-pop" alt="Roger le Chat">
+</div>
 
     <nav>
         <a href="#presentation">Présentation</a>
