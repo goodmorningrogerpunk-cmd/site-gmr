@@ -264,6 +264,55 @@ h2 {
     opacity: 1;
     transform: translateY(0);
 }
+        /* --- SECTION CONTACT & SOCIAUX --- */
+.contact-container {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+/* On réduit la taille de tous les logos sociaux (Facebook, Insta, etc.) */
+.logo-social {
+    width: 40px; /* Plus petit comme demandé */
+    height: auto;
+    margin: 0 15px;
+    transition: 0.3s;
+    filter: none; /* On enlève les effets par défaut */
+}
+
+.logo-social:hover {
+    transform: scale(1.1);
+    filter: drop-shadow(0px 0px 8px #12C3FF);
+}
+
+/* Cas spécifique du logo mail : on supprime le halo */
+.logo-mail {
+    width: 45px;
+    filter: none !important; /* Supprime le halo même au survol si tu veux */
+}
+
+/* --- BLOC STREAMING (Noir avec contour gris) --- */
+.streaming-box {
+    background-color: #000000; /* Fond noir pur */
+    border: 1px solid #333;    /* Contour gris foncé */
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 600px;
+    margin: 40px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.streaming-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.8rem;
+    color: #fff;
+    margin-bottom: 20px;
+    display: block;
+    text-align: center;
+}
     </style>
 </head>
 <body>
@@ -465,7 +514,7 @@ h2 {
     
     <div style="max-width: 800px; margin: auto; text-align: center;">
         <p style="margin-bottom: 25px; font-size: 1.1rem; color: #fff; font-family: 'Arial', sans-serif;">
-            Découvrez nos Punk-Rock Covers
+            Tu veux écouter Good Morning Roger ? Fais-toi plaiz' !
         </p>
 
         <div style="margin-bottom: 20px; border: 2px solid #12C3FF; box-shadow: 0px 0px 15px rgba(18, 195, 255, 0.2); line-height: 0;">
@@ -487,79 +536,83 @@ h2 {
         <div style="margin-bottom: 30px; border: 2px solid #12
 
 <section id="contact" class="reveal">
-
     <h2>CONTACT</h2>
     
-    <div style="max-width: 900px; margin: auto; text-align: center; font-family: 'Arial', sans-serif;">
+    <div style="max-width: 900px; margin: auto; text-align: center;">
         
-        <p style="font-size: 1.5rem; color: #fff; font-weight: bold; margin-bottom: 10px; font-family: 'Bebas Neue', cursive; text-transform: uppercase; letter-spacing: 2px;">
-            Tu veux programmer Good Morning Roger ?
+        <p style="font-family: 'Bebas Neue', cursive; font-size: 1.8rem; color: #12C3FF; margin-bottom: 5px; letter-spacing: 1px;">
+            TU VEUX PROGRAMMER GOOD MORNING ROGER ?
         </p>
-        <p style="font-size: 1.1rem; color: #fff; line-height: 1.6; margin-bottom: 30px;">
-            Envoie-nous un mail en nous donnant un max d'infos sur ton événement<br>
-            et on te répondra très vite.
+        <p style="color: #fff; margin-bottom: 30px; font-size: 1rem;">
+            Envoie-nous un mail avec un max d'infos sur ton événement,<br>
+            on te répondra très vite.
         </p>
 
         <div style="margin-bottom: 50px;">
             <a href="mailto:goodmorningroger.punk@gmail.com" style="text-decoration: none;">
-                <img src="logo10.jpg" class="logo-groupe-principal" style="width: 120px;" alt="Contact Email">
+                <img src="logo10.jpg" class="logo-social logo-mail" style="width: 80px;" alt="Contact Email">
                 <p style="color: #12C3FF; font-size: 1.1rem; margin-top: 10px; font-weight: bold; text-decoration: underline;">
                     goodmorningroger.punk@gmail.com
                 </p>
             </a>
         </div>
 
-        <p style="font-size: 1.1rem; color: #fff; margin-bottom: 30px; font-weight: bold; font-family: 'Bebas Neue', cursive; letter-spacing: 1px;">
-            Et retrouvez nous sur tous nos réseaux et plateformes de streaming :
-        </p>
-
-        <div style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; align-items: center; margin-bottom: 40px;">
+        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; align-items: center; margin-bottom: 40px;">
             <a href="https://www.facebook.com/GoodMorningRoger/" target="_blank"><img src="logo.jpg" class="logo-social" alt="Facebook"></a>
             <a href="https://www.instagram.com/goodmorningroger/" target="_blank"><img src="logo2.jpg" class="logo-social" alt="Instagram"></a>
             <a href="https://www.youtube.com/@goodmorningroger" target="_blank"><img src="logo6.jpg" class="logo-social" alt="YouTube"></a>
             <a href="https://www.tiktok.com/@goodmorningroger" target="_blank"><img src="logo8.jpg" class="logo-social" alt="TikTok"></a>
         </div>
 
-        <div style="display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; align-items: center; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 15px;">
+        <div class="streaming-box">
+            <span class="streaming-title" style="display: block; width: 100%; margin-bottom: 20px; font-family: 'Bebas Neue', cursive; color: #fff; font-size: 1.4rem;">
+                ÉCOUTER / STREAMER
+            </span>
             <a href="https://open.spotify.com/intl-fr/artist/182NnF7K7o8Pq6MvS2S8z6" target="_blank"><img src="logo3.jpg" class="logo-social" alt="Spotify"></a>
-            <a href="https://www.deezer.com/fr/artist/145889372" target="_blank"><img src="logo4.jpg" alt="Deezer" class="logo-social"></a>
+            <a href="https://www.deezer.com/fr/artist/145889372" target="_blank"><img src="logo4.jpg" class="logo-social" alt="Deezer"></a>
             <a href="https://music.amazon.fr/artists/B09G3F9R9S/good-morning-roger" target="_blank"><img src="logo5.jpg" class="logo-social" alt="Amazon Music"></a>
             <a href="https://music.apple.com/fr/artist/good-morning-roger/1585483324" target="_blank"><img src="logo9.jpg" class="logo-social" alt="Apple Music"></a>
             <a href="https://goodmorningroger.bandcamp.com/" target="_blank"><img src="logo7.jpg" class="logo-social" alt="Bandcamp"></a>
         </div>
 
-        <p style="margin-top: 80px; font-size: 0.7rem; color: #444; text-transform: uppercase; letter-spacing: 2px;">
+        <p style="margin-top: 100px; font-size: 0.7rem; color: #444; text-transform: uppercase; letter-spacing: 2px;">
+            © 2024 Good Morning Roger - Punk Rock
+        </p>
+    </div>
+</section>
+
 <script>
-    // On récupère toutes les images de la présentation et des actus
+    // 1. LIGHTBOX
     const images = document.querySelectorAll('.presentation-item img, .actus-photo img');
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = lightbox.querySelector('img');
 
     images.forEach(img => {
         img.addEventListener('click', () => {
-            // On vérifie que ce n'est pas une vidéo (iframe)
             if (img.src) {
                 lightboxImg.src = img.src;
                 lightbox.style.display = 'flex';
             }
         });
     });
-</script>
-            <script>
+
+    lightbox.addEventListener('click', () => {
+        lightbox.style.display = 'none';
+    });
+
+    // 2. REVEAL AU SCROLL
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('active');
             }
         });
-    }, {
-        threshold: 0.1 // L'effet se déclenche quand 10% de la section est visible
-    });
+    }, { threshold: 0.1 });
 
-    // On dit à l'observateur de surveiller toutes les sections avec la classe "reveal"
     document.querySelectorAll('.reveal').forEach((section) => {
         observer.observe(section);
     });
 </script>
+
 </body>
 </html>
