@@ -248,15 +248,21 @@ h2 {
     margin-bottom: 12px;
 }
 
-.concert-row-link:hover .concert-row {
-    background: rgba(18, 195, 255, 0.12);
-    border-left-color: #12C3FF;
-    transform: translateX(10px);
-}
-
 .concert-row-link:hover .concert-link {
     background: #12C3FF;
     color: #000;
+}
+        /* --- EFFET D'APPARITION AU SCROLL --- */
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease-out;
+}
+
+/* La classe qui sera ajoutée par le JavaScript quand on scrolle */
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
 }
     </style>
 </head>
@@ -272,7 +278,7 @@ h2 {
         <a href="#contact">Contact</a>
     </nav>
 
-<section id="presentation">
+<section id="presentation" class="reveal">
     <h2>PRÉSENTATION</h2>
 
     <div class="article-presentation">
@@ -316,7 +322,7 @@ h2 {
     </div>
 </section>
 
-<section id="actus">
+<section id="actus" class="reveal">
     <h2>ACTUS</h2>
 
     <div class="article-actus">
@@ -349,126 +355,112 @@ h2 {
     </div>
 </section>
 
-<section id="concerts">
+<section id="concerts" class="reveal">
     <h2>CONCERTS</h2>
     <div class="concert-list">
-        
-        <a href="https://www.facebook.com/Gapette/" target="_blank" class="concert-row-link">
-            <div class="concert-row">
-                <div class="concert-date-box"><span class="date-day">28</span><span class="date-month">MARS</span></div>
-                <div class="concert-info"><span class="concert-lieu">La Gapette</span><span class="concert-ville">Les Epesses (85)</span></div>
-                <span class="concert-link">INFOS</span>
-            </div>
-        </a>
+    
+    <a href="https://www.facebook.com/Gapette/" target="_blank" class="concert-row-link">
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">28</span><span class="date-month">MARS</span></div>
+            <div class="concert-info"><span class="concert-lieu">La Gapette</span><span class="concert-ville">Les Epesses (85)</span></div>
+        </div>
+    </a>
 
-        <a href="#" target="_blank" class="concert-row-link">
-            <div class="concert-row">
-                <div class="concert-date-box"><span class="date-day">04</span><span class="date-month">AVRIL</span></div>
-                <div class="concert-info"><span class="concert-lieu">Lutin de Travers</span><span class="concert-ville">Nantes (44)</span></div>
-                <span class="concert-link">INFOS</span>
-            </div>
-        </a>
+    <a href="#" target="_blank" class="concert-row-link">
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">04</span><span class="date-month">AVRIL</span></div>
+            <div class="concert-info"><span class="concert-lieu">Lutin de Travers</span><span class="concert-ville">Nantes (44)</span></div>
+        </div>
+    </a>
 
-        <a href="#" target="_blank" class="concert-row-link">
-            <div class="concert-row">
-                <div class="concert-date-box"><span class="date-day">05</span><span class="date-month">AVRIL</span></div>
-                <div class="concert-info"><span class="concert-lieu">La Forge</span><span class="concert-ville">Chambretaud (85)</span></div>
-                <span class="concert-link">INFOS</span>
-            </div>
-        </a>
+    <a href="#" target="_blank" class="concert-row-link">
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">05</span><span class="date-month">AVRIL</span></div>
+            <div class="concert-info"><span class="concert-lieu">La Forge</span><span class="concert-ville">Chambretaud (85)</span></div>
+        </div>
+    </a>
 
-        <a href="#" target="_blank" class="concert-row-link">
-            <div class="concert-row">
-                <div class="concert-date-box"><span class="date-day">08</span><span class="date-month">MAI</span></div>
-                <div class="concert-info"><span class="concert-lieu">Brasserie Horizon</span><span class="concert-ville">Questembert (56)</span></div>
-                <span class="concert-link">INFOS</span>
-            </div>
-        </a>
+    <a href="#" target="_blank" class="concert-row-link">
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">08</span><span class="date-month">MAI</span></div>
+            <div class="concert-info"><span class="concert-lieu">Brasserie Horizon</span><span class="concert-ville">Questembert (56)</span></div>
+        </div>
+    </a>
 
-        <a href="#" target="_blank" class="concert-row-link">
-            <div class="concert-row">
-                <div class="concert-date-box"><span class="date-day">05</span><span class="date-month">JUIN</span></div>
-                <div class="concert-info"><span class="concert-lieu">Fête de la Musique (La Cave et Vous)</span><span class="concert-ville">Mouzillon (44)</span></div>
-                <span class="concert-link">INFOS</span>
-            </div>
-        </a>
+    <a href="#" target="_blank" class="concert-row-link">
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">05</span><span class="date-month">JUIN</span></div>
+            <div class="concert-info"><span class="concert-lieu">Fête de la Musique (La Cave et Vous)</span><span class="concert-ville">Mouzillon (44)</span></div>
+        </div>
+    </a>
 
-        <a href="#" target="_blank" class="concert-row-link">
-            <div class="concert-row">
-                <div class="concert-date-box"><span class="date-day">13</span><span class="date-month">JUIN</span></div>
-                <div class="concert-info"><span class="concert-lieu">L'Arcadia</span><span class="concert-ville">Fougères (35)</span></div>
-                <span class="concert-link">INFOS</span>
-            </div>
-        </a>
+    <a href="#" target="_blank" class="concert-row-link">
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">13</span><span class="date-month">JUIN</span></div>
+            <div class="concert-info"><span class="concert-lieu">L'Arcadia</span><span class="concert-ville">Fougères (35)</span></div>
+        </div>
+    </a>
 
-        <a href="#" target="_blank" class="concert-row-link">
-            <div class="concert-row">
-                <div class="concert-date-box"><span class="date-day">17</span><span class="date-month">JUIN</span></div>
-                <div class="concert-info"><span class="concert-lieu">La Cave et Vous / Hellfest</span><span class="concert-ville">Clisson (44)</span></div>
-                <span class="concert-link">INFOS</span>
-            </div>
-        </a>
+    <a href="#" target="_blank" class="concert-row-link">
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">17</span><span class="date-month">JUIN</span></div>
+            <div class="concert-info"><span class="concert-lieu">La Cave et Vous / Hellfest</span><span class="concert-ville">Clisson (44)</span></div>
+        </div>
+    </a>
 
-        <a href="http://www.vandb.fr/magasin/poitiers-sud/" target="_blank" class="concert-row-link">
-            <div class="concert-row">
-                <div class="concert-date-box"><span class="date-day">02</span><span class="date-month">JUILLET</span></div>
-                <div class="concert-info"><span class="concert-lieu">V and B</span><span class="concert-ville">Poitiers (86)</span></div>
-                <span class="concert-link">SITE WEB</span>
-            </div>
-        </a>
+    <a href="http://www.vandb.fr/magasin/poitiers-sud/" target="_blank" class="concert-row-link">
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">02</span><span class="date-month">JUILLET</span></div>
+            <div class="concert-info"><span class="concert-lieu">V and B</span><span class="concert-ville">Poitiers (86)</span></div>
+        </div>
+    </a>
 
-        <a href="https://www.facebook.com/Lemillebornes/" target="_blank" class="concert-row-link">
-            <div class="concert-row">
-                <div class="concert-date-box"><span class="date-day">04</span><span class="date-month">JUILLET</span></div>
-                <div class="concert-info"><span class="concert-lieu">Mille Bornes</span><span class="concert-ville">Redon (35)</span></div>
-                <span class="concert-link">FACEBOOK</span>
-            </div>
-        </a>
+    <a href="https://www.facebook.com/Lemillebornes/" target="_blank" class="concert-row-link">
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">04</span><span class="date-month">JUILLET</span></div>
+            <div class="concert-info"><span class="concert-lieu">Mille Bornes</span><span class="concert-ville">Redon (35)</span></div>
+        </div>
+    </a>
 
-        <a href="https://breizhpms.fr/" target="_blank" class="concert-row-link">
-            <div class="concert-row">
-                <div class="concert-date-box"><span class="date-day">11</span><span class="date-month">JUILLET</span></div>
-                <div class="concert-info"><span class="concert-lieu">Breizh PMS Festival</span><span class="concert-ville">Guémené-Penfao (44)</span></div>
-                <span class="concert-link">BILLETS</span>
-            </div>
-        </a>
+    <a href="https://breizhpms.fr/" target="_blank" class="concert-row-link">
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">11</span><span class="date-month">JUILLET</span></div>
+            <div class="concert-info"><span class="concert-lieu">Breizh PMS Festival</span><span class="concert-ville">Guémené-Penfao (44)</span></div>
+        </div>
+    </a>
 
-        <a href="https://www.bonrepos.bzh/index.php/fr/" target="_blank" class="concert-row-link">
-            <div class="concert-row">
-                <div class="concert-date-box"><span class="date-day">01</span><span class="date-month">AOÛT</span></div>
-                <div class="concert-info"><span class="concert-lieu">Son et Lumière de Bon Repos</span><span class="concert-ville">Bon-Repos (22)</span></div>
-                <span class="concert-link">INFOS</span>
-            </div>
-        </a>
+    <a href="https://www.bonrepos.bzh/index.php/fr/" target="_blank" class="concert-row-link">
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">01</span><span class="date-month">AOÛT</span></div>
+            <div class="concert-info"><span class="concert-lieu">Son et Lumière de Bon Repos</span><span class="concert-ville">Bon-Repos (22)</span></div>
+        </div>
+    </a>
 
-        <a href="https://www.facebook.com/laminuteblondefc/?locale=fr_FR" target="_blank" class="concert-row-link">
-            <div class="concert-row">
-                <div class="concert-date-box"><span class="date-day">07</span><span class="date-month">AOÛT</span></div>
-                <div class="concert-info"><span class="concert-lieu">La Minute Blonde</span><span class="concert-ville">Fontenay-le-Comte (85)</span></div>
-                <span class="concert-link">FACEBOOK</span>
-            </div>
-        </a>
+    <a href="https://www.facebook.com/laminuteblondefc/?locale=fr_FR" target="_blank" class="concert-row-link">
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">07</span><span class="date-month">AOÛT</span></div>
+            <div class="concert-info"><span class="concert-lieu">La Minute Blonde</span><span class="concert-ville">Fontenay-le-Comte (85)</span></div>
+        </div>
+    </a>
 
-        <a href="https://www.facebook.com/profile.php?id=61551334076605" target="_blank" class="concert-row-link">
-            <div class="concert-row">
-                <div class="concert-date-box"><span class="date-day">29</span><span class="date-month">AOÛT</span></div>
-                <div class="concert-info"><span class="concert-lieu">Festival Rock n' Bylette</span><span class="concert-ville">Malville (44)</span></div>
-                <span class="concert-link">INFOS</span>
-            </div>
-        </a>
+    <a href="https://www.facebook.com/profile.php?id=61551334076605" target="_blank" class="concert-row-link">
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">29</span><span class="date-month">AOÛT</span></div>
+            <div class="concert-info"><span class="concert-lieu">Festival Rock n' Bylette</span><span class="concert-ville">Malville (44)</span></div>
+        </div>
+    </a>
 
-        <a href="https://www.brasseriesoma.fr/" target="_blank" class="concert-row-link">
-            <div class="concert-row">
-                <div class="concert-date-box"><span class="date-day">18</span><span class="date-month">SEPT.</span></div>
-                <div class="concert-info"><span class="concert-lieu">Brasserie Soma</span><span class="concert-ville">Le Loroux-Bottereau (44)</span></div>
-                <span class="concert-link">SITE WEB</span>
-            </div>
-        </a>
+    <a href="https://www.brasseriesoma.fr/" target="_blank" class="concert-row-link">
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">18</span><span class="date-month">SEPT.</span></div>
+            <div class="concert-info"><span class="concert-lieu">Brasserie Soma</span><span class="concert-ville">Le Loroux-Bottereau (44)</span></div>
+        </div>
+    </a>
 
-    </div>
+</div>
 </section>
 
-<section id="musiques">
+<section id="musiques" class="reveal">
     <h2>MUSIQUES</h2>
     
     <div style="max-width: 800px; margin: auto; text-align: center;">
@@ -494,7 +486,8 @@ h2 {
 
         <div style="margin-bottom: 30px; border: 2px solid #12
 
-<section id="contact">
+<section id="contact" class="reveal">
+
     <h2>CONTACT</h2>
     
     <div style="max-width: 900px; margin: auto; text-align: center; font-family: 'Arial', sans-serif;">
@@ -550,6 +543,22 @@ h2 {
                 lightbox.style.display = 'flex';
             }
         });
+    });
+</script>
+            <script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            }
+        });
+    }, {
+        threshold: 0.1 // L'effet se déclenche quand 10% de la section est visible
+    });
+
+    // On dit à l'observateur de surveiller toutes les sections avec la classe "reveal"
+    document.querySelectorAll('.reveal').forEach((section) => {
+        observer.observe(section);
     });
 </script>
 </body>
