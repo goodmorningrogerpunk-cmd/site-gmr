@@ -5,52 +5,118 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Good Morning Roger | Punk Rock</title>
     <style>
-        /* STYLE GLOBAL */
-        body { background-color: #000; color: #fff; font-family: 'Arial', sans-serif; margin: 0; padding: 0; scroll-behavior: smooth; }
+       /* 1. IMPORT DES POLICES */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;700&display=swap');
+
+/* 2. STYLE GLOBAL */
+body {
+    background-color: #0a0a0a;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* 3. TITRES (Look Punk-Rock) */
+h1, h2, h3 {
+    font-family: 'Bebas Neue', cursive;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #12C3FF; /* Ton bleu cyan */
+    text-align: center;
+}
+
+h2 { 
+    font-size: 3.5rem; 
+    margin: 60px 0 40px 0;
+    position: relative;
+}
+
+/* Petit trait sous le titre */
+h2::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: #12C3FF;
+    margin: 10px auto;
+}
+
+/* 4. MENU DE NAVIGATION */
+nav {
+    background: rgba(0, 0, 0, 0.9);
+    padding: 15px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid #12C3FF;
+    text-align: center;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 15px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    transition: color 0.3s;
+}
+
+nav a:hover {
+    color: #12C3FF;
+}
+
+/* 5. SECTIONS */
+section {
+    padding: 60px 20px;
+    max-width: 1100px;
+    margin: auto;
+}
+
+/* 6. STYLE CONCERTS */
+.concert-table { width: 100%; margin-top: 20px; }
+.concert-row { 
+    display: flex; 
+    align-items: center; 
+    padding: 20px 15px; 
+    border-bottom: 1px solid #222; 
+    transition: all 0.3s ease;
+}
+.concert-row:hover {
+    background-color: #161616 !important;
+    border-left: 5px solid #12C3FF;
+}
+.concert-date { 
+    flex: 0 0 150px; 
+    font-size: 1.8rem; 
+    font-weight: bold; 
+    color: #12C3FF; 
+    font-family: 'Bebas Neue', sans-serif;
+}
+.concert-info { flex: 1; padding-left: 20px; }
+.concert-lieu { font-size: 1.4rem; font-weight: bold; color: #fff; text-transform: uppercase; display: block; }
+.concert-ville { font-size: 1rem; color: #bbb; }
+
+/* 7. EFFETS LOGOS CONTACT */
+#contact img {
+    transition: all 0.3s ease;
+}
+#contact img:hover {
+    transform: scale(1.1) rotate(2deg);
+    filter: drop-shadow(0px 0px 10px #12C3FF);
+}
+
+/* 8. MOBILE ADAPTATION */
+@media (max-width: 600px) {
+    h2 { font-size: 2.5rem; }
+    .concert-row { flex-direction: column; align-items: flex-start; gap: 5px; }
+    .concert-date { font-size: 1.4rem; }
+    nav a { margin: 0 5px; font-size: 0.9rem; }
+}
         
-        /* MENU DE NAVIGATION */
-        nav { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 10px 5%; background: #000; border-bottom: 3px solid #12C3FF;
-            position: sticky; top: 0; z-index: 1000; 
-        }
-        .nav-logo img { height: 50px; }
-        .nav-links { display: flex; gap: 15px; }
-        .nav-links a { color: #fff; text-decoration: none; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
-        .nav-links a:hover { color: #12C3FF; }
-
-        /* TITRES DE SECTIONS */
-        h2 { 
-            font-size: 2.5rem; color: #12C3FF; text-transform: uppercase; 
-            margin-bottom: 40px; border-left: 8px solid #fff; padding-left: 15px; 
-            font-family: 'Arial Black', sans-serif;
-        }
-
-        /* SECTIONS */
-        section { padding: 80px 5% 40px; max-width: 1000px; margin: auto; border-bottom: 1px solid #222; }
-
-        /* GRILLE PHOTOS PRÉSENTATION */
-        .photo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 40px; }
-        .photo-grid img { width: 100%; height: 250px; object-fit: cover; border: 1px solid #fff; }
-
-        /* ARTICLES ACTUS */
-        .article { display: flex; flex-wrap: wrap; gap: 30px; margin-bottom: 60px; align-items: center; }
-        .article-reverse { flex-direction: row-reverse; }
-        .article-content { flex: 1; min-width: 300px; }
-        .article-image { flex: 1; min-width: 300px; }
-        .article-image img { width: 100%; border: 2px solid #12C3FF; box-shadow: 8px 8px 0px #12C3FF; }
-        
-        .btn { 
-            display: inline-block; margin-top: 20px; padding: 12px 25px; 
-            background-color: #12C3FF; color: #000; text-decoration: none; 
-            font-weight: bold; border-radius: 5px; text-transform: uppercase; 
-        }
-
-        /* MOBILE */
-        @media (max-width: 768px) {
-            .nav-links { display: none; } /* On cache le menu texte sur mobile pour simplifier */
-            h2 { font-size: 1.8rem; }
-        }
     </style>
 </head>
 <body>
