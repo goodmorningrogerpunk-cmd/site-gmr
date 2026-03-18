@@ -574,34 +574,25 @@ nav a:hover {
             Tu veux écouter Good Morning Roger ? Fais-toi plaiz' !
         </p>
 
-        <div style="margin-bottom: 25px; border: 2px solid #12C3FF; border-radius: 8px; box-shadow: 0px 0px 15px rgba(18, 195, 255, 0.2); line-height: 0; overflow: hidden;">
-            <iframe style="border: 0; width: 100%; height: 124px;" 
-                src="https://bandcamp.com/EmbeddedPlayer/album=1414452669/size=large/bgcol=333333/linkcol=12C3FF/tracklist=false/artwork=small/transparent=true/" 
-                seamless>
-                <a href="https://goodmorningroger.bandcamp.com/album/club-roger">Club Roger by Good Morning Roger</a>
-            </iframe>
-        </div>
+       <div style="margin-bottom: 25px; border: 2px solid #12C3FF; border-radius: 8px; box-shadow: 0px 0px 15px rgba(18, 195, 255, 0.2); line-height: 0; overflow: hidden; box-sizing: border-box; width: 100%;">
+    <iframe style="border: 0; width: 100%; height: 124px; display: block;" 
+        src="https://bandcamp.com/EmbeddedPlayer/album=1414452669/size=large/bgcol=333333/linkcol=12C3FF/tracklist=false/artwork=small/transparent=true/" 
+        seamless>
+        <a href="https://goodmorningroger.bandcamp.com/album/club-roger">Club Roger by Good Morning Roger</a>
+    </iframe>
+</div>
 
-        <div style="margin-bottom: 25px; border: 2px solid #12C3FF; border-radius: 8px; box-shadow: 0px 0px 15px rgba(18, 195, 255, 0.2); line-height: 0; overflow: hidden;">
-            <iframe style="border: 0; width: 100%; height: 124px;" 
-                src="https://bandcamp.com/EmbeddedPlayer/album=1871139396/size=large/bgcol=333333/linkcol=12C3FF/tracklist=false/artwork=small/track=30679371/transparent=true/" 
-                seamless>
-                <a href="https://goodmorningroger.bandcamp.com/album/back-to-90-2000s">Back to 90 - 2000's by Good Morning Roger</a>
-            </iframe>
-        </div>
+<div style="margin-bottom: 25px; border: 2px solid #12C3FF; border-radius: 8px; box-shadow: 0px 0px 15px rgba(18, 195, 255, 0.2); line-height: 0; overflow: hidden; box-sizing: border-box; width: 100%;">
+    <iframe style="border: 0; width: 100%; height: 124px; display: block;" 
+        src="https://bandcamp.com/EmbeddedPlayer/album=1871139396/size=large/bgcol=333333/linkcol=12C3FF/tracklist=false/artwork=small/track=30679371/transparent=true/" 
+        seamless>
+        <a href="https://goodmorningroger.bandcamp.com/album/back-to-90-2000s">Back to 90 - 2000's by Good Morning Roger</a>
+    </iframe>
+</div>
 
-    </div> </section> ```
+    </div> 
+</section>
 
----
-
-### Ce que j'ai corrigé :
-1.  **Fermetures propres :** J'ai rajouté le `</div>` et le `</section>` qui manquaient pour que ton site soit structurellement correct.
-2.  **Ajustement du cadre :** J'ai passé la hauteur de l'iframe à **124px** et ajouté `overflow: hidden`. Cela devrait forcer le cadre bleu à épouser la forme du lecteur sans laisser de bande noire ou de vide en bas.
-3.  **Bords arrondis :** J'ai ajouté un léger `border-radius: 8px` pour que les coins du cadre bleu soient aussi doux que ceux du lecteur Bandcamp.
-
-**Vérification :** Une fois que tu as fait le commit, regarde si le cadre bleu touche bien le haut et le bas du lecteur. Si c'est encore un tout petit peu décalé, on ajustera le "124px" à "122px" ou "126px" selon ton écran.
-
-Est-ce que tu veux que je vérifie aussi la section suivante (le Contact / Footer) pour être sûr qu'elle n'a pas souffert de la coupure ?
 
 <section id="contact" class="reveal">
     <h2>CONTACT</h2>
