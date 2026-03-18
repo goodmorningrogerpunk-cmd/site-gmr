@@ -79,6 +79,51 @@ h2 {
     .logo-groupe-principal { width: 85%; }
     h2 { font-size: 2.5rem; }
 }
+        /* --- AJOUT POUR LA GRILLE DE PRÉSENTATION --- */
+
+.presentation-grid {
+    display: grid;
+    /* Crée des colonnes automatiques de 280px minimum */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 40px;
+    padding: 20px;
+}
+
+.presentation-item {
+    background: #111;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #333;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.presentation-item:hover {
+    transform: translateY(-5px); /* Petit saut vers le haut au survol */
+    border-color: #12C3FF;
+}
+
+.presentation-item img {
+    width: 100%;
+    height: auto; /* Empêche de rogner l'image */
+    display: block;
+}
+
+/* Ratio spécial pour le YouTube Short (9:16) */
+.video-container {
+    position: relative;
+    padding-bottom: 177.77%; 
+    height: 0;
+    overflow: hidden;
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
     </style>
 </head>
 <body>
@@ -93,20 +138,32 @@ h2 {
 
 <section id="presentation">
     <h2>PRÉSENTATION</h2>
-    <h1 style="font-size: 3rem; margin-bottom: 5px; color: #fff; font-family: 'Arial Black';">GOOD MORNING ROGER</h1>
-    <p style="font-size: 1.2rem; font-weight: bold; margin-bottom: 30px;">DES PUNK COVERS, DES TUBES, DES DESSINS ANIMÉS ET DU FUN</p>
-
-    <div style="line-height: 1.8; font-size: 1.1rem; max-width: 850px;">
-        <p>Good Morning Roger, c’est le groupe qui a eu la (mauvaise ?) idée de mélanger le punk-rock avec tout ce que tu n’assumais pas d’écouter quand tu étais ado.</p>
-        <p>Au programme : des tubes légendaires comme <strong>La Tribu de Dana</strong>, <strong>Les Rois du Monde</strong>, <strong>Moi Lolita</strong> et même des génériques culte genre <strong>Denver le dernier dinosaure</strong> ou les classiques du <strong>Club Dorothée</strong>... le tout à la sauce punk-rock déjanté.</p>
-        <p style="font-style: italic; margin-top: 20px; font-weight: bold;">C’est énergique, c’est festif, c’est nostalgique et totalement décomplexé, c'est Good Morning Roger !</p>
+    
+    <div style="text-align: center; max-width: 850px; margin: 0 auto 40px auto; padding: 0 20px;">
+        <p style="font-size: 1.2rem; line-height: 1.8; color: #eee;">
+            Good Morning Roger, c'est l'énergie pure du Punk-Rock au service des tubes qui ont marqué les générations. 
+            Pas de fioritures, juste du gros son et du fun.
+        </p>
     </div>
 
-    <div class="photo-grid">
-        <img src="photo1.jpg" alt="GMR Photo 1">
-        <img src="photo2.jpg" alt="GMR Photo 2">
-        <img src="photo3.jpg" alt="GMR Photo 3">
-        <img src="photo4.jpg" alt="GMR Photo 4">
+    <div class="presentation-grid">
+        
+        <div class="presentation-item">
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/aU68X9G9wcE" 
+                    title="YouTube video player" frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+
+        <div class="presentation-item"><img src="photo9.jpg" alt="GMR Live"></div>
+        <div class="presentation-item"><img src="photo1.jpg" alt="GMR Live"></div>
+        <div class="presentation-item"><img src="photo4.jpg" alt="GMR Live"></div>
+        <div class="presentation-item"><img src="photo5.jpg" alt="GMR Live"></div>
+        <div class="presentation-item"><img src="photo10.jpg" alt="GMR Live"></div>
+
     </div>
 </section>
 
