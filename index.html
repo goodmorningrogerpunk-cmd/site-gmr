@@ -106,8 +106,16 @@ nav a:hover {
 }
 .presentation-item img { width: 100%; border-radius: 5px; border: 1px solid #333; }
 
-/* 5. SECTION CONCERTS (TON ANCIEN DESIGN TOP) */
+/* 5. SECTION CONCERTS */
 .concert-list { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+
+/* C'EST CETTE PARTIE QUI COMMANDE LE LIEN AUTOUR DE LA LIGNE */
+.concert-row-link {
+    text-decoration: none !important; /* Enlève le soulignement sur le lien */
+    display: block; /* Permet au lien de prendre toute la largeur */
+    color: #ffffff !important; /* Force la couleur blanche sur tout le contenu */
+}
+
 .concert-row {
     display: flex;
     align-items: center;
@@ -118,11 +126,14 @@ nav a:hover {
     border-left: 4px solid #333;
     transition: 0.3s;
 }
-.concert-row:hover {
+
+/* Effet au survol de la ligne entière */
+.concert-row-link:hover .concert-row {
     background: rgba(18, 195, 255, 0.07);
     border-left-color: #12C3FF;
     transform: translateX(10px);
 }
+
 .concert-date-box {
     flex: 0 0 80px;
     text-align: center;
@@ -130,33 +141,18 @@ nav a:hover {
     margin-right: 25px;
     padding-right: 15px;
 }
+
 .date-day { font-family: 'Bebas Neue', cursive; font-size: 2.2rem; line-height: 1; color: #12C3FF; display: block; }
 .date-month { font-family: 'Bebas Neue', cursive; font-size: 1rem; color: #fff; display: block; }
+
 .concert-info { flex: 1; text-align: left; }
-.concert-lieu { font-family: 'Bebas Neue', cursive; font-size: 1.5rem; display: block; }
+.concert-lieu { 
+    font-family: 'Bebas Neue', cursive; 
+    font-size: 1.5rem; 
+    display: block; 
+    color: #ffffff; /* Nom du lieu en blanc */
+}
 .concert-ville { color: #12C3FF; font-size: 0.95rem; font-weight: bold; }
-.concert-link {
-    color: #12C3FF;
-    text-decoration: none;
-    font-family: 'Bebas Neue', cursive;
-    border: 1px solid #12C3FF;
-    padding: 5px 15px;
-    border-radius: 5px;
-    transition: 0.3s;
-}
-.concert-link:hover { background: #12C3FF; color: #000; }
-
-      /* --- CORRECTION DES LIENS DE LIEUX --- */
-.concert-lieu a {
-    color: #ffffff !important;      /* Force le texte en blanc */
-    text-decoration: none !important; /* Enlève le soulignement */
-    transition: 0.3s;
-}
-
-.concert-lieu a:hover {
-    color: #12C3FF !important;      /* Devient bleu au survol (optionnel) */
-}
-
 /* 6. TITRES H2 */
 h2 { 
     font-family: 'Bebas Neue', sans-serif; 
