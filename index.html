@@ -239,6 +239,17 @@ img.img-mail:hover {
     background: rgba(0,0,0,0.9); align-items: center; justify-content: center;
 }
 #lightbox img { max-width: 90%; max-height: 80%; border: 3px solid #12C3FF; }
+      /* --- EFFET REVEAL (INDISPENSABLE POUR LE SCRIPT) --- */
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease-out;
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
 </style>
    
 </head>
