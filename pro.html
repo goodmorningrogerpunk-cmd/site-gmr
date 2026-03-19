@@ -5,121 +5,190 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Espace Pro | Good Morning Roger</title>
     <style>
-        /* REPRISE DU STYLE GOLD */
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;700&display=swap');
+/* 1. REPRISE EXACTE DU STYLE GOLD DE L'INDEX */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;700&display=swap');
 
-        body {
-            background-color: #0a0a0a;
-            color: #ffffff;
-            margin: 0;
-            font-family: 'Roboto', sans-serif;
-            text-align: center;
-        }
+body {
+    background-color: #0a0a0a;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+}
 
-        /* LOGO RE-CLIQUABLE VERS L'ACCUEIL */
-        .logo-wrapper {
-            max-width: 350px;
-            margin: 40px auto;
-            cursor: pointer;
-            position: relative;
-        }
-        .logo-groupe-principal { width: 100%; transition: 0.3s; }
-        .logo-wrapper:hover .logo-groupe-principal { transform: scale(1.05); }
+/* LOGO & MASCOTTE */
+.logo-wrapper {
+    position: relative;
+    max-width: 450px;
+    margin: 40px auto;
+    cursor: pointer;
+}
+.logo-groupe-principal {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.4));
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.mascotte-pop {
+    position: absolute;
+    top: -60px;
+    left: 60%;
+    width: 140px;
+    height: auto;
+    transform: rotate(-15deg) scale(0); 
+    opacity: 0;
+    z-index: 1;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.logo-wrapper:hover .logo-groupe-principal { transform: scale(1.08) rotate(3deg); }
+.logo-wrapper:hover .mascotte-pop { opacity: 1; transform: rotate(15deg) scale(1); }
 
-        h1 { font-family: 'Bebas Neue', cursive; color: #12C3FF; font-size: 3rem; letter-spacing: 2px; }
-        
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            border: 1px solid #333;
-        }
+/* NAVIGATION */
+nav {
+    background: rgba(0, 0, 0, 0.9);
+    padding: 15px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 2px solid #12C3FF;
+    text-align: center;
+}
+nav a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 15px;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.4rem;
+    transition: 0.3s;
+    display: inline-block;
+}
+nav a:hover { color: #12C3FF; transform: scale(1.2); }
 
-        p { font-size: 1.1rem; margin-bottom: 30px; }
+/* TITRES & CONTENEUR PRO */
+h2 { 
+    font-family: 'Bebas Neue', sans-serif; 
+    font-size: 4.5rem; 
+    color: #12C3FF; 
+    text-align: center; 
+    margin: 60px 0 20px 0; 
+    letter-spacing: 5px; 
+    text-shadow: 0 0 15px rgba(18, 195, 255, 0.4); 
+}
 
-        /* CHAMP MOT DE PASSE */
-        .password-box {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-        }
+.pro-box {
+    max-width: 800px;
+    margin: 0 auto 100px auto;
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid #333;
+    text-align: center;
+}
 
-        input[type="password"] {
-            padding: 12px;
-            border-radius: 5px;
-            border: 2px solid #12C3FF;
-            background: #000;
-            color: #fff;
-            font-size: 1rem;
-            width: 200px;
-        }
+.pro-text { font-size: 1.2rem; margin-bottom: 40px; }
 
-        button {
-            padding: 12px 20px;
-            border-radius: 5px;
-            border: none;
-            background: #12C3FF;
-            color: #000;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+/* STYLE DU FORMULAIRE */
+.password-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
 
-        button:hover { background: #fff; transform: scale(1.1); }
+input[type="password"] {
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid #12C3FF;
+    background: #000;
+    color: #fff;
+    font-size: 1.1rem;
+    width: 250px;
+    outline: none;
+}
 
-        #error-message {
-            color: #ff4d4d;
-            margin-top: 20px;
-            font-weight: bold;
-            display: none; /* Caché par défaut */
-        }
+.btn-valider {
+    padding: 15px 30px;
+    border-radius: 8px;
+    border: none;
+    background: #12C3FF;
+    color: #000;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.btn-valider:hover { background: #fff; transform: scale(1.1); }
+
+#error-msg {
+    color: #ff4d4d;
+    font-weight: bold;
+    margin-top: 20px;
+    display: none;
+}
+
+/* RESPONSIVE */
+@media (max-width: 800px) {
+    h2 { font-size: 2.8rem; }
+    .logo-wrapper { max-width: 300px; }
+    input[type="password"] { width: 100%; }
+}
     </style>
 </head>
 <body>
 
-    <a href="index.html" class="logo-wrapper">
-        <img src="Goodmorningrogerlogo.png" class="logo-groupe-principal" alt="Retour Accueil">
+    <a href="index.html" style="text-decoration: none;">
+        <div class="logo-wrapper">
+            <img src="Goodmorningrogerlogo.png" class="logo-groupe-principal" alt="Good Morning Roger Logo">
+            <img src="rogerchat.png" class="mascotte-pop" alt="Roger le Chat">
+        </div>
     </a>
 
-    <div class="container">
-        <h1>ESPACE PRO</h1>
-        <p>Tu as programmé <strong>Good Morning Roger</strong> ? Très bon choix !<br><br>
-        En te connectant ici tu trouveras tous les éléments nécessaires (communication, techniques, etc.)</p>
+    <nav>
+        <a href="index.html#presentation">Présentation</a>
+        <a href="index.html#actus">Actus</a>
+        <a href="index.html#concerts">Concerts</a>
+        <a href="index.html#musiques">Musiques</a>
+        <a href="index.html#contact">Contact</a>
+    </nav>
 
-        <div class="password-box">
-            <input type="password" id="passInput" placeholder="Mot de passe...">
-            <button onclick="checkPassword()">VALIDER</button>
+    <h2>ESPACE PRO</h2>
+
+    <div class="pro-box">
+        <p class="pro-text">
+            Tu as programmé <strong>Good Morning Roger</strong> ? Très bon choix !<br><br>
+            En te connectant ici tu trouveras tous les éléments nécessaires <br>(communication, techniques, etc.)
+        </p>
+
+        <div class="password-container">
+            <input type="password" id="passInput" placeholder="MOT DE PASSE">
+            <button class="btn-valider" onclick="check()">VALIDER</button>
         </div>
 
-        <p id="error-message">Oups, c'est pas le bon code !</p>
+        <p id="error-msg">Oups, c'est le bon code !</p>
     </div>
 
-   <script>
-    function checkPassword() {
-        const input = document.getElementById('passInput').value;
-        const error = document.getElementById('error-message');
-        
-        // Ton lien Drive encodé pour ne pas être indexé par les robots
-        const target = "https://drive.google.com/drive/folders/12jIgEcx42RbfitwHfGqMaTeCGtrOwEV7?usp=drive_link";
-        
-        // On compare le mot de passe encodé en Base64
-        // btoa(input) transforme "GMRchat" en "R01SY2hhdA=="
-        if (btoa(input) === "R01SY2hhdA==") {
-            window.location.href = target;
-        } else {
-            error.style.display = "block";
-            document.getElementById('passInput').value = ""; // Vide le champ en cas d'erreur
-        }
-    }
+    <script>
+        function check() {
+            const val = document.getElementById('passInput').value;
+            const err = document.getElementById('error-msg');
+            const link = "https://drive.google.com/drive/folders/12jIgEcx42RbfitwHfGqMaTeCGtrOwEV7?usp=drive_link";
 
-    // Touche Entrée
-    document.getElementById('passInput').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') checkPassword();
-    });
-</script>
+            // Mot de passe 
+            if (btoa(val) === "R01SY2hhdA==") {
+                window.location.href = link;
+            } else {
+                err.style.display = "block";
+                document.getElementById('passInput').value = "";
+            }
+        }
+
+        // Touche Entrée
+        document.getElementById('passInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') check();
+        });
+    </script>
 
 </body>
 </html>
