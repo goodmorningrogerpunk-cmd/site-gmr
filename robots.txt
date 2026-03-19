@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://goodmorningroger.fr/sitemap.xml
