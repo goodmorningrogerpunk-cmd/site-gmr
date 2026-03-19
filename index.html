@@ -386,16 +386,22 @@ nav a:hover {
     transition: all 0.3s ease-in-out;
 }
 
-            /* Halo BLANC par défaut */
-.halo-mail {
-    transition: all 0.4s ease-in-out;
-    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.6)); /* Halo blanc doux */
+/* Style pour l'image MAIL (Plus grosse que les autres) */
+.img-mail {
+    width: 80px !important;    /* Taille augmentée pour dominer les autres */
+    height: auto !important;
+    display: block;            /* Permet le centrage avec margin auto */
+    margin: 30px auto !important; /* Centre l'image et l'espace des autres */
+    transition: all 0.4s ease-in-out !important;
+    
+    /* HALO BLANC DE BASE (Bien présent) */
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.9)) !important;
 }
 
-/* Passage au CYAN au survol */
-.halo-mail:hover {
-    filter: drop-shadow(0 0 12px #12C3FF) drop-shadow(0 0 5px #12C3FF);
-    transform: scale(1.15); /* Un léger zoom pour l'effet interactif */
+/* EFFET AU SURVOL (CYAN ÉCLATANT) */
+.img-mail:hover {
+    filter: drop-shadow(0 0 20px #12C3FF) drop-shadow(0 0 10px #12C3FF) !important;
+    transform: scale(1.1);
     cursor: pointer;
 }
     </style>
@@ -648,11 +654,11 @@ nav a:hover {
             on te répondra très vite.
         </p>
 
-        <div style="margin-bottom: 50px;">
-            <a href="mailto:tonadresse@mail.com">
-    <img src="logomail.png" alt="Email" class="halo-mail" style="width: 40px; height: 40px;">
-</a>
-        </div>
+       <div style="text-align: center; width: 100%;">
+    <a href="mailto:goodmorningroger@mail.com">
+        <img src="logomail.png" class="img-mail" alt="Contact">
+    </a>
+</div>
         <div style="margin-top: 40px; margin-bottom: 20px;">
     <span class="streaming-title" style="font-family: 'Bebas Neue', cursive; color: #fff; font-size: 1.4rem; letter-spacing: 1px;">
         RETROUVES NOUS SUR CES PLATEFORMES
