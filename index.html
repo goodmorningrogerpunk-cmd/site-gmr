@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Good Morning Roger | Punk Rock</title>
-   <style>
+  <style>
 /* 1. IMPORT DES POLICES */
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;700&display=swap');
 
@@ -25,7 +25,6 @@ body {
     margin: 40px auto;
     cursor: pointer;
 }
-
 .logo-groupe-principal {
     display: block;
     width: 100%;
@@ -35,7 +34,6 @@ body {
     position: relative;
     z-index: 2;
 }
-
 .mascotte-pop {
     position: absolute;
     top: -60px;
@@ -48,16 +46,13 @@ body {
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.5));
 }
-
 .logo-wrapper:hover .logo-groupe-principal {
     transform: scale(1.08) rotate(3deg);
     filter: drop-shadow(0px 0px 25px rgba(18, 195, 255, 0.7));
 }
-
 .logo-wrapper:hover .mascotte-pop {
     opacity: 1;
     transform: rotate(15deg) scale(1);
-    filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.6));
 }
 
 /* --- NAVIGATION --- */
@@ -70,7 +65,6 @@ nav {
     border-bottom: 2px solid #12C3FF;
     text-align: center;
 }
-
 nav a {
     color: #fff;
     text-decoration: none;
@@ -80,7 +74,6 @@ nav a {
     transition: 0.3s;
     display: inline-block;
 }
-
 nav a:hover {
     color: #12C3FF;
     text-shadow: 0px 0px 10px rgba(18, 195, 255, 0.7);
@@ -97,17 +90,13 @@ nav a:hover {
     margin: 40px auto;
     padding: 0 20px;
 }
-
 .article-video, .actus-photo { flex: 0 0 280px; }
 .article-content, .actus-content { flex: 1; color: #ffffff; text-align: left; }
-
 .article-content h3, .actus-content h3 {
     font-family: 'Bebas Neue', cursive;
     font-size: 2.5rem;
     margin: 0 0 10px 0;
-    color: #ffffff;
 }
-
 .presentation-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -116,13 +105,11 @@ nav a:hover {
     margin: 40px auto;
     padding: 0 20px;
 }
-
 .presentation-item img, .actus-photo img {
     width: 100%;
     border-radius: 5px;
     border: 1px solid #333;
     cursor: zoom-in;
-    display: block;
 }
 
 /* 5. CONCERTS */
@@ -164,50 +151,54 @@ h2 {
     text-shadow: 0 0 15px rgba(18, 195, 255, 0.4); 
 }
 
-/* 7. BLOC STREAMING (BOÎTE NOIRE CENTRÉE) */
+/* 7. BLOC STREAMING (LE FAMEUX) */
 .streaming-box {
-    background-color: #000000;
-    border: 1px solid #333;
+    background-color: #000000 !important;
+    border: 1px solid #333 !important;
     border-radius: 12px;
     padding: 30px;
     max-width: 600px;
-    margin: 40px auto;
-    text-align: center;
-}
-
-.streaming-title {
-    font-family: 'Bebas Neue', cursive;
-    font-size: 1.8rem;
-    color: #fff;
-    margin-bottom: 25px;
-    display: block;
-    letter-spacing: 2px;
-}
-
-.streaming-logos {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
+    margin: 40px auto !important; /* CENTRE LE BLOC */
+    text-align: center !important; /* CENTRE LE TEXTE ET LOGOS */
 }
 
 /* 8. LOGOS SOCIAUX & MAIL */
 .logo-social {
     width: 40px;
     height: auto;
-    margin: 0 10px;
+    margin: 10px;
     transition: 0.3s;
 }
 .logo-social:hover { transform: scale(1.1); filter: drop-shadow(0px 0px 8px #12C3FF); }
 
 img.img-mail {
-    width: 40px !important;
-    max-width: 40px !important;
+    width: 45px !important; /* TAILLE DU MAIL ICI */
     height: auto !important;
     display: block !important;
     margin: 30px auto !important;
     transition: all 0.3s ease-in-out !important;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9)) !important;
+}
+img.img-mail:hover {
+    filter: drop-shadow(0 0 15px #12C3FF) !important;
+    transform: scale(1.1) !important;
+}
+
+/* 9. RESPONSIVE MOBILE */
+@media (max-width: 800px) {
+    h2 { font-size: 2.8rem; }
+    .article-presentation, .article-actus { flex-direction: column; align-items: center; text-align: center; }
+    .concert-row { flex-direction: column; text-align: center; }
+    .concert-date-box { border-right: none; margin-right: 0; margin-bottom: 10px; }
+}
+
+/* LIGHTBOX */
+#lightbox {
+    display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9); align-items: center; justify-content: center;
+}
+#lightbox img { max-width: 90%; max-height: 80%; border: 3px solid #12C3FF; }
+</style>
    
 </head>
 <body>
