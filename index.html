@@ -24,19 +24,17 @@ body {
     max-width: 450px;
     margin: 40px auto;
     cursor: pointer;
-    display: block; /* Important pour le centrage */
+    display: block;
 }
-
 .logo-groupe-principal {
     display: block;
     width: 100%;
     height: auto;
     filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.4));
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
     z-index: 2;
 }
-
 .mascotte-pop {
     position: absolute;
     top: -60px;
@@ -47,10 +45,8 @@ body {
     opacity: 0;
     z-index: 1;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.5));
 }
-
-.logo-wrapper:hover .logo-groupe-principal { transform: scale(1.08) rotate(3deg); filter: drop-shadow(0px 0px 25px rgba(18, 195, 255, 0.7)); }
+.logo-wrapper:hover .logo-groupe-principal { transform: scale(1.08) rotate(3deg); }
 .logo-wrapper:hover .mascotte-pop { opacity: 1; transform: rotate(15deg) scale(1); }
 
 /* 4. NAVIGATION */
@@ -63,30 +59,23 @@ nav {
     border-bottom: 2px solid #12C3FF;
     text-align: center;
 }
-
 nav a {
     color: #fff;
     text-decoration: none;
     margin: 0 15px;
     font-family: 'Bebas Neue', cursive;
     font-size: 1.4rem;
-    transition: 0.3s;
     display: inline-block;
 }
 
-nav a:hover { color: #12C3FF; transform: scale(1.2) rotate(-2deg); }
-
-/* 5. ARTICLES ET TITRES */
+/* 5. TITRES ET ARTICLES */
 h2 { 
     font-family: 'Bebas Neue', sans-serif; 
     font-size: 4.5rem; 
     color: #12C3FF; 
     text-align: center; 
-    margin: 80px 0 40px 0; 
-    letter-spacing: 5px; 
-    text-shadow: 0 0 15px rgba(18, 195, 255, 0.4); 
+    margin: 60px 0 30px 0;
 }
-
 .article-presentation, .article-actus {
     display: flex;
     align-items: flex-start;
@@ -96,12 +85,10 @@ h2 {
     margin: 40px auto;
     padding: 0 20px;
 }
-
 .article-video, .actus-photo { flex: 0 0 280px; }
-.article-content, .actus-content { flex: 1; text-align: left; }
-.article-content h3, .actus-content h3 { font-family: 'Bebas Neue', cursive; font-size: 2.5rem; margin: 0 0 10px 0; }
-
-.actus-photo img, .presentation-item img { width: 100%; border-radius: 5px; cursor: zoom-in; display: block; }
+.article-content, .actus-content { flex: 1; }
+.article-content h3, .actus-content h3 { font-family: 'Bebas Neue', cursive; font-size: 2.5rem; margin: 0; }
+.actus-photo img, .presentation-item img { width: 100%; border-radius: 5px; display: block; }
 
 .presentation-grid {
     display: grid;
@@ -112,98 +99,178 @@ h2 {
     padding: 0 20px;
 }
 
-.presentation-item { border-radius: 8px; overflow: hidden; border: 1px solid #333; transition: 0.3s; }
-
-/* 6. VIDEO (Correction affichage) */
-.video-container {
-    position: relative;
-    width: 100%;
-    border-radius: 8px;
-    overflow: hidden;
-    background: #000;
-}
-
-/* 7. CONCERTS */
-.concert-list { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+/* 6. CONCERTS */
+.concert-list { max-width: 900px; margin: 20px auto; padding: 0 20px; }
 .concert-row {
     display: flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.03);
-    margin-bottom: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    margin-bottom: 10px;
     padding: 15px;
     border-radius: 8px;
-    border-left: 4px solid #333;
-    transition: 0.3s;
 }
-.concert-row:hover { background: rgba(18, 195, 255, 0.07); border-left-color: #12C3FF; transform: translateX(10px); }
-.concert-date-box { flex: 0 0 80px; text-align: center; border-right: 1px solid #444; margin-right: 25px; padding-right: 15px; }
-.date-day { font-family: 'Bebas Neue', cursive; font-size: 2.2rem; color: #12C3FF; }
-.concert-lieu { font-family: 'Bebas Neue', cursive; font-size: 1.5rem; display: block; }
-.concert-ville { color: #12C3FF; font-size: 0.95rem; font-weight: bold; }
-.concert-row-link { text-decoration: none; color: inherit; display: block; margin-bottom: 12px; }
+.concert-date-box { flex: 0 0 80px; text-align: center; border-right: 1px solid #444; margin-right: 20px; }
+.date-day { font-family: 'Bebas Neue', cursive; font-size: 2rem; color: #12C3FF; display: block; }
+.concert-lieu { font-family: 'Bebas Neue', cursive; font-size: 1.5rem; }
+.concert-row-link { text-decoration: none; color: inherit; }
 
-/* 8. CONTACT ET HALO MAIL (La demande) */
+/* 7. CONTACT ET HALO MAIL (CORRECTIF FINAL) */
 .img-mail {
-    width: 85px !important;
+    width: 90px !important; /* On la fait bien grosse */
     height: auto !important;
     display: block !important;
     margin: 30px auto !important;
-    transition: all 0.4s ease-in-out !important;
-    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8)) !important; /* HALO BLANC FIXE */
+    transition: all 0.3s ease-in-out !important;
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.9)) !important; /* HALO BLANC */
 }
 .img-mail:hover {
     filter: drop-shadow(0 0 15px #12C3FF) drop-shadow(0 0 5px #12C3FF) !important; /* HALO CYAN */
     transform: scale(1.1) !important;
 }
 
-.logo-social { width: 40px; height: auto; margin: 0 15px; transition: 0.3s; }
-.logo-social:hover { transform: scale(1.1); filter: drop-shadow(0px 0px 8px #12C3FF); }
+.logo-social { width: 40px; margin: 0 10px; transition: 0.3s; }
+.logo-social:hover { filter: drop-shadow(0 0 8px #12C3FF); }
 
 .streaming-box {
-    background-color: #000000;
+    background: #000;
     border: 1px solid #333;
+    padding: 20px;
     border-radius: 12px;
-    padding: 30px;
     max-width: 600px;
-    margin: 40px auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 25px;
-    flex-wrap: wrap;
+    margin: 20px auto;
+    text-align: center;
 }
 
-/* 9. REVEAL ET LIGHTBOX */
-.reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
-.reveal.active { opacity: 1; transform: translateY(0); }
-#lightbox {
-    display: none;
-    position: fixed;
-    z-index: 2000;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.9);
-    align-items: center; justify-content: center;
-}
-#lightbox img { max-width: 90%; max-height: 80%; border: 3px solid #12C3FF; }
-
-/* 10. RESPONSIVE (MOBILE) */
+/* 8. RESPONSIVE MOBILE */
 @media (max-width: 768px) {
-    h2 { font-size: 2.8rem; }
-    .logo-wrapper { max-width: 80%; }
-    .mascotte-pop { width: 100px; top: -40px; }
+    h2 { font-size: 3rem; }
     .article-presentation, .article-actus { flex-direction: column; align-items: center; text-align: center; }
-    .article-content, .actus-content { text-align: center; }
-    .concert-row { flex-direction: column; text-align: center; }
-    .concert-date-box { border-right: none; margin-right: 0; padding-right: 0; margin-bottom: 10px; }
+    .concert-row { flex-direction: column; }
+    .concert-date-box { border-right: none; margin-bottom: 10px; }
 }
+
+/* On force l'affichage (réparation du bug de disparition) */
+section { opacity: 1 !important; transform: none !important; }
     </style>
 </head>
 <body>
 
-    <div id="lightbox" onclick="this.style.display='none'"><img src="" alt="Agrandissement"></div>
+    <div id="lightbox" onclick="this.style.display='none'" style="display:none; position:fixed; z-index:2000; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); align-items:center; justify-content:center;"><img src="" style="max-width:90%; max-height:80%; border:3px solid #12C3FF;"></div>
 
     <div class="logo-wrapper">
-        <img src="Goodmorningrogerlogo.png" class="logo-groupe-principal" alt="Good Morning Roger Logo">
-        <img src="rogerchat.png" class="mascotte-pop" alt="Roger le Chat">
+        <img src="Goodmorningrogerlogo.png" class="logo-groupe-principal" alt="Logo">
+        <img src="rogerchat.png" class="mascotte-pop" alt="Roger Chat">
     </div>
+
+    <nav>
+        <a href="#presentation">Présentation</a>
+        <a href="#actus">Actus</a>
+        <a href="#concerts">Concerts</a>
+        <a href="#musiques">Musiques</a>
+        <a href="#contact">Contact</a>
+    </nav>
+
+    <section id="presentation">
+        <h2>PRÉSENTATION</h2>
+        <div class="article-presentation">
+            <div class="article-video">
+                <video autoplay loop muted playsinline controls style="width:100%; border-radius:8px; background:#000;">
+                    <source src="https://goodmorningrogerpunk-cmd.github.io/site-gmr/teasergmrok.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="article-content">
+                <h3>Good Morning Roger</h3>
+                <p>Des punk covers, des tubes, des dessins animés et du fun !</p>
+                <p>C’est énergique, c’est festif, c’est nostalgique et totalement décomplexé.</p>
+            </div>
+        </div>
+        <div class="presentation-grid">
+            <div class="presentation-item"><img src="photo9.jpg"></div>
+            <div class="presentation-item"><img src="photo1.jpg"></div>
+            <div class="presentation-item"><img src="photo4.jpg"></div>
+            <div class="presentation-item"><img src="photo5.jpg"></div>
+            <div class="presentation-item"><img src="photo10.jpg"></div>
+        </div>
+    </section>
+
+    <section id="actus">
+        <h2>ACTUS</h2>
+        <div class="article-actus">
+            <div class="actus-photo"><img src="photo7.jpg"></div>
+            <div class="actus-content">
+                <h3>Nouvel album en préparation</h3>
+                <p>Sortie prévue en 2026 ! Plus de génériques, plus de punk !</p>
+            </div>
+        </div>
+        <div class="article-actus">
+            <div class="actus-photo"><img src="photo11.jpg"></div>
+            <div class="actus-content">
+                <h3>Plein de dates en 2026 !</h3>
+                <p>On arrive dans les bars et les festivals près de chez vous.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="concerts">
+        <h2>CONCERTS</h2>
+        <div class="concert-list">
+            <a href="https://www.facebook.com/Gapette/" class="concert-row-link"><div class="concert-row"><div class="concert-date-box"><span class="date-day">28</span><span>MARS</span></div><div class="concert-info"><span class="concert-lieu">La Gapette</span><br>Les Epesses (85)</div></div></a>
+            <a href="https://www.facebook.com/lelutindetravers/" class="concert-row-link"><div class="concert-row"><div class="concert-date-box"><span class="date-day">04</span><span>AVRIL</span></div><div class="concert-info"><span class="concert-lieu">Lutin de Travers</span><br>Nantes (44)</div></div></a>
+            <a href="https://www.facebook.com/p/La-Forge-100063457422069/" class="concert-row-link"><div class="concert-row"><div class="concert-date-box"><span class="date-day">05</span><span>AVRIL</span></div><div class="concert-info"><span class="concert-lieu">La Forge</span><br>Chambretaud (85)</div></div></a>
+            <a href="https://brasserie-brume.fr" class="concert-row-link"><div class="concert-row"><div class="concert-date-box"><span class="date-day">08</span><span>MAI</span></div><div class="concert-info"><span class="concert-lieu">Brasserie Horizon</span><br>Questembert (56)</div></div></a>
+            <a href="https://www.bar-caveetvous-clisson.fr/" class="concert-row-link"><div class="concert-row"><div class="concert-date-box"><span class="date-day">05</span><span>JUIN</span></div><div class="concert-info"><span class="concert-lieu">La Cave et Vous</span><br>Mouzillon (44)</div></div></a>
+            <a href="https://www.larcadiafougeres.fr/" class="concert-row-link"><div class="concert-row"><div class="concert-date-box"><span class="date-day">13</span><span>JUIN</span></div><div class="concert-info"><span class="concert-lieu">L'Arcadia</span><br>Fougères (35)</div></div></a>
+            <a href="https://www.bar-caveetvous-clisson.fr/" class="concert-row-link"><div class="concert-row"><div class="concert-date-box"><span class="date-day">17</span><span>JUIN</span></div><div class="concert-info"><span class="concert-lieu">Hellfest (Cave)</span><br>Clisson (44)</div></div></a>
+            <a href="http://www.vandb.fr/magasin/poitiers-sud/" class="concert-row-link"><div class="concert-row"><div class="concert-date-box"><span class="date-day">02</span><span>JUILLET</span></div><div class="concert-info"><span class="concert-lieu">V and B</span><br>Poitiers (86)</div></div></a>
+            <a href="https://www.facebook.com/Lemillebornes/" class="concert-row-link"><div class="concert-row"><div class="concert-date-box"><span class="date-day">04</span><span>JUILLET</span></div><div class="concert-info"><span class="concert-lieu">Mille Bornes</span><br>Redon (35)</div></div></a>
+            <a href="https://breizhpms.fr/" class="concert-row-link"><div class="concert-row"><div class="concert-date-box"><span class="date-day">11</span><span>JUILLET</span></div><div class="concert-info"><span class="concert-lieu">Breizh PMS Festival</span><br>Guémené (44)</div></div></a>
+            <a href="https://www.bonrepos.bzh/" class="concert-row-link"><div class="concert-row"><div class="concert-date-box"><span class="date-day">01</span><span>AOÛT</span></div><div class="concert-info"><span class="concert-lieu">Son et Lumière</span><br>Bon-Repos (22)</div></div></a>
+            <a href="https://www.facebook.com/laminuteblondefc/" class="concert-row-link"><div class="concert-row"><div class="concert-date-box"><span class="date-day">07</span><span>AOÛT</span></div><div class="concert-info"><span class="concert-lieu">La Minute Blonde</span><br>Fontenay (85)</div></div></a>
+            <a href="https://www.facebook.com/profile.php?id=61551334076605" class="concert-row-link"><div class="concert-row"><div class="concert-date-box"><span class="date-day">29</span><span>AOÛT</span></div><div class="concert-info"><span class="concert-lieu">Rock n' Bylette</span><br>Malville (44)</div></div></a>
+            <a href="https://www.brasseriesoma.fr/" class="concert-row-link"><div class="concert-row"><div class="concert-date-box"><span class="date-day">18</span><span>SEPT.</span></div><div class="concert-info"><span class="concert-lieu">Brasserie Soma</span><br>Loroux (44)</div></div></a>
+        </div>
+    </section>
+
+    <section id="musiques">
+        <h2>MUSIQUES</h2>
+        <div style="max-width: 700px; margin: 0 auto 20px auto; border: 2px solid #12C3FF; border-radius: 8px; overflow: hidden;">
+            <iframe style="border: 0; width: 100%; height: 120px;" src="https://bandcamp.com/EmbeddedPlayer/album=1414452669/size=large/bgcol=333333/linkcol=12C3FF/tracklist=false/artwork=small/transparent=true/" seamless></iframe>
+        </div>
+        <div style="max-width: 700px; margin: 0 auto 20px auto; border: 2px solid #12C3FF; border-radius: 8px; overflow: hidden;">
+            <iframe style="border: 0; width: 100%; height: 120px;" src="https://bandcamp.com/EmbeddedPlayer/album=1871139396/size=large/bgcol=333333/linkcol=12C3FF/tracklist=false/artwork=small/transparent=true/" seamless></iframe>
+        </div>
+        <div class="streaming-box">
+            <a href="https://open.spotify.com/intl-fr/artist/4G8tJAXMrv57k3GlfhEjsX"><img src="logospot.png" class="logo-social"></a>
+            <a href="https://www.deezer.com/fr/artist/248006762"><img src="logodeezer.png" class="logo-social"></a>
+            <a href="https://goodmorningroger.bandcamp.com/"><img src="logobandcamp.png" class="logo-social"></a>
+        </div>
+    </section>
+
+    <section id="contact">
+        <h2>CONTACT</h2>
+        <div style="text-align:center;">
+            <p style="font-family:'Bebas Neue'; font-size:1.8rem; color:#12C3FF;">PROGRAMMER GOOD MORNING ROGER ?</p>
+            <a href="mailto:goodmorningroger@mail.com">
+                <img src="logomail.png" class="img-mail" alt="Contact">
+            </a>
+            <div style="margin-top:30px;">
+                <a href="https://www.facebook.com/GoodMorningRoger/"><img src="logofb.png" class="logo-social"></a>
+                <a href="https://www.instagram.com/goodmorningroger/"><img src="logoinsta.png" class="logo-social"></a>
+                <a href="https://www.youtube.com/@goodmorningroger"><img src="logoyoutube.png" class="logo-social"></a>
+                <a href="https://www.tiktok.com/@good.morning.roger"><img src="logotiktok.png" class="logo-social"></a>
+            </div>
+            <p style="margin-top:40px; font-size:0.7rem;">© 2024 Good Morning Roger</p>
+        </div>
+    </section>
+
+    <script>
+        const imgs = document.querySelectorAll('img');
+        const lb = document.getElementById('lightbox');
+        const lbImg = lb.querySelector('img');
+        imgs.forEach(i => {
+            if(i.classList.contains('logo-social') || i.classList.contains('img-mail')) return;
+            i.onclick = () => { lbImg.src = i.src; lb.style.display = 'flex'; }
+        });
+    </script>
+</body>
+</html>
