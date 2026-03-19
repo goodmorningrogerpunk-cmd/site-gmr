@@ -6,10 +6,8 @@
     <title>Good Morning Roger | Punk Rock</title>
     <link rel="icon" type="image/png" href="chat_tete.png">
     <link rel="apple-touch-icon" href="chat_tete.png">
-  <style>
-/* 1. IMPORT DES POLICES LOCALES (Anti-bug Messenger) */
-
-/* Bebas Neue - Titres et Menu */
+<style>
+/* 1. POLICES LOCALES */
 @font-face {
   font-family: 'Bebas Neue';
   font-style: normal;
@@ -18,7 +16,6 @@
   src: url('fonts/bebas-neue-v14-latin-regular.woff2') format('woff2');
 }
 
-/* Roboto - Texte normal */
 @font-face {
   font-family: 'Roboto';
   font-style: normal;
@@ -27,7 +24,6 @@
   src: url('fonts/roboto-v32-latin-300.woff2') format('woff2');
 }
 
-/* Roboto - Texte Gras */
 @font-face {
   font-family: 'Roboto';
   font-style: normal;
@@ -42,24 +38,13 @@ body {
     color: #ffffff;
     margin: 0;
     padding: 0;
-    /* On ajoute des polices de secours standard au cas où */
     font-family: 'Roboto', Helvetica, Arial, sans-serif;
     line-height: 1.6;
 }
 
-/* Appliquer Bebas Neue avec secours Impact (très punk aussi) */
-nav a, h2, h3, .date-day, .date-month, .concert-lieu {
-    font-family: 'Bebas Neue', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif !important;
-}
-
-/* 2. STYLE GLOBAL */
-body {
-    background-color: #0a0a0a;
-    color: #ffffff;
-    margin: 0;
-    padding: 0;
-    font-family: 'Roboto', sans-serif;
-    line-height: 1.6;
+/* Application Bebas Neue */
+nav a, h2, h3, .date-day, .date-month, .concert-lieu, .streaming-title {
+    font-family: 'Bebas Neue', Impact, 'Arial Narrow Bold', sans-serif !important;
 }
 
 /* 3. LOGO, MASCOTTE POP & NAV */
@@ -113,7 +98,6 @@ nav a {
     color: #fff;
     text-decoration: none;
     margin: 0 15px;
-    font-family: 'Bebas Neue', cursive;
     font-size: 1.4rem;
     transition: 0.3s;
     display: inline-block;
@@ -149,7 +133,6 @@ nav a:hover {
 
 .article-content, .actus-content { flex: 1; color: #ffffff; text-align: left; }
 .article-content h3, .actus-content h3 {
-    font-family: 'Bebas Neue', cursive;
     font-size: 2.5rem;
     margin: 0 0 10px 0;
 }
@@ -161,7 +144,6 @@ nav a:hover {
     margin: 40px auto;
 }
 
-/* AJOUT : EFFET DE ZOOM ET CURSEUR SUR LES IMAGES DE PRÉSENTATION */
 .presentation-item { overflow: hidden; border-radius: 5px; border: 1px solid #333; }
 .presentation-item img { width: 100%; transition: transform 0.3s ease; cursor: pointer; display: block; }
 .presentation-item:hover img { transform: scale(1.08); }
@@ -200,20 +182,19 @@ nav a:hover {
     padding-right: 15px;
 }
 
-.date-day { font-family: 'Bebas Neue', cursive; font-size: 2.2rem; line-height: 1; color: #12C3FF; display: block; }
-.date-month { font-family: 'Bebas Neue', cursive; font-size: 1rem; color: #fff; display: block; }
+.date-day { font-size: 2.2rem; line-height: 1; color: #12C3FF; display: block; }
+.date-month { font-size: 1rem; color: #fff; display: block; }
 
 .concert-info { flex: 1; text-align: left; }
 .concert-lieu { 
-    font-family: 'Bebas Neue', cursive; 
     font-size: 1.5rem; 
     display: block; 
     color: #ffffff;
 }
 .concert-ville { color: #12C3FF; font-size: 0.95rem; font-weight: bold; }
+
 /* 6. TITRES H2 */
 h2 { 
-    font-family: 'Bebas Neue', sans-serif; 
     font-size: 4.5rem; 
     color: #12C3FF; 
     text-align: center; 
@@ -223,7 +204,7 @@ h2 {
     text-shadow: 0 0 15px rgba(18, 195, 255, 0.4); 
 }
 
-/* 7. BLOC STREAMING (CENTRÉ) */
+/* 7. BLOC STREAMING */
 .streaming-box {
     background-color: #000000;
     border: 1px solid #333;
@@ -262,12 +243,7 @@ img.img-mail:hover {
 @media (max-width: 800px) {
     .desktop-only { display: none !important; }
     .mobile-only { display: block !important; }
-    
-    .article-video {
-        width: 100%;
-        max-width: 320px;
-        margin: 0 auto 20px auto;
-    }
+    .article-video { width: 100%; max-width: 320px; margin: 0 auto 20px auto; }
 }
 @media (max-width: 800px) {
     h2 { font-size: 2.8rem; }
@@ -284,11 +260,11 @@ img.img-mail:hover {
 }
 #lightbox img { max-width: 90%; max-height: 80%; border: 3px solid #12C3FF; }
 
-      html {
-    scroll-behavior: smooth; /* Pour que le déplacement soit fluide et pas brusque */
-    scroll-padding-top: 120px; /* Ajuste cette valeur selon la hauteur de ta barre de menu */
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 120px;
 }
-      /* --- EFFET REVEAL (INDISPENSABLE POUR LE SCRIPT) --- */
+
 .reveal {
     opacity: 0;
     transform: translateY(30px);
@@ -300,13 +276,11 @@ img.img-mail:hover {
     transform: translateY(0);
 }
 </style>
-   
 </head>
 <body>
     <div id="lightbox" onclick="this.style.display='none'"><img src="" alt="Agrandissement"></div>
     <div class="logo-wrapper">
     <img src="Goodmorningrogerlogo.png" class="logo-groupe-principal" alt="Good Morning Roger Logo">
-
     <img src="rogerchat.png" class="mascotte-pop" alt="Roger le Chat">
 </div>
 
@@ -321,15 +295,14 @@ img.img-mail:hover {
 
 <section id="presentation" class="reveal">
     <h2>PRÉSENTATION</h2>
-
     <div class="article-presentation">
    <div class="article-video">
-    <div class="presentation-item-video"> <div class="video-container desktop-only" style="position: relative; padding-bottom: 177.77%; height: 0; overflow: hidden; border-radius: 8px;">
+    <div class="presentation-item-video"> 
+        <div class="video-container desktop-only" style="position: relative; padding-bottom: 177.77%; height: 0; overflow: hidden; border-radius: 8px;">
             <video autoplay loop muted playsinline controls preload="auto" poster="photo5.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background: #000;">
                 <source src="https://goodmorningrogerpunk-cmd.github.io/site-gmr/teasergmrok.mp4" type="video/mp4">
             </video>
         </div>
-
         <div class="video-container mobile-only" style="position: relative; padding-bottom: 177.77%; height: 0; overflow: hidden; border-radius: 8px; border: 2px solid #12C3FF;">
             <iframe 
                 style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
@@ -342,25 +315,16 @@ img.img-mail:hover {
         </div>
     </div>
 </div>
-
         <div class="article-content">
             <h3>Good Morning Roger</h3>
             <span class="article-subtitle">Des punk covers, des tubes, des dessins animés et du fun</span>
-
             <div class="article-text">
-                <p>
-                    <strong>Good Morning Roger</strong>, c’est le groupe qui a eu la (mauvaise ?) idée de mélanger le punk-rock avec tout ce que tu n’assumais pas d’écouter quand tu étais ado.
-                </p>
-                <p>
-                    Au programme : des tubes légendaires comme <em>La Tribu de Dana, Les Rois du Monde, Moi Lolita</em> et même des génériques culte genre <em>Denver le dernier dinosaure</em> ou les classiques du <em>Club Dorothée</em>... le tout à la sauce punk-rock déjanté.
-                </p>
-                <p>
-                    C’est énergique, c’est festif, c’est nostalgique et totalement décomplexé, c'est Good Morning Roger !
-                </p>
+                <p><strong>Good Morning Roger</strong>, c’est le groupe qui a eu la (mauvaise ?) idée de mélanger le punk-rock avec tout ce que tu n’assumais pas d’écouter quand tu étais ado.</p>
+                <p>Au programme : des tubes légendaires comme <em>La Tribu de Dana, Les Rois du Monde, Moi Lolita</em> et même des génériques culte genre <em>Denver le dernier dinosaure</em> ou les classiques du <em>Club Dorothée</em>... le tout à la sauce punk-rock déjanté.</p>
+                <p>C’est énergique, c’est festif, c’est nostalgique et totalement décomplexé, c'est Good Morning Roger !</p>
             </div>
         </div>
     </div>
-
     <div class="presentation-grid">
         <div class="presentation-item"><img src="photo9.jpg" alt="Live GMR"></div>
         <div class="presentation-item"><img src="photo1.jpg" alt="Live GMR"></div>
@@ -372,11 +336,8 @@ img.img-mail:hover {
 
 <section id="actus" class="reveal">
     <h2>ACTUS</h2>
-
     <div class="article-actus">
-        <div class="actus-photo">
-            <img src="photo7.jpg" alt="Album Club Roger">
-        </div>
+        <div class="actus-photo"><img src="photo7.jpg" alt="Album Club Roger"></div>
         <div class="actus-content">
             <h3>On prépare un nouvel album</h3>
             <div class="actus-text">
@@ -386,221 +347,76 @@ img.img-mail:hover {
             </div>
         </div>
     </div>
-
-    <div class="article-actus">
-        <div class="actus-photo">
-            <img src="photo11.jpg" alt="Dates Concerts">
-        </div>
-        <div class="actus-content">
-            <h3>Plein de dates en 2026 !</h3>
-            <div class="actus-text">
-                <p>On avait plein de dates en 2025, eh ben on en a encore plus en 2026, et ça c'est trop cool !</p>
-                <p>Des bars, des festoches... tout ça tout ça, on va bien s'éclater.</p>
-                <p>On compte sur toi pour venir chanter avec nous !</p>
-                <p><a href="#concerts" style="color: #12C3FF; text-decoration: underline; font-weight: bold;">Voir les dates de concerts</a> </p>
-            </div>
-        </div>
-    </div>
 </section>
 
 <section id="concerts" class="reveal">
     <h2>CONCERTS</h2>
 <div class="concert-list">
-<p style="color: #FFFFF; font-weight: bold; text-align: center; font-size: 1.3rem; margin-top: -15px; margin-bottom: 40px; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 10px rgba(18, 195, 255, 0.7), 0 0 20px rgba(18, 195, 255, 0.4);">
+<p style="color: #fff; font-weight: bold; text-align: center; font-size: 1.3rem; margin-top: -15px; margin-bottom: 40px; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 10px rgba(18, 195, 255, 0.7);">
     LES DATES DE 2026
 </p>
-
 <div class="concert-container">
-
     <a href="https://www.facebook.com/Gapette/" target="_blank" class="concert-row-link">
         <div class="concert-row">
             <div class="concert-date-box"><span class="date-day">28</span><span class="date-month">MARS</span></div>
             <div class="concert-info"><span class="concert-lieu">La Gapette</span><span class="concert-ville">Les Epesses (85)</span></div>
         </div>
     </a>
-
     <a href="https://www.facebook.com/lelutindetravers/?locale=fr_FR" target="_blank" class="concert-row-link">
         <div class="concert-row">
             <div class="concert-date-box"><span class="date-day">04</span><span class="date-month">AVRIL</span></div>
             <div class="concert-info"><span class="concert-lieu">Lutin de Travers</span><span class="concert-ville">Nantes (44)</span></div>
         </div>
     </a>
-
     <a href="https://www.facebook.com/p/La-Forge-100063457422069/" target="_blank" class="concert-row-link">
         <div class="concert-row">
             <div class="concert-date-box"><span class="date-day">05</span><span class="date-month">AVRIL</span></div>
             <div class="concert-info"><span class="concert-lieu">La Forge</span><span class="concert-ville">Chambretaud (85)</span></div>
         </div>
     </a>
-
-    <a href="https://brasserie-brume.fr" target="_blank" class="concert-row-link">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">08</span><span class="date-month">MAI</span></div>
-            <div class="concert-info"><span class="concert-lieu">Brasserie Horizon</span><span class="concert-ville">Questembert (56)</span></div>
-        </div>
-    </a>
-
-    <a href="https://www.bar-caveetvous-clisson.fr/" target="_blank" class="concert-row-link">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">05</span><span class="date-month">JUIN</span></div>
-            <div class="concert-info"><span class="concert-lieu">Fête de la Musique (La Cave et Vous)</span><span class="concert-ville">Mouzillon (44)</span></div>
-        </div>
-    </a>
-
-    <a href="https://www.larcadiafougeres.fr/" target="_blank" class="concert-row-link">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">13</span><span class="date-month">JUIN</span></div>
-            <div class="concert-info"><span class="concert-lieu">L'Arcadia</span><span class="concert-ville">Fougères (35)</span></div>
-        </div>
-    </a>
-
-    <a href="https://www.bar-caveetvous-clisson.fr/" target="_blank" class="concert-row-link">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">17</span><span class="date-month">JUIN</span></div>
-            <div class="concert-info"><span class="concert-lieu">La Cave et Vous / Hellfest</span><span class="concert-ville">Clisson (44)</span></div>
-        </div>
-    </a>
-
-    <a href="http://www.vandb.fr/magasin/poitiers-sud/" target="_blank" class="concert-row-link">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">02</span><span class="date-month">JUILLET</span></div>
-            <div class="concert-info"><span class="concert-lieu">V and B</span><span class="concert-ville">Poitiers (86)</span></div>
-        </div>
-    </a>
-
-    <a href="https://www.facebook.com/Lemillebornes/" target="_blank" class="concert-row-link">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">04</span><span class="date-month">JUILLET</span></div>
-            <div class="concert-info"><span class="concert-lieu">Mille Bornes</span><span class="concert-ville">Redon (35)</span></div>
-        </div>
-    </a>
-
-    <a href="https://breizhpms.fr/" target="_blank" class="concert-row-link">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">11</span><span class="date-month">JUILLET</span></div>
-            <div class="concert-info"><span class="concert-lieu">Breizh PMS Festival</span><span class="concert-ville">Guémené-Penfao (44)</span></div>
-        </div>
-    </a>
-
-    <a href="https://www.bonrepos.bzh/index.php/fr/" target="_blank" class="concert-row-link">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">01</span><span class="date-month">AOÛT</span></div>
-            <div class="concert-info"><span class="concert-lieu">Son et Lumière de Bon Repos</span><span class="concert-ville">Bon-Repos (22)</span></div>
-        </div>
-    </a>
-
-    <a href="https://www.facebook.com/laminuteblondefc/?locale=fr_FR" target="_blank" class="concert-row-link">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">07</span><span class="date-month">AOÛT</span></div>
-            <div class="concert-info"><span class="concert-lieu">La Minute Blonde</span><span class="concert-ville">Fontenay-le-Comte (85)</span></div>
-        </div>
-    </a>
-
-    <a href="https://www.facebook.com/profile.php?id=61551334076605" target="_blank" class="concert-row-link">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">29</span><span class="date-month">AOÛT</span></div>
-            <div class="concert-info"><span class="concert-lieu">Festival Rock n' Bylette</span><span class="concert-ville">Malville (44)</span></div>
-        </div>
-    </a>
-
-    <a href="https://www.brasseriesoma.fr/" target="_blank" class="concert-row-link">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">18</span><span class="date-month">SEPT.</span></div>
-            <div class="concert-info"><span class="concert-lieu">Brasserie Soma</span><span class="concert-ville">Le Loroux-Bottereau (44)</span></div>
-        </div>
-    </a>
-
+</div>
 </div>
 </section>
 
 <section id="musiques" class="reveal">
     <h2>MUSIQUES</h2>
-
-<p style="text-align: center; margin-bottom: 30px; font-size: 1.2rem; color: #fff; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px;">
-    Tu veux écouter <span style="color: #12C3FF;">Good Morning Roger</span> ? <br>
-    Fais-toi plaiz' !
+<p style="text-align: center; margin-bottom: 30px; font-size: 1.2rem; color: #fff; letter-spacing: 1px;">
+    Tu veux écouter <span style="color: #12C3FF;">Good Morning Roger</span> ? <br> Fais-toi plaiz' !
 </p>
-    
-    <div style="max-width: 700px; margin: 0 auto 25px auto; border: 2px solid #12C3FF; border-radius: 8px; box-shadow: 0px 0px 15px rgba(18, 195, 255, 0.2); line-height: 0; overflow: hidden;">
+    <div style="max-width: 700px; margin: 0 auto 25px auto; border: 2px solid #12C3FF; border-radius: 8px; line-height: 0; overflow: hidden;">
     <iframe style="border: 0; width: 100%; height: 120px; display: block;" 
         src="https://bandcamp.com/EmbeddedPlayer/album=1414452669/size=large/bgcol=333333/linkcol=12C3FF/tracklist=false/artwork=small/transparent=true/" 
         seamless>
         <a href="https://goodmorningroger.bandcamp.com/album/club-roger">Club Roger by Good Morning Roger</a>
     </iframe>
 </div>
-
-<div style="max-width: 700px; margin: 0 auto 25px auto; border: 2px solid #12C3FF; border-radius: 8px; box-shadow: 0px 0px 15px rgba(18, 195, 255, 0.2); line-height: 0; overflow: hidden;">
-    <iframe style="border: 0; width: 100%; height: 120px; display: block;" 
-        src="https://bandcamp.com/EmbeddedPlayer/album=1871139396/size=large/bgcol=333333/linkcol=12C3FF/tracklist=false/artwork=small/track=30679371/transparent=true/" 
-        seamless>
-        <a href="https://goodmorningroger.bandcamp.com/album/back-to-90-2000s">Back to 90 - 2000's by Good Morning Roger</a>
-    </iframe>
-</div>
-
     <div class="streaming-box">
-            <span class="streaming-title" style="display: block; width: 100%; margin-bottom: 20px; font-family: 'Bebas Neue', cursive; color: #fff; font-size: 1.4rem;">
+            <span class="streaming-title" style="display: block; width: 100%; margin-bottom: 20px; color: #fff; font-size: 1.4rem;">
                 ON EST AUSSI SUR TOUTES LES PLATEFORMES DE STREAMING
             </span>
-            <a href="https://open.spotify.com/intl-fr/artist/4G8tJAXMrv57k3GlfhEjsX" target="_blank"><img src="logospot.png" class="logo-social" alt="Spotify"></a>
-            <a href="https://www.deezer.com/fr/artist/248006762" target="_blank"><img src="logodeezer.png" class="logo-social" alt="Deezer"></a>
-            <a href="https://.amazon.fr/artists/B0CQTXV21G/good-morning-roger" target="_blank"><img src="logoamazon.png" class="logo-social" alt="Amazon "></a>
-            <a href="https://.apple.com/fr/artist/good-morning-roger/1722583151" target="_blank"><img src="logoapple.png" class="logo-social" alt="Apple "></a>
-            <a href="https://goodmorningroger.bandcamp.com/" target="_blank"><img src="logobandcamp.png" class="logo-social" alt="Bandcamp"></a>
-        </div>
-
-    </div> 
+            <a href="#" target="_blank"><img src="logospot.png" class="logo-social" alt="Spotify"></a>
+            <a href="#" target="_blank"><img src="logodeezer.png" class="logo-social" alt="Deezer"></a>
+    </div>
 </section>
-
 
 <section id="contact" class="reveal">
     <h2>CONTACT</h2>
-
 <div style="max-width: 900px; margin: auto; text-align: center;">
-
-    <p style="font-family: 'Bebas Neue', cursive; font-size: 1.8rem; color: #12C3FF; margin-bottom: 5px; letter-spacing: 1px;">
-        TU VEUX PROGRAMMER GOOD MORNING ROGER ?
-    </p>
-    <p style="color: #fff; margin-bottom: 30px; font-size: 1rem;">
-        Envoie-nous un mail avec un max d'infos sur ton événement,<br>
-        on te répondra très vite.
-    </p>
-
+    <p style="font-size: 1.8rem; color: #12C3FF; margin-bottom: 5px; letter-spacing: 1px;">TU VEUX PROGRAMMER GOOD MORNING ROGER ?</p>
     <div style="text-align: center; width: 100%;">
-        <a href="mailto:goodmorningroger.punk@gmail.com">
-            <img src="logomail.png" class="img-mail" alt="Contact">
-        </a>
+        <a href="mailto:goodmorningroger.punk@gmail.com"><img src="logomail.png" class="img-mail" alt="Contact"></a>
         <div style="margin-top: 10px;">
-            <a href="mailto:goodmorningroger.punk@gmail.com" style="color: #fff; font-weight: bold; text-decoration: none; font-size: 1.1rem;">
-                goodmorningroger.punk@gmail.com
-            </a>
+            <a href="mailto:goodmorningroger.punk@gmail.com" style="color: #fff; font-weight: bold; text-decoration: none; font-size: 1.1rem;">goodmorningroger.punk@gmail.com</a>
         </div>
     </div>
-
-    <div style="margin-top: 40px; margin-bottom: 20px;">
-        <span class="streaming-title" style="font-family: 'Bebas Neue', cursive; color: #fff; font-size: 1.4rem; letter-spacing: 1px;">
-            RETROUVE NOUS AUSSI SUR CES PLATEFORMES
-        </span>
-    </div>
-
-    <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; align-items: center; margin-bottom: 40px;">
-        <a href="https://www.facebook.com/GoodMorningRoger/" target="_blank"><img src="logofb.png" class="logo-social" alt="Facebook"></a>
-        <a href="https://www.instagram.com/goodmorningroger/" target="_blank"><img src="logoinsta.png" class="logo-social" alt="Instagram"></a>
-        <a href="https://www.youtube.com/@goodmorningroger" target="_blank"><img src="logoyoutube.png" class="logo-social" alt="YouTube"></a>
-        <a href="https://www.tiktok.com/@good.morning.roger" target="_blank"><img src="logotiktok.png" class="logo-social" alt="TikTok"></a>
-    </div>
-
-    <p style="margin-top: 100px; font-size: 0.7rem; color: #444; text-transform: uppercase; letter-spacing: 2px;">
-        © 2026 Good Morning Roger
-    </p>
+    <p style="margin-top: 100px; font-size: 0.7rem; color: #444; text-transform: uppercase; letter-spacing: 2px;">© 2026 Good Morning Roger</p>
 </div>
 </section>
 
 <script>
-    // 1. LIGHTBOX
     const images = document.querySelectorAll('.presentation-item img, .actus-photo img');
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = lightbox.querySelector('img');
-
     images.forEach(img => {
         img.addEventListener('click', () => {
             if (img.src) {
@@ -609,24 +425,13 @@ img.img-mail:hover {
             }
         });
     });
-
-    lightbox.addEventListener('click', () => {
-        lightbox.style.display = 'none';
-    });
-
-    // 2. REVEAL AU SCROLL
+    lightbox.addEventListener('click', () => { lightbox.style.display = 'none'; });
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('active');
-            }
+            if (entry.isIntersecting) { entry.target.classList.add('active'); }
         });
     }, { threshold: 0.1 });
-
-    document.querySelectorAll('.reveal').forEach((section) => {
-        observer.observe(section);
-    });
+    document.querySelectorAll('.reveal').forEach((section) => { observer.observe(section); });
 </script>
-
 </body>
 </html>
