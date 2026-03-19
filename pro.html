@@ -129,4 +129,85 @@ input[type="password"] {
     border-radius: 8px;
     border: none;
     background: #12C3FF;
-    color: #00
+    color: #000;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.btn-pro:hover {
+    background: #fff;
+    transform: scale(1.1);
+}
+
+#error-msg {
+    color: #ff4d4d;
+    font-weight: bold;
+    margin-top: 20px;
+    display: none;
+}
+
+/* RESPONSIVE */
+@media (max-width: 800px) {
+    h2 { font-size: 2.8rem; }
+    .logo-wrapper { max-width: 320px; }
+    input[type="password"] { width: 100%; }
+}
+    </style>
+</head>
+<body>
+
+    <a href="index.html" style="text-decoration: none;">
+        <div class="logo-wrapper">
+            <img src="Goodmorningrogerlogo.png" class="logo-groupe-principal" alt="Good Morning Roger Logo">
+            <img src="rogerchat.png" class="mascotte-pop" alt="Roger le Chat">
+        </div>
+    </a>
+
+    <nav>
+        <a href="index.html#presentation">Présentation</a>
+        <a href="index.html#actus">Actus</a>
+        <a href="index.html#concerts">Concerts</a>
+        <a href="index.html#musiques">Musiques</a>
+        <a href="index.html#contact">Contact</a>
+        <a href="pro.html" style="color: #12C3FF; border-bottom: 2px solid #12C3FF;">Espace Pro</a>
+    </nav>
+
+    <h2>ESPACE PRO</h2>
+
+    <div class="pro-container">
+        <p class="pro-text">
+            Tu as programmé <strong>Good Morning Roger</strong> ? Très bon choix !<br><br>
+            En te connectant ici tu trouveras tous les éléments nécessaires <br>(communication, techniques, etc.)
+        </p>
+
+        <div class="password-box">
+            <input type="password" id="passInput" placeholder="MOT DE PASSE">
+            <button class="btn-pro" onclick="verify()">VALIDER</button>
+        </div>
+
+        <p id="error-msg">Oups, c'est le bon code !</p>
+    </div>
+
+    <script>
+        function verify() {
+            const inputVal = document.getElementById('passInput').value;
+            const error = document.getElementById('error-msg');
+            const driveLink = "https://drive.google.com/drive/folders/12jIgEcx42RbfitwHfGqMaTeCGtrOwEV7?usp=drive_link";
+
+            // Mot de passe : GMRchat (encodé pour plus de discrétion)
+            if (btoa(inputVal) === "R01SY2hhdA==") {
+                window.location.href = driveLink;
+            } else {
+                error.style.display = "block";
+                document.getElementById('passInput').value = "";
+            }
+        }
+
+        document.getElementById('passInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') verify();
+        });
+    </script>
+
+</body>
+</html>
