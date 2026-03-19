@@ -7,8 +7,50 @@
     <link rel="icon" type="image/png" href="chat_tete.png">
     <link rel="apple-touch-icon" href="chat_tete.png">
   <style>
-/* 1. IMPORT DES POLICES */
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;700&display=swap');
+/* 1. IMPORT DES POLICES LOCALES (Anti-bug Messenger) */
+
+/* Bebas Neue - Titres et Menu */
+@font-face {
+  font-family: 'Bebas Neue';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/bebas-neue-v14-latin-regular.woff2') format('woff2');
+}
+
+/* Roboto - Texte normal */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('fonts/roboto-v32-latin-300.woff2') format('woff2');
+}
+
+/* Roboto - Texte Gras */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('fonts/roboto-v32-latin-700.woff2') format('woff2');
+}
+
+/* 2. STYLE GLOBAL */
+body {
+    background-color: #0a0a0a;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+    /* On ajoute des polices de secours standard au cas où */
+    font-family: 'Roboto', Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+}
+
+/* Appliquer Bebas Neue avec secours Impact (très punk aussi) */
+nav a, h2, h3, .date-day, .date-month, .concert-lieu {
+    font-family: 'Bebas Neue', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif !important;
+}
 
 /* 2. STYLE GLOBAL */
 body {
