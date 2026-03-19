@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Espace Pro | Good Morning Roger</title>
     <style>
-/* 1. REPRISE EXACTE DU STYLE GOLD DE L'INDEX */
+/* 1. IMPORT DES POLICES */
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;700&display=swap');
 
+/* 2. STYLE GLOBAL */
 body {
     background-color: #0a0a0a;
     color: #ffffff;
@@ -17,7 +18,7 @@ body {
     line-height: 1.6;
 }
 
-/* LOGO & MASCOTTE */
+/* 3. LOGO, MASCOTTE POP & NAV (STRICTEMENT IDENTIQUE À INDEX) */
 .logo-wrapper {
     position: relative;
     max-width: 450px;
@@ -30,6 +31,8 @@ body {
     height: auto;
     filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.4));
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    z-index: 2; /* Le logo est au-dessus du chat au repos */
 }
 .mascotte-pop {
     position: absolute;
@@ -39,13 +42,19 @@ body {
     height: auto;
     transform: rotate(-15deg) scale(0); 
     opacity: 0;
-    z-index: 1;
+    z-index: 1; /* LE CHAT EST DERRIÈRE LE LOGO */
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.5));
 }
-.logo-wrapper:hover .logo-groupe-principal { transform: scale(1.08) rotate(3deg); }
-.logo-wrapper:hover .mascotte-pop { opacity: 1; transform: rotate(15deg) scale(1); }
+.logo-wrapper:hover .logo-groupe-principal {
+    transform: scale(1.08) rotate(3deg);
+    filter: drop-shadow(0px 0px 25px rgba(18, 195, 255, 0.7)); /* HALO ACTIVÉ AU SURVOL */
+}
+.logo-wrapper:hover .mascotte-pop {
+    opacity: 1;
+    transform: rotate(15deg) scale(1);
+}
 
-/* NAVIGATION */
 nav {
     background: rgba(0, 0, 0, 0.9);
     padding: 15px;
@@ -64,20 +73,25 @@ nav a {
     transition: 0.3s;
     display: inline-block;
 }
-nav a:hover { color: #12C3FF; transform: scale(1.2); }
+nav a:hover {
+    color: #12C3FF;
+    text-shadow: 0px 0px 10px rgba(18, 195, 255, 0.7);
+    transform: scale(1.2) rotate(-2deg); /* INCLINAISON RÉACTIVÉE */
+}
 
-/* TITRES & CONTENEUR PRO */
+/* 4. CONTENU SPÉCIFIQUE ESPACE PRO */
 h2 { 
     font-family: 'Bebas Neue', sans-serif; 
     font-size: 4.5rem; 
     color: #12C3FF; 
     text-align: center; 
-    margin: 60px 0 20px 0; 
+    margin: 80px 0 40px 0; 
     letter-spacing: 5px; 
+    text-transform: uppercase; 
     text-shadow: 0 0 15px rgba(18, 195, 255, 0.4); 
 }
 
-.pro-box {
+.pro-container {
     max-width: 800px;
     margin: 0 auto 100px auto;
     padding: 40px;
@@ -87,10 +101,12 @@ h2 {
     text-align: center;
 }
 
-.pro-text { font-size: 1.2rem; margin-bottom: 40px; }
+.pro-text {
+    font-size: 1.2rem;
+    margin-bottom: 40px;
+}
 
-/* STYLE DU FORMULAIRE */
-.password-container {
+.password-box {
     display: flex;
     justify-content: center;
     gap: 15px;
@@ -108,87 +124,9 @@ input[type="password"] {
     outline: none;
 }
 
-.btn-valider {
+.btn-pro {
     padding: 15px 30px;
     border-radius: 8px;
     border: none;
     background: #12C3FF;
-    color: #000;
-    font-family: 'Bebas Neue', cursive;
-    font-size: 1.4rem;
-    cursor: pointer;
-    transition: 0.3s;
-}
-.btn-valider:hover { background: #fff; transform: scale(1.1); }
-
-#error-msg {
-    color: #ff4d4d;
-    font-weight: bold;
-    margin-top: 20px;
-    display: none;
-}
-
-/* RESPONSIVE */
-@media (max-width: 800px) {
-    h2 { font-size: 2.8rem; }
-    .logo-wrapper { max-width: 300px; }
-    input[type="password"] { width: 100%; }
-}
-    </style>
-</head>
-<body>
-
-    <a href="index.html" style="text-decoration: none;">
-        <div class="logo-wrapper">
-            <img src="Goodmorningrogerlogo.png" class="logo-groupe-principal" alt="Good Morning Roger Logo">
-            <img src="rogerchat.png" class="mascotte-pop" alt="Roger le Chat">
-        </div>
-    </a>
-
-    <nav>
-        <a href="index.html#presentation">Présentation</a>
-        <a href="index.html#actus">Actus</a>
-        <a href="index.html#concerts">Concerts</a>
-        <a href="index.html#musiques">Musiques</a>
-        <a href="index.html#contact">Contact</a>
-    </nav>
-
-    <h2>ESPACE PRO</h2>
-
-    <div class="pro-box">
-        <p class="pro-text">
-            Tu as programmé <strong>Good Morning Roger</strong> ? Très bon choix !<br><br>
-            En te connectant ici tu trouveras tous les éléments nécessaires <br>(communication, techniques, etc.)
-        </p>
-
-        <div class="password-container">
-            <input type="password" id="passInput" placeholder="MOT DE PASSE">
-            <button class="btn-valider" onclick="check()">VALIDER</button>
-        </div>
-
-        <p id="error-msg">Oups, c'est le bon code !</p>
-    </div>
-
-    <script>
-        function check() {
-            const val = document.getElementById('passInput').value;
-            const err = document.getElementById('error-msg');
-            const link = "https://drive.google.com/drive/folders/12jIgEcx42RbfitwHfGqMaTeCGtrOwEV7?usp=drive_link";
-
-            // Mot de passe 
-            if (btoa(val) === "R01SY2hhdA==") {
-                window.location.href = link;
-            } else {
-                err.style.display = "block";
-                document.getElementById('passInput').value = "";
-            }
-        }
-
-        // Touche Entrée
-        document.getElementById('passInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') check();
-        });
-    </script>
-
-</body>
-</html>
+    color: #00
