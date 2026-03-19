@@ -32,7 +32,7 @@ body {
     filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.4));
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
-    z-index: 2; /* Le logo est au-dessus du chat au repos */
+    z-index: 2;
 }
 .mascotte-pop {
     position: absolute;
@@ -42,13 +42,13 @@ body {
     height: auto;
     transform: rotate(-15deg) scale(0); 
     opacity: 0;
-    z-index: 1; /* LE CHAT EST DERRIÈRE LE LOGO */
+    z-index: 1;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.5));
 }
 .logo-wrapper:hover .logo-groupe-principal {
     transform: scale(1.08) rotate(3deg);
-    filter: drop-shadow(0px 0px 25px rgba(18, 195, 255, 0.7)); /* HALO ACTIVÉ AU SURVOL */
+    filter: drop-shadow(0px 0px 25px rgba(18, 195, 255, 0.7));
 }
 .logo-wrapper:hover .mascotte-pop {
     opacity: 1;
@@ -76,7 +76,21 @@ nav a {
 nav a:hover {
     color: #12C3FF;
     text-shadow: 0px 0px 10px rgba(18, 195, 255, 0.7);
-    transform: scale(1.2) rotate(-2deg); /* INCLINAISON RÉACTIVÉE */
+    transform: scale(1.2) rotate(-2deg);
+}
+
+/* STYLE SPÉCIFIQUE DU BOUTON PRO (JAUNE) */
+.nav-pro {
+    color: #FFD700 !important; /* Jaune doré */
+    border: 1px solid #FFD700;
+    padding: 5px 15px;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+.nav-pro:hover {
+    background: rgba(255, 215, 0, 0.1);
+    box-shadow: 0px 0px 10px rgba(255, 215, 0, 0.5);
+    transform: scale(1.1) !important; /* On réduit un peu l'agrandissement pour le bouton encadré */
 }
 
 /* 4. CONTENU SPÉCIFIQUE ESPACE PRO */
@@ -152,6 +166,8 @@ input[type="password"] {
     h2 { font-size: 2.8rem; }
     .logo-wrapper { max-width: 320px; }
     input[type="password"] { width: 100%; }
+    nav a { margin: 0 8px; font-size: 1.1rem; }
+    .nav-pro { display: inline-block; margin-top: 10px; }
 }
     </style>
 </head>
@@ -170,7 +186,7 @@ input[type="password"] {
         <a href="index.html#concerts">Concerts</a>
         <a href="index.html#musiques">Musiques</a>
         <a href="index.html#contact">Contact</a>
-        <a href="pro.html" style="color: #12C3FF; border-bottom: 2px solid #12C3FF;">Espace Pro</a>
+        <a href="pro.html" class="nav-pro">Espace Pro</a>
     </nav>
 
     <h2>ESPACE PRO</h2>
@@ -195,7 +211,6 @@ input[type="password"] {
             const error = document.getElementById('error-msg');
             const driveLink = "https://drive.google.com/drive/folders/12jIgEcx42RbfitwHfGqMaTeCGtrOwEV7?usp=drive_link";
 
-            // Mot de passe : GMRchat (encodé pour plus de discrétion)
             if (btoa(inputVal) === "R01SY2hhdA==") {
                 window.location.href = driveLink;
             } else {
