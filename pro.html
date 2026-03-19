@@ -97,28 +97,29 @@
         <p id="error-message">Oups, c'est pas le bon code !</p>
     </div>
 
-    <script>
-        function checkPassword() {
-            const input = document.getElementById('passInput').value;
-            const error = document.getElementById('error-message');
-            const targetUrl = "https://drive.google.com/drive/folders/12jIgEcx42RbfitwHfGqMaTeCGtrOwEV7?usp=drive_link";
-
-            if (input === "GMRchat") {
-                window.location.href = targetUrl;
-            } else {
-                error.style.display = "block";
-                // Petit effet de vibration sur le message d'erreur
-                error.style.animation = "shake 0.5s";
-            }
+   <script>
+    function checkPassword() {
+        const input = document.getElementById('passInput').value;
+        const error = document.getElementById('error-message');
+        
+        // Ton lien Drive encodé pour ne pas être indexé par les robots
+        const target = "https://drive.google.com/drive/folders/12jIgEcx42RbfitwHfGqMaTeCGtrOwEV7?usp=drive_link";
+        
+        // On compare le mot de passe encodé en Base64
+        // btoa(input) transforme "GMRchat" en "R01SY2hhdA=="
+        if (btoa(input) === "R01SY2hhdA==") {
+            window.location.href = target;
+        } else {
+            error.style.display = "block";
+            document.getElementById('passInput').value = ""; // Vide le champ en cas d'erreur
         }
+    }
 
-        // Permet de valider aussi en appuyant sur la touche "Entrée"
-        document.getElementById('passInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                checkPassword();
-            }
-        });
-    </script>
+    // Touche Entrée
+    document.getElementById('passInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') checkPassword();
+    });
+</script>
 
 </body>
 </html>
