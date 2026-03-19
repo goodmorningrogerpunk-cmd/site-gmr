@@ -164,16 +164,43 @@ h2 {
     text-shadow: 0 0 15px rgba(18, 195, 255, 0.4); 
 }
 
-/* 7. SECTION CONTACT & MAIL (CORRECTIF PRIORITAIRE) */
+/* 7. BLOC STREAMING (BOÎTE NOIRE CENTRÉE) */
+.streaming-box {
+    background-color: #000000;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 600px;
+    margin: 40px auto;
+    text-align: center;
+}
+
+.streaming-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.8rem;
+    color: #fff;
+    margin-bottom: 25px;
+    display: block;
+    letter-spacing: 2px;
+}
+
+.streaming-logos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* 8. LOGOS SOCIAUX & MAIL */
 .logo-social {
     width: 40px;
     height: auto;
-    margin: 0 15px;
+    margin: 0 10px;
     transition: 0.3s;
 }
 .logo-social:hover { transform: scale(1.1); filter: drop-shadow(0px 0px 8px #12C3FF); }
 
-/* L'ENVELOPPE MAIL */
 img.img-mail {
     width: 40px !important;
     max-width: 40px !important;
@@ -181,34 +208,6 @@ img.img-mail {
     display: block !important;
     margin: 30px auto !important;
     transition: all 0.3s ease-in-out !important;
-    /* HALO BLANC PAR DÉFAUT */
-    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9)) !important;
-}
-
-img.img-mail:hover {
-    /* HALO CYAN AU SURVOL */
-    filter: drop-shadow(0 0 15px #12C3FF) drop-shadow(0 0 5px #12C3FF) !important;
-    transform: scale(1.15) !important;
-}
-
-/* 8. RESPONSIVE MOBILE */
-@media (max-width: 800px) {
-    h2 { font-size: 2.8rem; }
-    .article-presentation, .article-actus { flex-direction: column; align-items: center; text-align: center; }
-    .concert-row { flex-direction: column; text-align: center; }
-    .concert-date-box { border-right: none; margin-right: 0; margin-bottom: 10px; }
-}
-
-/* LIGHTBOX & REVEAL */
-#lightbox {
-    display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.9); align-items: center; justify-content: center;
-}
-#lightbox img { max-width: 90%; max-height: 80%; border: 3px solid #12C3FF; }
-
-.reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
-.reveal.active { opacity: 1; transform: translateY(0); }
-</style>
    
 </head>
 <body>
