@@ -379,6 +379,24 @@ nav a:hover {
         margin: 10px auto !important;
         display: block;
     }
+
+
+/* On s'assure que la transition est fluide */
+.hover-halo {
+    transition: all 0.3s ease-in-out;
+}
+
+            /* Halo BLANC par défaut */
+.halo-mail {
+    transition: all 0.4s ease-in-out;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.6)); /* Halo blanc doux */
+}
+
+/* Passage au CYAN au survol */
+.halo-mail:hover {
+    filter: drop-shadow(0 0 12px #12C3FF) drop-shadow(0 0 5px #12C3FF);
+    transform: scale(1.15); /* Un léger zoom pour l'effet interactif */
+    cursor: pointer;
 }
     </style>
 </head>
@@ -631,12 +649,9 @@ nav a:hover {
         </p>
 
         <div style="margin-bottom: 50px;">
-            <a href="mailto:goodmorningroger.punk@gmail.com" style="text-decoration: none;">
-                <img src="logomail.png" class="logo-social logo-mail" style="width: 80px;" alt="Contact Email">
-                <p style="color: #12C3FF; font-size: 1.1rem; margin-top: 10px; font-weight: bold; text-decoration: underline;">
-                    goodmorningroger.punk@gmail.com
-                </p>
-            </a>
+            <a href="mailto:tonadresse@mail.com">
+    <img src="logomail.png" alt="Email" class="halo-mail" style="width: 40px; height: 40px;">
+</a>
         </div>
         <div style="margin-top: 40px; margin-bottom: 20px;">
     <span class="streaming-title" style="font-family: 'Bebas Neue', cursive; color: #fff; font-size: 1.4rem; letter-spacing: 1px;">
