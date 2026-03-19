@@ -91,11 +91,10 @@ nav a:hover {
     padding: 0 20px;
 }
 .article-video, .actus-photo { 
-    flex: 0 0 280px; /* Force la largeur de la colonne image */
+    flex: 0 0 280px; 
     max-width: 280px; 
 }
 
-/* CE BLOC MANQUAIT POUR RECADRER L'IMAGE D'ACTU */
 .actus-photo img {
     width: 100%;
     height: auto;
@@ -117,15 +116,19 @@ nav a:hover {
     max-width: 1100px;
     margin: 40px auto;
 }
-.presentation-item img { width: 100%; border-radius: 5px; border: 1px solid #333; }
+
+/* AJOUT : EFFET DE ZOOM ET CURSEUR SUR LES IMAGES DE PRÉSENTATION */
+.presentation-item { overflow: hidden; border-radius: 5px; border: 1px solid #333; }
+.presentation-item img { width: 100%; transition: transform 0.3s ease; cursor: pointer; display: block; }
+.presentation-item:hover img { transform: scale(1.08); }
+
 /* 5. SECTION CONCERTS */
 .concert-list { max-width: 900px; margin: 40px auto; padding: 0 20px; }
 
-/* C'EST CETTE PARTIE QUI COMMANDE LE LIEN AUTOUR DE LA LIGNE */
 .concert-row-link {
-    text-decoration: none !important; /* Enlève le soulignement sur le lien */
-    display: block; /* Permet au lien de prendre toute la largeur */
-    color: #ffffff !important; /* Force la couleur blanche sur tout le contenu */
+    text-decoration: none !important;
+    display: block;
+    color: #ffffff !important;
 }
 
 .concert-row {
@@ -139,7 +142,6 @@ nav a:hover {
     transition: 0.3s;
 }
 
-/* Effet au survol de la ligne entière */
 .concert-row-link:hover .concert-row {
     background: rgba(18, 195, 255, 0.07);
     border-left-color: #12C3FF;
@@ -162,7 +164,7 @@ nav a:hover {
     font-family: 'Bebas Neue', cursive; 
     font-size: 1.5rem; 
     display: block; 
-    color: #ffffff; /* Nom du lieu en blanc */
+    color: #ffffff;
 }
 .concert-ville { color: #12C3FF; font-size: 0.95rem; font-weight: bold; }
 /* 6. TITRES H2 */
@@ -188,7 +190,7 @@ h2 {
     text-align: center;
 }
 
-/* 8. LOGOS SOCIAUX & MAIL (TAILLE RÉDUITE + HALOS) */
+/* 8. LOGOS SOCIAUX & MAIL */
 .logo-social {
     width: 40px;
     height: auto;
@@ -204,34 +206,31 @@ img.img-mail {
     display: block !important;
     margin: 30px auto !important;
     transition: all 0.3s ease-in-out !important;
-    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8)) !important; /* Halo blanc fixe */
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8)) !important;
 }
 img.img-mail:hover {
-    filter: drop-shadow(0 0 15px #12C3FF) !important; /* Halo cyan survol */
+    filter: drop-shadow(0 0 15px #12C3FF) !important;
     transform: scale(1.1) !important;
 }
-/* PAR DÉFAUT (ORDI) */
 .mobile-only { display: none !important; }
 .desktop-only { display: block; }
 
 @media (max-width: 800px) {
-    /* SUR MOBILE */
     .desktop-only { display: none !important; }
     .mobile-only { display: block !important; }
     
     .article-video {
         width: 100%;
-        max-width: 320px; /* Pour garder le format vertical propre */
+        max-width: 320px;
         margin: 0 auto 20px auto;
     }
 }
-/* 9. RESPONSIVE MOBILE */
 @media (max-width: 800px) {
     h2 { font-size: 2.8rem; }
     .article-presentation, .article-actus { flex-direction: column; align-items: center; text-align: center; }
     .concert-row { flex-direction: column; text-align: center; }
     .concert-date-box { border-right: none; margin-right: 0; margin-bottom: 10px; }
-    .concert-info { text-align: center; } /* Cette ligne centre le lieu et la ville */
+    .concert-info { text-align: center; }
 }
 
 /* LIGHTBOX */
@@ -258,7 +257,6 @@ img.img-mail:hover {
         <a href="#musiques">Musiques</a>
         <a href="#contact">Contact</a>
         <a href="pro.html" style="color: #FFD700; border: 1px solid #FFD700; padding: 5px 10px; border-radius: 5px;">Espace Pro</a>
-</nav>
     </nav>
 
 <section id="presentation" class="reveal">
@@ -266,8 +264,7 @@ img.img-mail:hover {
 
     <div class="article-presentation">
    <div class="article-video">
-    <div class="presentation-item">
-        <div class="video-container desktop-only" style="position: relative; padding-bottom: 177.77%; height: 0; overflow: hidden; border-radius: 8px;">
+    <div class="presentation-item-video"> <div class="video-container desktop-only" style="position: relative; padding-bottom: 177.77%; height: 0; overflow: hidden; border-radius: 8px;">
             <video autoplay loop muted playsinline controls preload="auto" poster="photo9.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background: #000;">
                 <source src="https://goodmorningrogerpunk-cmd.github.io/site-gmr/teasergmrok.mp4" type="video/mp4">
             </video>
