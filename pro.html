@@ -258,7 +258,8 @@ img.img-mail:hover {
             const inputVal = document.getElementById('passInput').value;
             const error = document.getElementById('error-msg');
             if (btoa(inputVal) === "R01SY2hhdA==") {
-                window.location.href = "https://drive.google.com/drive/folders/12jIgEcx42RbfitwHfGqMaTeCGtrOwEV7?usp=drive_link";
+                window.open("https://drive.google.com/drive/folders/12jIgEcx42RbfitwHfGqMaTeCGtrOwEV7?usp=drive_link", "_blank");
+            error.style.display = "none";
             } else {
                 error.style.display = "block";
                 document.getElementById('passInput').value = "";
