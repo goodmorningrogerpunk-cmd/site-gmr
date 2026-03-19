@@ -7,8 +7,22 @@
     <link rel="icon" type="image/png" href="chat_tete.png">
     <link rel="apple-touch-icon" href="chat_tete.png">
     <style>
-/* 1. STYLE GLOBAL & NAV (STRICTEMENT IDENTIQUE À INDEX) */
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;700&display=swap');
+/* 1. POLICES LOCALES (MISES À JOUR POUR CORRESPONDRE À L'INDEX) */
+@font-face {
+  font-family: 'Bebas Neue';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/bebas-neue-v16-latin-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/robotov51-latin-regular.woff2') format('woff2');
+}
 
 body {
     background-color: #0a0a0a;
@@ -84,7 +98,7 @@ nav a:hover {
 }
 
 /* 2. TITRES ET BLOCS */
-h2 { 
+h1 { 
     font-family: 'Bebas Neue', sans-serif; 
     font-size: 4.5rem; 
     color: #12C3FF; 
@@ -97,7 +111,7 @@ h2 {
 
 .pro-container {
     max-width: 800px;
-    margin: 0 auto 40px auto; /* Marge réduite pour enchaîner le 2ème bloc */
+    margin: 0 auto 40px auto; 
     padding: 40px;
     background: rgba(255, 255, 255, 0.03);
     border-radius: 12px;
@@ -137,10 +151,10 @@ input[type="password"] {
 .btn-pro:hover { background: #fff; transform: scale(1.1); }
 #error-msg { color: #ff4d4d; font-weight: bold; margin-top: 20px; display: none; }
 
-/* 4. STYLE DU BLOC CONTACT (REPRISE INDEX) */
+/* 4. STYLE DU BLOC CONTACT */
 .contact-title-cyan {
     font-family: 'Bebas Neue', cursive;
-    font-size: 2.2rem; /* Plus gros comme demandé */
+    font-size: 2.2rem; 
     color: #12C3FF;
     font-weight: bold;
     margin-bottom: 10px;
@@ -169,14 +183,14 @@ img.img-mail:hover {
     transform: scale(1.1) !important;
 }
 
-        html {
+html {
     scroll-behavior: smooth;
-    scroll-padding-top: 120px; /* La marge de sécurité pour ton menu */
+    scroll-padding-top: 120px; 
 }
 
 /* RESPONSIVE */
 @media (max-width: 800px) {
-    h2 { font-size: 2.8rem; }
+    h1 { font-size: 2.8rem; }
     .logo-wrapper { max-width: 320px; }
     input[type="password"] { width: 100%; }
     .contact-title-cyan { font-size: 1.8rem; }
@@ -201,7 +215,7 @@ img.img-mail:hover {
         <a href="pro.html" class="nav-pro">Espace Pro</a>
     </nav>
 
-    <h2>ESPACE PRO</h2>
+    <h1>ESPACE PRO</h1>
 
     <div class="pro-container">
         <p style="font-size: 1.2rem;">
