@@ -385,25 +385,30 @@ nav a:hover {
 .hover-halo {
     transition: all 0.3s ease-in-out;
 }
-
-/* Style pour l'image MAIL (Plus grosse que les autres) */
+/* --- STYLE FINAL LOGO MAIL --- */
 .img-mail {
-    width: 80px !important;    /* Taille augmentée pour dominer les autres */
+    /* Taille réduite (environ 50% de l'originale) */
+    width: 40px !important; 
     height: auto !important;
-    display: block;            /* Permet le centrage avec margin auto */
-    margin: 30px auto !important; /* Centre l'image et l'espace des autres */
-    transition: all 0.4s ease-in-out !important;
     
-    /* HALO BLANC DE BASE (Bien présent) */
-    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.9)) !important;
+    /* Centrage propre */
+    display: block;
+    margin: 20px auto !important;
+    
+    /* Transition fluide */
+    transition: all 0.3s ease-in-out !important;
+    
+    /* 1. HALO BLANC DE BASE (Fixe) */
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8)) !important;
 }
 
-/* EFFET AU SURVOL (CYAN ÉCLATANT) */
+/* 2. EFFET AU SURVOL (Halo Cyan) */
 .img-mail:hover {
-    filter: drop-shadow(0 0 20px #12C3FF) drop-shadow(0 0 10px #12C3FF) !important;
+    filter: drop-shadow(0 0 12px #12C3FF) drop-shadow(0 0 5px #12C3FF) !important;
     transform: scale(1.1);
     cursor: pointer;
 }
+
     </style>
 </head>
 <body>
