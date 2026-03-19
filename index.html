@@ -30,7 +30,7 @@ body {
     width: 100%;
     height: auto;
     filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.4));
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
     z-index: 2;
 }
@@ -103,16 +103,10 @@ nav a:hover {
     gap: 15px;
     max-width: 1100px;
     margin: 40px auto;
-    padding: 0 20px;
 }
-.presentation-item img, .actus-photo img {
-    width: 100%;
-    border-radius: 5px;
-    border: 1px solid #333;
-    cursor: zoom-in;
-}
+.presentation-item img { width: 100%; border-radius: 5px; border: 1px solid #333; }
 
-/* 5. CONCERTS */
+/* 5. SECTION CONCERTS (TON ANCIEN DESIGN TOP) */
 .concert-list { max-width: 900px; margin: 40px auto; padding: 0 20px; }
 .concert-row {
     display: flex;
@@ -136,8 +130,21 @@ nav a:hover {
     margin-right: 25px;
     padding-right: 15px;
 }
-.date-day { font-family: 'Bebas Neue', cursive; font-size: 2.2rem; color: #12C3FF; display: block; }
+.date-day { font-family: 'Bebas Neue', cursive; font-size: 2.2rem; line-height: 1; color: #12C3FF; display: block; }
 .date-month { font-family: 'Bebas Neue', cursive; font-size: 1rem; color: #fff; display: block; }
+.concert-info { flex: 1; text-align: left; }
+.concert-lieu { font-family: 'Bebas Neue', cursive; font-size: 1.5rem; display: block; }
+.concert-ville { color: #12C3FF; font-size: 0.95rem; font-weight: bold; }
+.concert-link {
+    color: #12C3FF;
+    text-decoration: none;
+    font-family: 'Bebas Neue', cursive;
+    border: 1px solid #12C3FF;
+    padding: 5px 15px;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+.concert-link:hover { background: #12C3FF; color: #000; }
 
 /* 6. TITRES H2 */
 h2 { 
@@ -151,36 +158,37 @@ h2 {
     text-shadow: 0 0 15px rgba(18, 195, 255, 0.4); 
 }
 
-/* 7. BLOC STREAMING (LE FAMEUX) */
+/* 7. BLOC STREAMING (CENTRÉ) */
 .streaming-box {
-    background-color: #000000 !important;
-    border: 1px solid #333 !important;
+    background-color: #000000;
+    border: 1px solid #333;
     border-radius: 12px;
     padding: 30px;
     max-width: 600px;
-    margin: 40px auto !important; /* CENTRE LE BLOC */
-    text-align: center !important; /* CENTRE LE TEXTE ET LOGOS */
+    margin: 40px auto;
+    text-align: center;
 }
 
-/* 8. LOGOS SOCIAUX & MAIL */
+/* 8. LOGOS SOCIAUX & MAIL (TAILLE RÉDUITE + HALOS) */
 .logo-social {
     width: 40px;
     height: auto;
-    margin: 10px;
+    margin: 0 10px;
     transition: 0.3s;
 }
 .logo-social:hover { transform: scale(1.1); filter: drop-shadow(0px 0px 8px #12C3FF); }
 
 img.img-mail {
-    width: 45px !important; /* TAILLE DU MAIL ICI */
+    width: 70px !important;
+    max-width: 70px !important;
     height: auto !important;
     display: block !important;
     margin: 30px auto !important;
     transition: all 0.3s ease-in-out !important;
-    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9)) !important;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8)) !important; /* Halo blanc fixe */
 }
 img.img-mail:hover {
-    filter: drop-shadow(0 0 15px #12C3FF) !important;
+    filter: drop-shadow(0 0 15px #12C3FF) !important; /* Halo cyan survol */
     transform: scale(1.1) !important;
 }
 
