@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espace Pro | Good Morning Roger</title>
+    <style>
+        /* REPRISE DU STYLE GOLD */
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;700&display=swap');
+
+        body {
+            background-color: #0a0a0a;
+            color: #ffffff;
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            text-align: center;
+        }
+
+        /* LOGO RE-CLIQUABLE VERS L'ACCUEIL */
+        .logo-wrapper {
+            max-width: 350px;
+            margin: 40px auto;
+            cursor: pointer;
+            position: relative;
+        }
+        .logo-groupe-principal { width: 100%; transition: 0.3s; }
+        .logo-wrapper:hover .logo-groupe-principal { transform: scale(1.05); }
+
+        h1 { font-family: 'Bebas Neue', cursive; color: #12C3FF; font-size: 3rem; letter-spacing: 2px; }
+        
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid #333;
+        }
+
+        p { font-size: 1.1rem; margin-bottom: 30px; }
+
+        /* CHAMP MOT DE PASSE */
+        .password-box {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        input[type="password"] {
+            padding: 12px;
+            border-radius: 5px;
+            border: 2px solid #12C3FF;
+            background: #000;
+            color: #fff;
+            font-size: 1rem;
+            width: 200px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border-radius: 5px;
+            border: none;
+            background: #12C3FF;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover { background: #fff; transform: scale(1.1); }
+
+        #error-message {
+            color: #ff4d4d;
+            margin-top: 20px;
+            font-weight: bold;
+            display: none; /* Caché par défaut */
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="logo-wrapper">
+        <img src="Goodmorningrogerlogo.png" class="logo-groupe-principal" alt="Retour Accueil">
+    </a>
+
+    <div class="container">
+        <h1>ESPACE PRO</h1>
+        <p>Tu as programmé <strong>Good Morning Roger</strong> ? Très bon choix !<br><br>
+        En te connectant ici tu trouveras tous les éléments nécessaires (communication, techniques, etc.)</p>
+
+        <div class="password-box">
+            <input type="password" id="passInput" placeholder="Mot de passe...">
+            <button onclick="checkPassword()">VALIDER</button>
+        </div>
+
+        <p id="error-message">Oups, c'est pas le bon code !</p>
+    </div>
+
+    <script>
+        function checkPassword() {
+            const input = document.getElementById('passInput').value;
+            const error = document.getElementById('error-message');
+            const targetUrl = "https://drive.google.com/drive/folders/12jIgEcx42RbfitwHfGqMaTeCGtrOwEV7?usp=drive_link";
+
+            if (input === "GMRchat") {
+                window.location.href = targetUrl;
+            } else {
+                error.style.display = "block";
+                // Petit effet de vibration sur le message d'erreur
+                error.style.animation = "shake 0.5s";
+            }
+        }
+
+        // Permet de valider aussi en appuyant sur la touche "Entrée"
+        document.getElementById('passInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+    </script>
+
+</body>
+</html>
