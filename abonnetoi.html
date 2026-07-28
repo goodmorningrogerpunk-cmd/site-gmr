@@ -1,1 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Abonne-toi ! | Good Morning Roger</title>
+    <meta name="robots" content="noindex, nofollow"> <!-- Empêche les moteurs de recherche d'indexer la page si tu veux qu'elle reste discrète -->
 
+    <link rel="icon" type="image/png" href="/chat_tete.png">
+    <link rel="apple-touch-icon" href="/chat_tete.png">
+
+    <style>
+        @font-face {
+            font-family: 'Bebas Neue';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('fonts/bebas-neue-v16-latin-regular.woff2') format('woff2');
+        }
+
+        @font-face {
+            font-family: 'Roboto';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('fonts/robotov51-latin-regular.woff2') format('woff2');
+        }
+
+        body {
+            background-color: #0a0a0a;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px 15px;
+            font-family: 'Roboto', sans-serif;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .logo-header {
+            width: 100%;
+            max-width: 280px;
+            height: auto;
+            margin-bottom: 25px;
+            filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.4));
+        }
+
+        h1 {
+            font-family: 'Bebas Neue', Impact, sans-serif;
+            font-size: 2.2rem;
+            color: #12C3FF;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0 0 30px 0;
+            text-shadow: 0 0 12px rgba(18, 195, 255, 0.4);
+            line-height: 1.2;
+        }
+
+        .grid-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 380px;
+            margin-bottom: 35px;
+        }
+
+        .link-btn {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: #ffffff;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .link-btn:hover {
+            background: rgba(18, 195, 255, 0.15);
+            border-color: #12C3FF;
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(18, 195, 255, 0.4);
+        }
+
+        .link-btn img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            margin-right: 15px;
+        }
+
+        .call-to-action {
+            font-family: 'Bebas Neue', Impact, sans-serif;
+            font-size: 1.8rem;
+            color: #ffffff;
+            letter-spacing: 2px;
+            margin-top: 10px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .cta-sub {
+            color: #12C3FF;
+            font-size: 2rem;
+            display: block;
+            margin-top: 5px;
+        }
+
+        footer {
+            margin-top: 40px;
+            font-size: 0.7rem;
+            color: #444;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Logo du groupe -->
+    <a href="https://goodmorningroger.fr">
+        <img src="Goodmorningrogerlogo.png" alt="Good Morning Roger" class="logo-header">
+    </a>
+
+    <!-- Titre principal -->
+    <h1>Découvre Good Morning Roger<br>sur tous les réseaux</h1>
+
+    <!-- Liste des liens sous forme de gros boutons faciles à cliquer sur smartphone -->
+    <div class="grid-links">
+        
+        <!-- Réseaux Sociaux -->
+        <a href="https://www.instagram.com/goodmorningroger/" target="_blank" class="link-btn">
+            <img src="logoinsta.png" alt="Instagram"> Instagram
+        </a>
+
+        <a href="https://www.facebook.com/GoodMorningRoger/" target="_blank" class="link-btn">
+            <img src="logofb.png" alt="Facebook"> Facebook
+        </a>
+
+        <a href="https://www.tiktok.com/@good.morning.roger" target="_blank" class="link-btn">
+            <img src="logotiktok.png" class="logo-social" alt="TikTok"> TikTok
+        </a>
+
+        <a href="https://www.youtube.com/@goodmorningroger" target="_blank" class="link-btn">
+            <img src="logoyoutube.png" alt="YouTube"> YouTube
+        </a>
+
+        <!-- Streaming -->
+        <a href="https://open.spotify.com/intl-fr/artist/4G8tJAXMrv57k3GlfhEjsX" target="_blank" class="link-btn">
+            <img src="logospot.png" alt="Spotify"> Spotify
+        </a>
+
+        <a href="https://www.deezer.com/fr/artist/248006762" target="_blank" class="link-btn">
+            <img src="logodeezer.png" alt="Deezer"> Deezer
+        </a>
+
+        <a href="https://music.apple.com/fr/artist/good-morning-roger/1722583151" target="_blank" class="link-btn">
+            <img src="logoapple.png" alt="Apple Music"> Apple Music
+        </a>
+
+        <a href="https://music.amazon.fr/artists/B0CQTXV21G/good-morning-roger" target="_blank" class="link-btn">
+            <img src="logoamazon.png" alt="Amazon Music"> Amazon Music
+        </a>
+
+        <a href="https://goodmorningroger.bandcamp.com/" target="_blank" class="link-btn">
+            <img src="logobandcamp.png" alt="Bandcamp"> Bandcamp
+        </a>
+
+    </div>
+
+    <!-- Message d'encouragement -->
+    <div class="call-to-action">
+        Donne-nous de la force
+        <span class="cta-sub">et abonne-toi ! 🔥</span>
+    </div>
+
+    <footer>
+        © 2026 GOOD MORNING ROGER
+    </footer>
+
+</body>
+</html>
