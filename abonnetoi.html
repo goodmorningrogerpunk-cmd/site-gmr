@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>Abonne-toi ! | Good Morning Roger</title>
-    <meta name="robots" content="noindex, nofollow"> <!-- Empêche les moteurs de recherche d'indexer la page si tu veux qu'elle reste discrète -->
+    <meta name="robots" content="noindex, nofollow">
 
     <link rel="icon" type="image/png" href="/chat_tete.png">
     <link rel="apple-touch-icon" href="/chat_tete.png">
@@ -42,25 +42,73 @@
             box-sizing: border-box;
         }
 
-        .logo-header {
+        /* --- LOGO, MASCOTTE POP & SURLIGNAGE --- */
+        .logo-wrapper {
+            position: relative;
+            max-width: 320px;
+            margin: 30px auto 20px auto;
+            cursor: pointer;
+        }
+        .logo-groupe-principal {
+            display: block;
             width: 100%;
-            max-width: 280px;
             height: auto;
-            margin-bottom: 25px;
             filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.4));
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.4s ease;
+            position: relative;
+            z-index: 2;
+        }
+        .mascotte-pop {
+            position: absolute;
+            top: -50px;
+            left: 60%;
+            width: 110px;
+            height: auto;
+            transform: rotate(-15deg) scale(0); 
+            opacity: 0;
+            z-index: 1;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.5));
+        }
+        .logo-wrapper:hover .logo-groupe-principal {
+            transform: scale(1.08) rotate(3deg);
+            filter: drop-shadow(0px 0px 25px rgba(18, 195, 255, 0.7));
+        }
+        .logo-wrapper:hover .mascotte-pop {
+            opacity: 1;
+            transform: rotate(15deg) scale(1);
         }
 
+        /* Titre principal */
         h1 {
             font-family: 'Bebas Neue', Impact, sans-serif;
             font-size: 2.2rem;
             color: #12C3FF;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin: 0 0 30px 0;
+            margin: 10px 0 10px 0;
             text-shadow: 0 0 12px rgba(18, 195, 255, 0.4);
             line-height: 1.2;
         }
 
+        /* Message d'encouragement sous le titre */
+        .call-to-action {
+            font-family: 'Bebas Neue', Impact, sans-serif;
+            font-size: 1.8rem;
+            color: #ffffff;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .cta-sub {
+            color: #12C3FF;
+            font-size: 2rem;
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* Liste de boutons */
         .grid-links {
             display: flex;
             flex-direction: column;
@@ -99,22 +147,6 @@
             margin-right: 15px;
         }
 
-        .call-to-action {
-            font-family: 'Bebas Neue', Impact, sans-serif;
-            font-size: 1.8rem;
-            color: #ffffff;
-            letter-spacing: 2px;
-            margin-top: 10px;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-        }
-
-        .cta-sub {
-            color: #12C3FF;
-            font-size: 2rem;
-            display: block;
-            margin-top: 5px;
-        }
-
         footer {
             margin-top: 40px;
             font-size: 0.7rem;
@@ -126,21 +158,24 @@
 </head>
 <body>
 
-    <!-- Logo du groupe -->
-    <a href="https://goodmorningroger.fr">
-        <img src="Goodmorningrogerlogo.png" alt="Good Morning Roger" class="logo-header">
+    <!-- Logo du groupe avec Mascotte Pop & Surlignage -->
+    <a href="https://goodmorningroger.fr" style="text-decoration: none;">
+        <div class="logo-wrapper">
+            <img src="Goodmorningrogerlogo.png" class="logo-groupe-principal" alt="Good Morning Roger - Groupe de Punk Rock Covers">
+            <img src="rogerchat.png" class="mascotte-pop" alt="Roger le Chat">
+        </div>
     </a>
 
     <!-- Titre principal -->
     <h1>Découvre Good Morning Roger<br>sur tous les réseaux</h1>
 
-        <!-- Message d'encouragement -->
+    <!-- Message d'encouragement sous le titre -->
     <div class="call-to-action">
         Donne-nous de la force
         <span class="cta-sub">et abonne-toi ! 🔥</span>
     </div>
 
-    <!-- Liste des liens sous forme de gros boutons faciles à cliquer sur smartphone -->
+    <!-- Liste des liens -->
     <div class="grid-links">
         
         <!-- Réseaux Sociaux -->
@@ -153,7 +188,7 @@
         </a>
 
         <a href="https://www.tiktok.com/@good.morning.roger" target="_blank" class="link-btn">
-            <img src="logotiktok.png" class="logo-social" alt="TikTok"> TikTok
+            <img src="logotiktok.png" alt="TikTok"> TikTok
         </a>
 
         <a href="https://www.youtube.com/@goodmorningroger" target="_blank" class="link-btn">
@@ -182,7 +217,6 @@
         </a>
 
     </div>
-
 
     <footer>
         © 2026 GOOD MORNING ROGER
