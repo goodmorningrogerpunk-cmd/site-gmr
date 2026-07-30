@@ -2,10 +2,17 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Viewport fixé à 800px sans responsive pour forcer le rendu PC rétro sur smartphone -->
+    <meta name="viewport" content="width=800, initial-scale=0.45">
     <title>*** GOOD MORNING ROGER - SITE OFFICIEL 1998 ***</title>
+    
+    <!-- Importation des polices vintage compatibles Mobile -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,400;0,700;1,400&family=Impact&display=swap" rel="stylesheet">
+
     <style>
-        /* CSS Style 1998 : Brut, kitsch & compatible Mobile */
+        /* CSS Style 1998 : Brut et Kitsch (Non-Responsive) */
         * {
             box-sizing: border-box;
         }
@@ -14,18 +21,21 @@
             background-color: #000033;
             background-image: url('https://upload.wikimedia.org/wikipedia/commons/2/27/Starsinthesky.gif');
             color: #00FF00;
-            font-family: "Comic Sans MS", "Times New Roman", Times, serif !important;
+            font-family: 'Comic Neue', "Comic Sans MS", "Times New Roman", Times, serif !important;
             margin: 10px;
             padding: 0;
+            width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         /* Forcer la typographie d'époque sur TOUS les éléments */
         p, td, th, div, span, b, i, a {
-            font-family: "Comic Sans MS", "Times New Roman", Times, serif !important;
+            font-family: 'Comic Neue', "Comic Sans MS", "Times New Roman", Times, serif !important;
         }
 
         h1, h2, h3 {
-            font-family: "Impact", "Arial Black", sans-serif !important;
+            font-family: 'Impact', "Arial Black", sans-serif !important;
             text-shadow: 2px 2px #000000;
         }
 
@@ -53,17 +63,16 @@
             background-color: #FF0000;
         }
 
-        /* Style des tables Netscape */
+        /* Style des tables Netscape d'époque */
         table.main-container {
-            max-width: 800px;
-            width: 100%;
+            width: 800px;
             margin: 0 auto;
         }
 
         table.main-table {
             background-color: #000000;
             border: 4px ridge #C0C0C0;
-            width: 100%;
+            width: 800px;
         }
 
         td.menu-td {
@@ -71,11 +80,13 @@
             vertical-align: top;
             padding: 10px;
             border-right: 3px groove #C0C0C0;
+            width: 180px;
         }
 
         td.content-td {
             padding: 15px;
             vertical-align: top;
+            width: 620px;
         }
 
         .win95-btn {
@@ -117,16 +128,6 @@
         @keyframes blinker {
             50% { opacity: 0; }
         }
-
-        /* Responsive Mobile 1998 */
-        @media (max-width: 650px) {
-            .wordart { font-size: 20pt; }
-            table.main-table, table.main-table tr, table.main-table td {
-                display: block !important;
-                width: 100% !important;
-            }
-            td.menu-td { border-right: none; border-bottom: 3px groove #C0C0C0; }
-        }
     </style>
 </head>
 <body>
@@ -162,7 +163,7 @@
     <table class="main-table main-container" cellpadding="5" cellspacing="0">
         <tr>
             <!-- COLONNE DE GAUCHE : MENU NETSCAPE / WIN95 -->
-            <td width="180" class="menu-td">
+            <td class="menu-td">
                 <center>
                     <img src="Goodmorningrogerlogo.png" width="150" alt="GMR Logo"><br>
                     <img src="rogerchat.png" width="80" alt="Roger Chat"><br>
@@ -199,11 +200,11 @@
                     <center>
                         <table border="1" bordercolor="#12C3FF" cellpadding="5">
                             <tr>
-                                <td><img src="photo9.jpg" width="100"></td>
-                                <td><img src="photo1.jpg" width="100"></td>
-                                <td><img src="photo4.jpg" width="100"></td>
-                                <td><img src="photo5.jpg" width="100"></td>
-                                <td><img src="photo10.jpg" width="100"></td>
+                                <td><img src="photo9.jpg" width="90"></td>
+                                <td><img src="photo1.jpg" width="90"></td>
+                                <td><img src="photo4.jpg" width="90"></td>
+                                <td><img src="photo5.jpg" width="90"></td>
+                                <td><img src="photo10.jpg" width="90"></td>
                             </tr>
                         </table>
                     </center>
@@ -326,13 +327,15 @@
 
     <br>
 
-    <!-- PIED DE PAGE & COMPTEUR DE VISITES KITSCH -->
+    <!-- PIED DE PAGE & COMPTEUR DE VISITES DYNAMIQUE -->
     <table class="main-container" border="0">
         <tr>
             <td align="center">
                 <font size="2" color="#FFFFFF">
                     Vous êtes le visiteur n° : 
-                    <img src="https://counter.websiteout.net/compte.php?S=www.goodmorningroger.fr&C=6&D=5&N=0&M=0" align="middle" alt="Hit Counter"><br><br>
+                    <a href="https://www.freecounterstat.com" target="_blank">
+                        <img src="https://counter6.optistats.ovh/private/freecounterstat.php?counter=094595fa19fb2548ad7283eb911d6e15" border="0" alt="compteur de visite" align="middle">
+                    </a><br><br>
                     © 1998 Good Morning Roger - Web Page hébergée sur GeoCities Web Hosting.<br>
                     Optimisé pour <b>Netscape Navigator 4.0</b> & <b>Internet Explorer 4.0</b> en Résolution 800x600 - 256 Couleurs.<br>
                     <a href="mentions-legales.html">Mentions Légales</a>
