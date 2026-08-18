@@ -57,7 +57,7 @@ body {
 }
 
 /* Application Bebas Neue partout où c'est nécessaire */
-nav a, h2, h3, .date-day, .date-month, .concert-lieu, .streaming-title {
+nav a, h2, h3, .date-day, .date-month, .concert-lieu, .streaming-title, .past-summary, .past-date {
     font-family: 'Bebas Neue', Impact, 'Arial Narrow Bold', sans-serif !important;
 }
 
@@ -207,6 +207,72 @@ nav a:hover {
 }
 .concert-ville { color: #12C3FF; font-size: 0.95rem; font-weight: bold; }
 
+/* STYLE DES CONCERTS PASSÉS (1 SEULE LIGNE COMPACTE) */
+.concert-row-past {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.02);
+    margin-bottom: 8px;
+    padding: 10px 15px;
+    border-radius: 6px;
+    border-left: 3px solid #555;
+    opacity: 0.75;
+    transition: 0.3s;
+}
+.concert-row-link:hover .concert-row-past {
+    background: rgba(18, 195, 255, 0.08);
+    border-left-color: #12C3FF;
+    opacity: 1;
+    transform: translateX(5px);
+}
+.past-date {
+    font-size: 1.2rem;
+    color: #12C3FF;
+    flex: 0 0 140px;
+    letter-spacing: 1px;
+}
+.past-info {
+    flex: 1;
+    text-align: right;
+    font-size: 0.95rem;
+    color: #dddddd;
+}
+.past-lieu-text {
+    font-weight: bold;
+    color: #ffffff;
+}
+.past-ville-text {
+    color: #12C3FF;
+    margin-left: 6px;
+}
+
+/* ACCORDÉONS ANNEES (SOUS-MENU PASSÉS) */
+.past-year-details {
+    margin: 15px 0;
+    text-align: left;
+}
+.past-summary {
+    font-size: 1.3rem;
+    color: #ffffff;
+    cursor: pointer;
+    padding: 8px 15px;
+    border: 1px solid #444;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.05);
+    transition: 0.3s;
+    letter-spacing: 1px;
+    list-style: none;
+}
+.past-summary::-webkit-details-marker {
+    display: none;
+}
+.past-summary:hover {
+    border-color: #12C3FF;
+    color: #12C3FF;
+    background: rgba(18, 195, 255, 0.1);
+}
+
 /* 6. TITRES H2 */
 h2 { 
     font-size: 4.5rem; 
@@ -265,6 +331,9 @@ img.img-mail:hover {
     .concert-row { flex-direction: column; text-align: center; }
     .concert-date-box { border-right: none; margin-right: 0; margin-bottom: 10px; }
     .concert-info { text-align: center; }
+    .concert-row-past { flex-direction: column; text-align: center; gap: 5px; }
+    .past-date { flex: none; }
+    .past-info { text-align: center; }
 }
 
 /* LIGHTBOX */
@@ -446,6 +515,7 @@ html {
 
 <!-- CONTENEUR DES CONCERTS À VENIR -->
 <div class="concert-container" id="upcoming-concerts">
+    <!-- DATES 2026 -->
     <a href="https://www.facebook.com/events/3233615933482214?locale=fr_FR" target="_blank" class="concert-row-link" data-date="2026-02-13">
         <div class="concert-row">
             <div class="concert-date-box"><span class="date-day">13</span><span class="date-month">FÉVRIER</span></div>
@@ -590,16 +660,60 @@ html {
             <div class="concert-info"><span class="concert-lieu">Festival Mots-Zik</span><span class="concert-ville">Saint-Jacut-les-Pins (56)</span></div>
         </div>
     </a>
+
+    <!-- DATES 2025 -->
+    <a href="https://www.goodmorningroger.fr" target="_blank" class="concert-row-link" data-date="2025-06-21">
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">21</span><span class="date-month">JUIN</span></div>
+            <div class="concert-info"><span class="concert-lieu">Fête de la Musique</span><span class="concert-ville">Clisson (44)</span></div>
+        </div>
+    </a>
+    <a href="https://www.goodmorningroger.fr" target="_blank" class="concert-row-link" data-date="2025-10-18">
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">18</span><span class="date-month">OCT.</span></div>
+            <div class="concert-info"><span class="concert-lieu">Le Hellfest Corner</span><span class="concert-ville">Nantes (44)</span></div>
+        </div>
+    </a>
+
+    <!-- DATES 2024 -->
+    <a href="https://www.goodmorningroger.fr" target="_blank" class="concert-row-link" data-date="2024-05-11">
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">11</span><span class="date-month">MAI</span></div>
+            <div class="concert-info"><span class="concert-lieu">Bar de l'Ouest</span><span class="concert-ville">Vallet (44)</span></div>
+        </div>
+    </a>
+    <a href="https://www.goodmorningroger.fr" target="_blank" class="concert-row-link" data-date="2024-09-20">
+        <div class="concert-row">
+            <div class="concert-date-box"><span class="date-day">20</span><span class="date-month">SEPT.</span></div>
+            <div class="concert-info"><span class="concert-lieu">Rock & Beer Festival</span><span class="concert-ville">Vertou (44)</span></div>
+        </div>
+    </a>
 </div>
 
-<!-- BOUTON DÉROULANT DES CONCERTS PASSÉS -->
+<!-- BOUTON DÉROULANT GÉNÉRAL DES CONCERTS PASSÉS -->
 <details id="past-concerts-details" style="margin-top: 30px; text-align: center;">
     <summary style="font-family: 'Bebas Neue', Impact, sans-serif; font-size: 1.5rem; color: #12C3FF; cursor: pointer; padding: 12px 25px; border: 2px solid #12C3FF; border-radius: 8px; display: inline-block; background: rgba(0,0,0,0.5); transition: 0.3s; letter-spacing: 1px;">
         LES CONCERTS PASSÉS ▼
     </summary>
     
-    <div class="concert-container" id="past-concerts" style="margin-top: 25px; text-align: left;">
-        <!-- Les dates passées seront déplacées ici automatiquement -->
+    <div style="margin-top: 25px;">
+        <!-- VOLET 2026 -->
+        <details class="past-year-details" id="year-details-2026">
+            <summary class="past-summary">2026 ▼</summary>
+            <div class="concert-container" id="past-concerts-2026" style="margin-top: 10px;"></div>
+        </details>
+
+        <!-- VOLET 2025 -->
+        <details class="past-year-details" id="year-details-2025">
+            <summary class="past-summary">2025 ▼</summary>
+            <div class="concert-container" id="past-concerts-2025" style="margin-top: 10px;"></div>
+        </details>
+
+        <!-- VOLET 2024 -->
+        <details class="past-year-details" id="year-details-2024">
+            <summary class="past-summary">2024 ▼</summary>
+            <div class="concert-container" id="past-concerts-2024" style="margin-top: 10px;"></div>
+        </details>
     </div>
 </details>
 
@@ -695,35 +809,69 @@ html {
     }, { threshold: 0.1 });
     document.querySelectorAll('.reveal').forEach((section) => { observer.observe(section); });
 
-    // CLASSEMENT AUTOMATIQUE DES CONCERTS (VENIR vs PASSÉS)
+    // CLASSEMENT AUTOMATIQUE DES CONCERTS (VENIR VS PASSÉS PAR ANNÉE + FORMAT COMPACT)
     document.addEventListener("DOMContentLoaded", () => {
         const today = new Date();
-        today.setHours(0, 0, 0, 0); // Réinitialise l'heure pour comparer uniquement la date
+        today.setHours(0, 0, 0, 0);
 
         const concertLinks = document.querySelectorAll('.concert-row-link');
-        const pastContainer = document.getElementById('past-concerts');
         const pastDetails = document.getElementById('past-concerts-details');
 
-        let pastCount = 0;
+        const pastCounts = { "2026": 0, "2025": 0, "2024": 0 };
 
         concertLinks.forEach(link => {
             const dateStr = link.getAttribute('data-date');
             if (dateStr) {
                 const concertDate = new Date(dateStr + "T00:00:00");
                 if (concertDate < today) {
-                    // C'est un concert passé : on le déplace dans la section passée
-                    pastContainer.appendChild(link);
-                    const concertRow = link.querySelector('.concert-row');
-                    if (concertRow) {
-                        concertRow.style.opacity = '0.7';
+                    const year = concertDate.getFullYear().toString();
+                    const targetContainer = document.getElementById(`past-concerts-${year}`);
+
+                    if (targetContainer) {
+                        // Extrait le jour, mois, lieu et ville
+                        const daySpan = link.querySelector('.date-day');
+                        const monthSpan = link.querySelector('.date-month');
+                        const lieuSpan = link.querySelector('.concert-lieu');
+                        const villeSpan = link.querySelector('.concert-ville');
+
+                        const day = daySpan ? daySpan.textContent.trim() : '';
+                        const month = monthSpan ? monthSpan.textContent.trim() : '';
+                        const lieu = lieuSpan ? lieuSpan.textContent.trim() : '';
+                        const ville = villeSpan ? villeSpan.textContent.trim() : '';
+
+                        // Transforme la structure vers un affichage 1 seule ligne compacte
+                        link.innerHTML = `
+                            <div class="concert-row-past">
+                                <span class="past-date">${day} ${month}</span>
+                                <span class="past-info">
+                                    <span class="past-lieu-text">${lieu}</span>
+                                    <span class="past-ville-text">${ville}</span>
+                                </span>
+                            </div>
+                        `;
+
+                        targetContainer.appendChild(link);
+                        if (pastCounts[year] !== undefined) {
+                            pastCounts[year]++;
+                        }
                     }
-                    pastCount++;
                 }
             }
         });
 
-        // Masquer le bouton accordéon s'il n'y a aucun concert passé
-        if (pastCount === 0 && pastDetails) {
+        // Masque les années vides
+        let totalPast = 0;
+        Object.keys(pastCounts).forEach(year => {
+            const yearDetails = document.getElementById(`year-details-${year}`);
+            if (pastCounts[year] === 0 && yearDetails) {
+                yearDetails.style.display = 'none';
+            } else {
+                totalPast += pastCounts[year];
+            }
+        });
+
+        // Masque le bloc global "CONCERTS PASSÉS" s'il n'y en a aucun
+        if (totalPast === 0 && pastDetails) {
             pastDetails.style.display = 'none';
         }
     });
