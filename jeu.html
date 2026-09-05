@@ -683,14 +683,19 @@ function spawnWorldElements() {
   }
 }
 
-// Génération séquentielle R -> O -> G -> E -> R
+// Génération séquentielle R -> O -> G -> E -> R dans une zone entièrement dégagée après l'obstacle
 function handleObstacleSpawned(obsX, obsY, obsW) {
   obstacleCounter++;
   if (obstacleCounter % 3 === 0) {
     const char = rogerLetters[nextSpawnLetterIndex];
+    
+    // Positionnement 120px après la fin de l'obstacle pour éviter tout chevauchement
+    const safeX = obsX + obsW + 120;
+    const safeY = ENTITY_GROUND_Y - 100;
+    
     items.push({
-      x: obsX + (obsW / 2) - 32, 
-      y: Math.max(50, obsY - 90), 
+      x: safeX, 
+      y: safeY, 
       w: 65, 
       h: 75,
       char: char, 
