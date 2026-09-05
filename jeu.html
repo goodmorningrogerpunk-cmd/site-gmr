@@ -637,6 +637,22 @@ function spawnWorldElements() {
     const newPlat = { x, y: targetY, w, h: 65, key: `${color}_${type}` };
     platforms.push(newPlat);
 
+    // Occasionnellement placer une lettre isolée sur la plateforme sans obstacle
+    if (type !== 'short' && Math.random() < 0.35) {
+      const char = rogerLetters[nextSpawnLetterIndex];
+      items.push({
+        x: x + (w / 2) - 32,
+        y: targetY - 80,
+        w: 65,
+        h: 75,
+        char: char,
+        letterIdx: nextSpawnLetterIndex,
+        frame: 0,
+        animTimer: 0
+      });
+      nextSpawnLetterIndex = (nextSpawnLetterIndex + 1) % rogerLetters.length;
+    }
+
     if (type !== 'short' && Math.random() < 0.60 && (x - lastObstacleX) > 200) {
       const platIndices = [0, 1, 3, 4];
       const configIdx = platIndices[Math.floor(Math.random() * platIndices.length)];
@@ -686,13 +702,23 @@ function handleObstacleSpawned(obsX, obsY, obsW) {
   obstacleCounter++;
   if (obstacleCounter % 3 === 0) {
     const char = rogerLetters[nextSpawnLetterIndex];
+    const lastObs = obstacles[obstacles.length - 1];
     
-    const safeX = obsX + obsW + 120;
-    const safeY = ENTITY_GROUND_Y - 100;
-    
+    let letterX = obsX + (obsW / 2) - 32;
+    let letterY;
+
+    // Obstacle aérien -> Lettre passe en bas (se baisser)
+    if (lastObs && lastObs.type === 'air') {
+      letterY = ENTITY_GROUND_Y - 45; 
+    } 
+    // Obstacle au sol -> Lettre au-dessus de l'obstacle (sauter)
+    else {
+      letterY = Math.max(40, obsY - 110); 
+    }
+
     items.push({
-      x: safeX, 
-      y: safeY, 
+      x: letterX, 
+      y: letterY, 
       w: 65, 
       h: 75,
       char: char, 
