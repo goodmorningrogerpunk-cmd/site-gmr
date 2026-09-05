@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Skate Cat - Roger Bonus Game</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      touch-action: none;
+    }
+    body {
+      background-color: #1a1a24;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Courier New', Courier, monospace;
+      color: #ffffff;
+      overflow: hidden;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+    }
+    #game-container {
+      position: relative;
+      width: 100%;
+      max-width: 960px;
+      aspect-ratio: 16 / 9;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 4px solid #2e2e40;
+      background: #000;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    /* --- BOUTONS PIXEL ART --- */
+    .pixel-btn {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.1s ease;
+      z-index: 25;
+      image-rendering: pixelated;
+    }
+
+    #start-main-btn {
+      position: absolute;
+      top: 80%; 
+      left: 5%;
+      transform: translateY(-50%);
+      padding: 18px 32px;
+      font-size: 22px;
+      color: #1a1a24;
+      background-color: #ffd54f;
+      border: 4px solid #ffffff;
+      box-shadow: 0 6px 0px #b29320, 0 10px 20px rgba(0,0,0,0.8);
+    }
+    #start-main-btn:hover {
+      background-color: #ffe082;
+      transform: translateY(-52%);
+    }
+    #start-main-btn:active {
+      transform: translateY(-48%);
+      box-shadow: 0 2px 0px #b29320;
+    }
+
+    .right-buttons-stack {
+      position: absolute;
+      top: 80%;
+      right: 5%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 25;
+    }
+
+    .secondary-btn {
+      padding: 10px 18px;
+      font-size: 14px;
+      color: #ffd54f;
+      background-color: #1a1a24;
+      border: 3px solid #ffd54f;
+      box-shadow: 0 4px 0px #000, 0 6px 12px rgba(0,0,0,0.7);
+      text-align: center;
+    }
+    .secondary-btn:hover {
+      background-color: #2a2a38;
+      color: #fff;
+      transform: translateY(-2px);
+    }
+    .secondary-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 0px #000;
+    }
+    
+    #restart-btn {
+      display: none;
+      position: absolute;
+      top: 75%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 16px 36px;
+      font-size: 24px;
+      color: #1a1a24;
+      background-color: #ffd54f;
+      border: 4px solid #ffffff;
+      box-shadow: 0 6px 0px #b29320, 0 10px 20px rgba(0,0,0,0.6);
+      z-index: 20;
+    }
+
+    /* --- MODALS --- */
+    .game-modal {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 85%;
+      max-width: 680px;
+      background: #111118;
+      border: 4px solid #ffd54f;
+      border-radius: 8px;
+      padding: 24px;
+      z-index: 30;
+      box-shadow: 0 0 30px rgba(0,0,0,0.9);
+      color: #fff;
+    }
+    .game-modal h2 {
+      color: #ffd54f;
+      text-align: center;
+      margin-bottom: 16px;
+      font-size: 24px;
+    }
+    .game-modal .goal-text {
+      font-size: 14px;
+      line-height: 1.5;
+      color: #e0e0e0;
+      margin-bottom: 18px;
+      background: rgba(255, 213, 79, 0.1);
+      border-left: 3px solid #ffd54f;
+      padding: 10px 14px;
+      border-radius: 4px;
+    }
+    .game-modal ul {
+      list-style-type: none;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+    .game-modal li {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .rule-icon {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+    
+    .modal-close-btn {
+      display: block;
+      margin: 0 auto;
+      padding: 12px 28px;
+      background: #ffd54f;
+      color: #1a1a24;
+      border: 3px solid #ffffff;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      text-shadow: none;
+      box-shadow: 0 4px 0px #b29320;
+    }
+    .modal-close-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0px #b29320;
+    }
+
+    /* --- OVERLAY ORIENTATION MOBILES --- */
+    #rotate-device-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #111118;
+      z-index: 9999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+    }
+    #rotate-device-overlay .rotate-icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+      animation: rotateAnim 2s infinite ease-in-out;
+    }
+    #rotate-device-overlay p {
+      color: #ffd54f;
+      font-size: 20px;
+      font-weight: bold;
+      line-height: 1.4;
+    }
+
+    @keyframes rotateAnim {
+      0%, 10% { transform: rotate(0deg); }
+      50%, 60% { transform: rotate(-90deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    @media screen and (orientation: portrait) and (max-width: 900px) {
+      #rotate-device-overlay {
+        display: flex;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="rotate-device-overlay">
+  <div class="rotate-icon">📱</div>
+  <p>MERCI DE TOURNER VOTRE ÉCRAN<br>EN MODE HORIZONTAL POUR JOUER</p>
+</div>
+
+<div id="game-container">
+  <canvas id="gameCanvas" width="960" height="540"></canvas>
+  
+  <button id="start-main-btn" class="pixel-btn">LANCER LA PARTIE</button>
+  
+  <div class="right-buttons-stack" id="right-stack">
+    <button id="rules-btn" class="pixel-btn secondary-btn">RÈGLES & CONTRÔLES</button>
+    <button id="about-btn" class="pixel-btn secondary-btn">EN SAVOIR PLUS</button>
+  </div>
+  
+  <button id="restart-btn" class="pixel-btn">RECOMMENCER</button>
+  
+  <div id="rules-modal" class="game-modal">
+    <h2>RÈGLES ET CONTRÔLES</h2>
+    <div class="goal-text">
+      Le but est d'obtenir le plus grand score. Tu gagnes des points au fur et mesure que tu avance dans le parcours. Des points bonus sont déclenchés lorsque tu passes sur une lettre doré ou quand tu as réussi à former le mot "ROGER" par exemple. Attention à éviter les obstacles sur ta route !
+    </div>
+    <ul>
+      <li>🎮 <b>ESPACE / TAP DROITE</b> : Sauter</li>
+      <li>🎮 <b>FLÈCHE BAS / TAP GAUCHE</b> : Se baisser / Descendre des plateformes</li>
+      <li><img src="R1.png" alt="R" class="rule-icon"> <b>LETTRES ROGER</b> : Collecte 5 petites lettres R O G E R pour créer une GROSSE lettre et écrire R O G E R en gros.</li>
+      <li>❤️ <b>SYSTÈME DE VIES</b> : Chaque GROSSE lettre accumulée en bas à gauche te protège contre un choc !</li>
+    </ul>
+    <button id="close-rules-btn" class="pixel-btn modal-close-btn">FERMER</button>
+  </div>
+
+  <div id="about-modal" class="game-modal">
+    <h2>EN SAVOIR PLUS</h2>
+    <p style="text-align: center; margin-bottom: 24px; font-size: 18px;">texte à créer</p>
+    <button id="close-about-btn" class="pixel-btn modal-close-btn">FERMER</button>
+  </div>
+</div>
+
+<script>
+// Prévention des menus contextuels au toucher long
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+const startMainBtn = document.getElementById('start-main-btn');
+const rightStack = document.getElementById('right-stack');
+const rulesBtn = document.getElementById('rules-btn');
+const aboutBtn = document.getElementById('about-btn');
+const restartBtn = document.getElementById('restart-btn');
+
+const rulesModal = document.getElementById('rules-modal');
+const closeRulesBtn = document.getElementById('close-rules-btn');
+
+const aboutModal = document.getElementById('about-modal');
+const closeAboutBtn = document.getElementById('close-about-btn');
+
+// --- VIDÉO ACCUEIL ---
+const introVideo = document.createElement('video');
+introVideo.src = 'video_intro_gmr_skate.mp4';
+introVideo.loop = true;
+introVideo.muted = true;
+introVideo.playsInline = true;
+
+// --- SYSTÈME AUDIO ---
+const bgMusic = new Audio('roger_8bitok.mp3');
+bgMusic.loop = true;
+bgMusic.volume = 0.8; 
+
+const superSayanTheme = new Audio('supersayantheme.mp3');
+superSayanTheme.volume = 1.0;
+
+const sounds = {
+  run: new Audio('skate_run.mp3'),
+  jump: new Audio('skate_jump.mp3'),
+  reception: new Audio('skate_reception.mp3'),
+  coin: new Audio('coin_receive.mp3'),
+  damage: new Audio('damage.mp3'),
+  sayan: new Audio('sayan.mp3'),
+  speedFly: new Audio('speed_fly.mp3')
+};
+
+sounds.run.loop = true;
+sounds.run.volume = 0.6;
+sounds.jump.volume = 0.7;
+sounds.reception.volume = 0.7;
+sounds.coin.volume = 0.8;
+sounds.damage.volume = 0.85;
+sounds.sayan.volume = 0.15;    
+sounds.speedFly.volume = 0.15; 
+
+let audioUnlocked = false;
+let fadeInterval = null;
+
+function unlockAudio() {
+  if (!audioUnlocked) {
+    sounds.run.play().then(() => {
+      sounds.run.pause();
+      audioUnlocked = true;
+    }).catch(() => {});
+  }
+}
+
+function startBgMusic() {
+  unlockAudio();
+  bgMusic.muted = false;
+  bgMusic.volume = 0.8;
+  if (bgMusic.paused) {
+    bgMusic.play().catch(err => console.log("Audio play error:", err));
+  }
+}
+
+function stopAllSounds() {
+  if (fadeInterval) clearInterval(fadeInterval);
+  bgMusic.pause();
+  bgMusic.currentTime = 0;
+  bgMusic.muted = false;
+
+  superSayanTheme.pause();
+  superSayanTheme.currentTime = 0;
+
+  Object.values(sounds).forEach(sound => {
+    sound.pause();
+    sound.currentTime = 0;
+  });
+}
+
+function playRunSound() {
+  if (audioUnlocked && gameStarted && !gameOver && cat.isGrounded && !superSayen.active && !freezeForSequence) {
+    if (sounds.run.paused) {
+      sounds.run.currentTime = 0;
+      sounds.run.play().catch(() => {});
+    }
+  }
+}
+
+function stopRunSound() {
+  if (!sounds.run.paused) {
+    sounds.run.pause();
+  }
+}
+
+function playSoundEffect(sound) {
+  if (audioUnlocked) {
+    sound.currentTime = 0;
+    sound.play().catch(() => {});
+  }
+}
+
+function transitionSuperSayanToNormal() {
+  if (fadeInterval) clearInterval(fadeInterval);
+  
+  bgMusic.muted = false;
+  bgMusic.volume = 0;
+  
+  const fadeSteps = 30;
+  let step = 0;
+  
+  fadeInterval = setInterval(() => {
+    step++;
+    const progress = step / fadeSteps;
+    
+    superSayanTheme.volume = Math.max(0, 1.0 * (1 - progress));
+    bgMusic.volume = Math.min(0.8, 0.8 * progress);
+    
+    if (step >= fadeSteps) {
+      clearInterval(fadeInterval);
+      superSayanTheme.pause();
+      superSayanTheme.currentTime = 0;
+      superSayanTheme.volume = 1.0;
+      bgMusic.volume = 0.8;
+    }
+  }, 50);
+}
+
+function loadSmartImage(baseName) {
+  const img = new Image();
+  const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG'];
+  let extIdx = 0;
+
+  img.onerror = () => {
+    extIdx++;
+    if (extIdx < extensions.length) {
+      img.src = `${baseName}.${extensions[extIdx]}`;
+    }
+  };
+  img.src = `${baseName}.${extensions[0]}`;
+  return img;
+}
+
+// --- ASSETS ---
+const assets = {
+  bg: loadSmartImage('background'),
+  cat: {
+    runSequence: [
+      loadSmartImage('chat_push2'),
+      loadSmartImage('chat_run'),
+      loadSmartImage('chat_run1'),
+      loadSmartImage('chat_run3')
+    ],
+    run4: loadSmartImage('chat_run4'),
+    jump: [loadSmartImage('chat_jump1'), loadSmartImage('chat_jump2'), loadSmartImage('chat_jump3')],
+    crouch: loadSmartImage('chat_reception2'),
+    fail: loadSmartImage('chat_fail'),
+    transform: [
+      loadSmartImage('chat_transform1'),
+      loadSmartImage('chat_transform2'),
+      loadSmartImage('chat_transform3'),
+      loadSmartImage('chat_transform4'),
+      loadSmartImage('chat_transform5'),
+      loadSmartImage('chat_transform6')
+    ],
+    fly: [
+      loadSmartImage('chat_fly1'),
+      loadSmartImage('chat_fly2'),
+      loadSmartImage('chat_fly3'),
+      loadSmartImage('chat_fly4'),
+      loadSmartImage('chat_fly5'),
+      loadSmartImage('chat_fly6')
+    ]
+  },
+  platforms: {
+    bleu_short: loadSmartImage('bleu_short'), bleu_medium: loadSmartImage('bleu_medium'), bleu_long: loadSmartImage('bleu_long'),
+    rouge_short: loadSmartImage('rouge_short'), rouge_medium: loadSmartImage('rouge_medium'), rouge_long: loadSmartImage('rouge_long'),
+    vert_short: loadSmartImage('vert_short'), vert_medium: loadSmartImage('vert_medium'), vert_long: loadSmartImage('vert_long')
+  },
+  obstaclesConfig: [
+    { type: 'anim', frames: [loadSmartImage('obstacle_jl1'), loadSmartImage('obstacle_jl2'), loadSmartImage('obstacle_jl3')], targetH: 150 },
+    { type: 'anim', frames: [loadSmartImage('obstacle_marc1'), loadSmartImage('obstacle_marc2'), loadSmartImage('obstacle_marc3')], targetH: 150 },
+    { type: 'air', img: loadSmartImage('obstacle3'), targetW: 120 },
+    { type: 'plat', img: loadSmartImage('obstacle1'), targetH: 100 },
+    { type: 'plat', img: loadSmartImage('obstacle2'), targetH: 140 },
+    { type: 'ground', img: loadSmartImage('obstacle4'), targetH: 75 },
+    { type: 'ground', img: loadSmartImage('obstacle5'), targetH: 80 },
+    { type: 'air', img: loadSmartImage('obstacle6'), targetW: 130 }
+  ],
+  letters: {
+    R: Array.from({length: 8}, (_, i) => loadSmartImage(`R${i+1}`)),
+    O: Array.from({length: 8}, (_, i) => loadSmartImage(`O${i+1}`)),
+    G: Array.from({length: 8}, (_, i) => loadSmartImage(`G${i+1}`)),
+    E: Array.from({length: 8}, (_, i) => loadSmartImage(`E${i+1}`))
+  }
+};
+
+function getObstacleDimensions(conf) {
+  const sampleImg = (conf.type === 'anim') ? conf.frames[0] : conf.img;
+  let w = 80, h = 80;
+
+  if (sampleImg && sampleImg.complete && sampleImg.naturalWidth > 0) {
+    const ratio = sampleImg.naturalWidth / sampleImg.naturalHeight;
+    if (conf.targetH) {
+      h = conf.targetH;
+      w = h * ratio;
+    } else if (conf.targetW) {
+      w = conf.targetW;
+      h = w / ratio;
+    }
+  } else {
+    w = conf.targetW || 100;
+    h = conf.targetH || 100;
+  }
+  return { w, h };
+}
+
+// --- PHYSIQUE & ETAT ---
+const BASE_GAME_SPEED = 6.5;
+let currentGameSpeed = BASE_GAME_SPEED;
+const GROUND_Y = 430;        
+const ENTITY_GROUND_Y = 418; 
+const GRAVITY = 0.8;
+const JUMP_FORCE = -12;
+const JUMP_HOLD_FORCE = -0.55;
+const MAX_JUMP_TIME = 15;
+
+let bgX = 0;
+let score = 0;
+let lastScoreTime = Date.now();
+let gameOver = false;
+let gameStarted = false;
+let bonusEffectTimer = 0;
+
+const rogerLetters = ['R', 'O', 'G', 'E', 'R'];
+let rogerCollected = [false, false, false, false, false];
+let completedWordsCount = 0;
+
+let invulnerableTimer = 0;
+let fallingLetters = [];
+
+// --- ETAT CINÉMATIQUE FREEZE & ANIMATION LETTRES GAUCHE ---
+let freezeForSequence = false;
+let sequenceCurrentLetterIndex = 0;
+let sequenceAngle = 0;
+let bounceTimer = 0;
+
+// --- ETAT SUPER SAYEN ---
+const superSayen = {
+  active: false,
+  state: 'NONE', 
+  timer: 0,
+  transformFrame: 0,
+  flyFrame: 0,
+  animTimer: 0,
+  targetY: 180
+};
+
+const cat = {
+  x: 100,
+  y: ENTITY_GROUND_Y - 110,
+  width: 110,
+  height: 110,
+  vy: 0,
+  isGrounded: true,
+  wasGrounded: true,
+  isPlatformGrounded: false,
+  isCrouching: false,
+  isRun4Pose: false,
+  jumpTimer: 0,
+  isJumping: false,
+  animFrame: 0,
+  animTimer: 0,
+  state: 'RUN'
+};
+
+let platforms = [];
+let obstacles = [];
+let items = [];
+let lastObstacleX = -1000;
+let obstacleCounter = 0;
+
+function triggerSuperSayen() {
+  if (!gameStarted || gameOver || superSayen.active) return;
+  
+  superSayen.active = true;
+  superSayen.state = 'TRANSFORM';
+  superSayen.timer = 0;
+  superSayen.transformFrame = 0;
+  superSayen.flyFrame = 0;
+  superSayen.animTimer = 0;
+  
+  cat.vy = 0;
+  cat.isGrounded = false;
+  cat.isPlatformGrounded = false;
+  stopRunSound();
+
+  bgMusic.muted = true;
+  superSayanTheme.currentTime = 0;
+  superSayanTheme.volume = 1.0;
+  superSayanTheme.play().catch(() => {});
+
+  playSoundEffect(sounds.sayan);
+  playSoundEffect(sounds.speedFly);
+}
+
+function triggerLetterFall(char, x, y) {
+  fallingLetters.push({
+    char: char,
+    x: x,
+    y: y,
+    vy: -3,
+    vx: (Math.random() - 0.5) * 4,
+    angle: 0,
+    vAngle: (Math.random() - 0.5) * 0.2,
+    alpha: 1.0
+  });
+}
+
+function spawnWorldElements() {
+  if (superSayen.state === 'LANDING' || freezeForSequence) return;
+
+  const lastPlat = platforms[platforms.length - 1];
+  const lastX = lastPlat ? lastPlat.x + lastPlat.w : 350;
+
+  if (lastX < canvas.width + 300) {
+    const minHeightY = ENTITY_GROUND_Y - 230;
+    const maxHeightY = ENTITY_GROUND_Y - 90;
+
+    const prevY = lastPlat ? lastPlat.y : ENTITY_GROUND_Y - 100;
+    
+    let targetY = prevY + (Math.random() * 160 - 80);
+    if (targetY < minHeightY) targetY = minHeightY;
+    if (targetY > maxHeightY) targetY = maxHeightY;
+
+    const heightDifference = prevY - targetY;
+    let gap = 130 + Math.random() * 80;
+    if (heightDifference > 50) {
+      gap = 90 + Math.random() * 40;
+    }
+
+    const x = Math.max(canvas.width + 100, lastX + gap);
+
+    const types = ['short', 'medium', 'long'];
+    const colors = ['bleu', 'rouge', 'vert'];
+    const type = types[Math.floor(Math.random() * types.length)];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    
+    const widths = { short: 160, medium: 260, long: 360 };
+    const w = widths[type];
+
+    const newPlat = { x, y: targetY, w, h: 65, key: `${color}_${type}` };
+    platforms.push(newPlat);
+
+    if (type !== 'short' && Math.random() < 0.60 && (x - lastObstacleX) > 200) {
+      const platIndices = [0, 1, 3, 4];
+      const configIdx = platIndices[Math.floor(Math.random() * platIndices.length)];
+      const conf = assets.obstaclesConfig[configIdx];
+      const dim = getObstacleDimensions(conf);
+
+      const obsX = x + (w / 2) - (dim.w / 2);
+      const depthAdjustment = (configIdx === 3) ? 33 : 25;
+      const obsY = targetY - dim.h + depthAdjustment; 
+      const flipX = Math.random() < 0.5;
+
+      obstacles.push({ x: obsX, y: obsY, w: dim.w, h: dim.h, configIdx, frame: 0, animTimer: 0, flipX });
+      lastObstacleX = obsX + dim.w;
+
+      handleObstacleSpawned(obsX, obsY, dim.w);
+    }
+  }
+
+  if ((canvas.width + 100 - lastObstacleX) > 230 && Math.random() < 0.85) {
+    const freeIndices = [0, 1, 2, 5, 6, 7];
+    const configIdx = freeIndices[Math.floor(Math.random() * freeIndices.length)];
+    const conf = assets.obstaclesConfig[configIdx];
+    const dim = getObstacleDimensions(conf);
+
+    const obsX = canvas.width + 120 + Math.random() * 100;
+    const flipX = Math.random() < 0.5;
+    let obsY;
+
+    if (conf.type === 'air') {
+      obsY = ENTITY_GROUND_Y - 170;
+      obstacles.push({
+        x: obsX, baseY: obsY, y: obsY, w: dim.w, h: dim.h,
+        configIdx, type: 'air', floatPhase: Math.random() * Math.PI * 2, flipX
+      });
+    } else {
+      const extraOffset = (configIdx === 0 || configIdx === 1) ? 5 : 0;
+      obsY = ENTITY_GROUND_Y - dim.h + extraOffset;
+      obstacles.push({ x: obsX, y: obsY, w: dim.w, h: dim.h, configIdx, frame: 0, animTimer: 0, flipX });
+    }
+
+    lastObstacleX = obsX + dim.w;
+    handleObstacleSpawned(obsX, obsY, dim.w);
+  }
+}
+
+function handleObstacleSpawned(obsX, obsY, obsW) {
+  obstacleCounter++;
+  if (obstacleCounter % 3 === 0) {
+    const randLetterIdx = Math.floor(Math.random() * 5);
+    const char = rogerLetters[randLetterIdx];
+    items.push({
+      x: obsX + (obsW / 2) - 32, 
+      y: Math.max(50, obsY - 90), 
+      w: 65, 
+      h: 75,
+      char: char, 
+      letterIdx: randLetterIdx, 
+      frame: 0, 
+      animTimer: 0
+    });
+  }
+}
+
+function drawShadow(centerX, centerY, radiusX, radiusY, opacity = 0.35) {
+  ctx.save();
+  ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;
+  ctx.beginPath();
+  ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+// --- CONTRÔLES CLAVIER & TACTILE ---
+const keys = {};
+
+window.addEventListener('keydown', (e) => {
+  unlockAudio();
+  keys[e.code] = true;
+
+  if (e.code === 'Space' && gameOver) {
+    startBgMusic();
+    resetGame();
+    return;
+  }
+
+  if (e.key === 'm' || e.key === 'M' || e.code === 'KeyM') {
+    triggerSuperSayen();
+  }
+
+  if ((e.key === 'r' || e.key === 'R' || e.code === 'KeyR') && gameStarted && !gameOver && !superSayen.active) {
+    cat.isRun4Pose = true;
+  }
+
+  if (e.code === 'Escape') {
+    if (rulesModal.style.display === 'block') {
+      rulesModal.style.display = 'none';
+    } else if (aboutModal.style.display === 'block') {
+      aboutModal.style.display = 'none';
+    } else {
+      gameStarted = false;
+      gameOver = false;
+      superSayen.active = false;
+      freezeForSequence = false;
+      startMainBtn.style.display = 'block';
+      rightStack.style.display = 'flex';
+      stopAllSounds();
+    }
+  }
+});
+
+window.addEventListener('keyup', (e) => {
+  keys[e.code] = false;
+  if (e.code === 'Space') {
+    cat.isJumping = false;
+  }
+});
+
+// --- GESTION DES COMMANDES TACTILES DANS LA BANDE NOIRE DU CANVAS ---
+function handleTouchAction(e, isTouchStart) {
+  if (!gameStarted || rulesModal.style.display === 'block' || aboutModal.style.display === 'block') return;
+
+  const rect = canvas.getBoundingClientRect();
+  
+  for (let i = 0; i < e.touches.length; i++) {
+    const touch = e.touches[i];
+    const touchX = (touch.clientX - rect.left) * (canvas.width / rect.width);
+    const touchY = (touch.clientY - rect.top) * (canvas.height / rect.height);
+
+    // Si le toucher est dans la bande noire inférieure
+    if (touchY >= GROUND_Y) {
+      if (gameOver) {
+        if (isTouchStart) {
+          startBgMusic();
+          resetGame();
+        }
+        return;
+      }
+
+      if (touchX < canvas.width / 2) {
+        // Côté GAUCHE : Se baisser
+        keys['ArrowDown'] = isTouchStart;
+      } else {
+        // Côté DROITE : Sauter
+        keys['Space'] = isTouchStart;
+        keys['ArrowUp'] = isTouchStart;
+        if (!isTouchStart) cat.isJumping = false;
+      }
+    }
+  }
+}
+
+canvas.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  unlockAudio();
+  handleTouchAction(e, true);
+}, { passive: false });
+
+canvas.addEventListener('touchend', (e) => {
+  e.preventDefault();
+  if (e.touches.length === 0) {
+    keys['ArrowDown'] = false;
+    keys['Space'] = false;
+    keys['ArrowUp'] = false;
+    cat.isJumping = false;
+  } else {
+    handleTouchAction(e, false);
+  }
+}, { passive: false });
+
+// GESTION DES BOUTONS IHM
+startMainBtn.addEventListener('click', () => {
+  if (introVideo) {
+    introVideo.pause();
+  }
+  startMainBtn.style.display = 'none';
+  rightStack.style.display = 'none';
+  startBgMusic();
+  resetGame();
+});
+
+rulesBtn.addEventListener('click', () => {
+  unlockAudio();
+  rulesModal.style.display = 'block';
+});
+
+closeRulesBtn.addEventListener('click', () => {
+  rulesModal.style.display = 'none';
+});
+
+aboutBtn.addEventListener('click', () => {
+  unlockAudio();
+  aboutModal.style.display = 'block';
+});
+
+closeAboutBtn.addEventListener('click', () => {
+  aboutModal.style.display = 'none';
+});
+
+restartBtn.addEventListener('click', () => {
+  startBgMusic();
+  resetGame();
+});
+
+function resetGame() {
+  score = 0;
+  lastScoreTime = Date.now();
+  gameOver = false;
+  gameStarted = true;
+  bonusEffectTimer = 0;
+  lastObstacleX = -1000;
+  obstacleCounter = 0;
+  completedWordsCount = 0;
+  invulnerableTimer = 0;
+  fallingLetters = [];
+  superSayen.active = false;
+  superSayen.state = 'NONE';
+  freezeForSequence = false;
+  sequenceCurrentLetterIndex = 0;
+  sequenceAngle = 0;
+  currentGameSpeed = BASE_GAME_SPEED;
+  
+  cat.y = ENTITY_GROUND_Y - cat.height;
+  cat.vy = 0;
+  cat.isGrounded = true;
+  cat.wasGrounded = true;
+  cat.isPlatformGrounded = false;
+  cat.isRun4Pose = false;
+  cat.isJumping = false;
+  cat.jumpTimer = 0;
+  cat.state = 'RUN';
+  platforms = [];
+  obstacles = [];
+  items = [];
+  rogerCollected = [false, false, false, false, false];
+  restartBtn.style.display = 'none';
+}
+
+function update() {
+  if (!gameStarted || gameOver) {
+    stopRunSound();
+    return;
+  }
+
+  bounceTimer += 0.08;
+
+  if (invulnerableTimer > 0) {
+    invulnerableTimer--;
+  }
+
+  fallingLetters.forEach(fl => {
+    fl.y += fl.vy;
+    fl.x += fl.vx;
+    fl.vy += 0.4;
+    fl.angle += fl.vAngle;
+    fl.alpha -= 0.02;
+  });
+  fallingLetters = fallingLetters.filter(fl => fl.alpha > 0);
+
+  if (freezeForSequence) {
+    stopRunSound();
+    sequenceAngle += 0.12; 
+    
+    if (sequenceAngle >= Math.PI * 2) {
+      sequenceAngle = 0;
+      sequenceCurrentLetterIndex++;
+      
+      if (sequenceCurrentLetterIndex >= 5) {
+        freezeForSequence = false;
+        completedWordsCount = 0; 
+        triggerSuperSayen();
+      }
+    }
+    return; 
+  }
+
+  const now = Date.now();
+  if (now - lastScoreTime >= 1000) {
+    score += superSayen.active ? 500 : 50;
+    lastScoreTime = now;
+  }
+
+  const jumpPressed = !!keys['Space'];
+  const flyUpPressed = !!(keys['Space'] || keys['ArrowUp'] || keys['KeyW']);
+  const downPressed = !!(keys['ArrowDown'] || keys['KeyS']);
+
+  if (superSayen.active) {
+    superSayen.animTimer++;
+
+    if (superSayen.state === 'TRANSFORM') {
+      currentGameSpeed = BASE_GAME_SPEED * 0.5;
+      
+      if (cat.y > superSayen.targetY) {
+        cat.y -= 3;
+      }
+
+      const frameInterval = (superSayen.transformFrame === 5) ? 4 : 14;
+
+      if (superSayen.animTimer % frameInterval === 0) {
+        if (superSayen.transformFrame < 5) {
+          superSayen.transformFrame++;
+        } else {
+          superSayen.state = 'FLY';
+          superSayen.timer = 0;
+        }
+      }
+    } else if (superSayen.state === 'FLY') {
+      currentGameSpeed = BASE_GAME_SPEED * 3.5;
+      superSayen.timer++;
+      score += 15;
+
+      const flySpeed = 7;
+      const maxFlyY = ENTITY_GROUND_Y - cat.height + 65; 
+      
+      if (flyUpPressed) {
+        cat.y = Math.max(30, cat.y - flySpeed);
+      }
+      if (downPressed) {
+        cat.y = Math.min(maxFlyY, cat.y + flySpeed);
+      }
+
+      if (superSayen.animTimer % 4 === 0) {
+        superSayen.flyFrame = (superSayen.flyFrame + 1) % 6;
+      }
+
+      if (superSayen.timer >= 450) {
+        superSayen.state = 'LANDING';
+        
+        obstacles = obstacles.filter(o => o.x < cat.x - 100 || o.x > cat.x + 800);
+        platforms = platforms.filter(p => p.x < cat.x - 100 || p.x > cat.x + 800);
+        lastObstacleX = canvas.width + 500;
+
+        transitionSuperSayanToNormal();
+      }
+    } else if (superSayen.state === 'LANDING') {
+      currentGameSpeed = BASE_GAME_SPEED;
+
+      if (cat.y < ENTITY_GROUND_Y - cat.height) {
+        cat.y += 6;
+      } else {
+        cat.y = ENTITY_GROUND_Y - cat.height;
+        cat.isGrounded = true;
+        cat.vy = 0;
+        superSayen.active = false;
+        superSayen.state = 'NONE';
+        
+        obstacles.forEach(o => {
+          if (o.type !== 'air') {
+            const extraOffset = (o.configIdx === 0 || o.configIdx === 1) ? 5 : 0;
+            let matchingPlat = platforms.find(p => o.x + o.w > p.x && o.x < p.x + p.w);
+            if (matchingPlat) {
+              const depthAdjustment = (o.configIdx === 3) ? 33 : 25;
+              o.y = matchingPlat.y - o.h + depthAdjustment;
+            } else {
+              o.y = ENTITY_GROUND_Y - o.h + extraOffset;
+            }
+          }
+        });
+
+        lastObstacleX = cat.x + 400;
+      }
+    }
+  } else {
+    currentGameSpeed = BASE_GAME_SPEED;
+  }
+
+  bgX -= currentGameSpeed * 0.4;
+  lastObstacleX -= currentGameSpeed;
+
+  if (!superSayen.active) {
+    if (downPressed && cat.isPlatformGrounded) {
+      cat.y += 12;
+      cat.isGrounded = false;
+      cat.isPlatformGrounded = false;
+      stopRunSound();
+    }
+
+    if (jumpPressed && cat.isGrounded) {
+      cat.vy = JUMP_FORCE;
+      cat.isGrounded = false;
+      cat.isPlatformGrounded = false;
+      cat.isJumping = true;
+      cat.jumpTimer = 0;
+      cat.isRun4Pose = false;
+      cat.state = 'RUN';
+      
+      stopRunSound();
+      playSoundEffect(sounds.jump);
+    }
+
+    if (jumpPressed && cat.isJumping) {
+      if (cat.jumpTimer < MAX_JUMP_TIME) {
+        cat.vy += JUMP_HOLD_FORCE;
+        cat.jumpTimer++;
+      }
+    }
+
+    cat.isCrouching = downPressed;
+
+    cat.vy += GRAVITY;
+    cat.y += cat.vy;
+  }
+
+  // Box de collision par défaut (Mode normal)
+  let catBoxX = cat.x + 25;
+  let catBoxWidth = cat.width - 50;
+  let catBoxY = cat.isCrouching ? cat.y + 60 : cat.y + 12;
+  let catBoxHeight = cat.isCrouching ? 45 : cat.height - 24;
+
+  // Hitbox du chat en vol Super Sayen
+  if (superSayen.active && superSayen.state === 'FLY') {
+    const hitBoxHeight = 110;
+    const speedBuffer = currentGameSpeed * 2.0;
+    
+    catBoxX = cat.x + (cat.width / 2) - 45 - speedBuffer;
+    catBoxWidth = 90 + (speedBuffer * 2);
+    catBoxY = cat.y + (cat.height / 2) - (hitBoxHeight / 2);
+    catBoxHeight = hitBoxHeight;
+  }
+
+  if (!superSayen.active) {
+    cat.wasGrounded = cat.isGrounded;
+    cat.isGrounded = false;
+    cat.isPlatformGrounded = false;
+
+    if (cat.y + cat.height >= ENTITY_GROUND_Y) {
+      cat.y = ENTITY_GROUND_Y - cat.height;
+      cat.vy = 0;
+      cat.isGrounded = true;
+      cat.isJumping = false;
+    }
+
+    if (!downPressed || cat.vy < 0) {
+      platforms.forEach(p => {
+        const depthOffset = 14; 
+        const surfaceY = p.y + depthOffset;
+
+        if (
+          cat.x + cat.width > p.x &&
+          cat.x < p.x + p.w &&
+          cat.y + cat.height >= surfaceY &&
+          cat.y + cat.height <= surfaceY + 20 &&
+          cat.vy >= 0
+        ) {
+          cat.y = surfaceY - cat.height;
+          cat.vy = 0;
+          cat.isGrounded = true;
+          cat.isPlatformGrounded = true;
+          cat.isJumping = false;
+        }
+      });
+    }
+  }
+
+  platforms.forEach(p => p.x -= currentGameSpeed);
+
+  if (!superSayen.active) {
+    if (!cat.wasGrounded && cat.isGrounded) {
+      playSoundEffect(sounds.reception);
+    }
+
+    if (cat.isGrounded) {
+      playRunSound();
+    } else {
+      stopRunSound();
+    }
+  }
+
+  platforms = platforms.filter(p => p.x + p.w > -100);
+
+  obstacles.forEach(o => {
+    o.x -= currentGameSpeed;
+
+    if (o.type === 'air') {
+      o.floatPhase += 0.05;
+      o.y = o.baseY + Math.sin(o.floatPhase) * 12;
+    } else {
+      o.animTimer++;
+      if (o.animTimer % 10 === 0) {
+        o.frame = (o.frame + 1) % 3;
+      }
+    }
+
+    const obsBoxX = o.x + 10;
+    const obsBoxWidth = Math.max(10, o.w - 20);
+    const obsBoxY = o.type === 'air' ? o.y + 4 : o.y + 10;
+    const obsBoxHeight = o.type === 'air' ? Math.max(10, o.h - 8) : Math.max(10, o.h - 20);
+
+    if (!superSayen.active && invulnerableTimer <= 0) {
+      if (
+        catBoxX < obsBoxX + obsBoxWidth &&
+        catBoxX + catBoxWidth > obsBoxX &&
+        catBoxY < obsBoxY + obsBoxHeight &&
+        catBoxY + catBoxHeight > obsBoxY
+      ) {
+        playSoundEffect(sounds.damage);
+
+        if (completedWordsCount > 0) {
+          completedWordsCount--;
+          invulnerableTimer = 90;
+          
+          const masterHudX = 20;
+          const masterHudY = canvas.height - 115;
+          const lostChar = rogerLetters[completedWordsCount];
+          const lostX = masterHudX + (completedWordsCount * 95);
+          triggerLetterFall(lostChar, lostX, masterHudY);
+        } else {
+          gameOver = true;
+          cat.state = 'FAIL';
+          stopRunSound();
+          stopAllSounds();
+          restartBtn.style.display = 'block';
+        }
+      }
+    }
+  });
+  obstacles = obstacles.filter(o => o.x + o.w > -100);
+
+  items.forEach(it => {
+    it.x -= currentGameSpeed;
+    
+    it.animTimer++;
+    if (it.animTimer % 6 === 0) {
+      it.frame = (it.frame + 1) % 8;
+    }
+
+    // Zone de ramassage élargie en mode vol Super Sayen (effet aimant)
+    let hitW = it.w;
+    let hitH = it.h;
+    let hitX = it.x;
+    let hitY = it.y;
+
+    if (superSayen.active && superSayen.state === 'FLY') {
+      hitW = it.w + 120;
+      hitH = it.h + 180;
+      hitX = it.x - 60;
+      hitY = it.y - 90;
+    }
+
+    const itemHit = (
+      catBoxX < hitX + hitW &&
+      catBoxX + catBoxWidth > hitX &&
+      catBoxY < hitY + hitH &&
+      catBoxY + catBoxHeight > hitY
+    );
+
+    if (itemHit) {
+      // +100 points à chaque lettre dorée collectée
+      score += 100;
+
+      const targetIndices = [];
+      rogerLetters.forEach((char, idx) => {
+        if (char === it.char) targetIndices.push(idx);
+      });
+
+      for (const idx of targetIndices) {
+        if (!rogerCollected[idx]) {
+          rogerCollected[idx] = true;
+          break;
+        }
+      }
+
+      it.collected = true;
+      playSoundEffect(sounds.coin);
+
+      if (rogerCollected.every(val => val === true)) {
+        score += 1000;
+        bonusEffectTimer = 90;
+        rogerCollected = [false, false, false, false, false];
+        
+        if (completedWordsCount < 5) {
+          completedWordsCount++;
+          
+          if (completedWordsCount === 5) {
+            freezeForSequence = true;
+            sequenceCurrentLetterIndex = 0;
+            sequenceAngle = 0;
+          }
+        }
+      }
+    }
+  });
+  items = items.filter(it => !it.collected && it.x + it.w > -100);
+
+  if (bonusEffectTimer > 0) {
+    bonusEffectTimer--;
+  }
+
+  spawnWorldElements();
+
+  cat.animTimer++;
+  if (cat.animTimer % 14 === 0) {
+    cat.animFrame = (cat.animFrame + 1) % 4;
+  }
+}
+
+function drawHomeScreen() {
+  if (introVideo.paused) {
+    introVideo.play().catch(() => {});
+  }
+
+  if (introVideo.readyState >= 2) {
+    const vidRatio = introVideo.videoWidth / introVideo.videoHeight;
+    const canvasRatio = canvas.width / canvas.height;
+    
+    let renderW, renderH, offsetX, offsetY;
+
+    if (canvasRatio > vidRatio) {
+      renderW = canvas.width;
+      renderH = canvas.width / vidRatio;
+      offsetX = 0;
+      offsetY = (canvas.height - renderH) / 2;
+    } else {
+      renderH = canvas.height;
+      renderW = canvas.height * vidRatio;
+      offsetX = (canvas.width - renderW) / 2;
+      offsetY = 0;
+    }
+
+    ctx.drawImage(introVideo, offsetX, offsetY, renderW, renderH);
+  } else {
+    ctx.fillStyle = '#1a1a24';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // ÉCRAN D'ACCUEIL
+  if (!gameStarted) {
+    drawHomeScreen();
+    if (gameOver) {
+      drawGameOverOverlay();
+    }
+    return;
+  }
+
+  // EN JEU
+  if (assets.bg.complete && assets.bg.naturalWidth > 0) {
+    const availableHeight = GROUND_Y;
+    const bgScale = availableHeight / assets.bg.naturalHeight;
+    const bgScaledWidth = assets.bg.naturalWidth * bgScale;
+    const currentBgX = bgX % bgScaledWidth;
+
+    ctx.drawImage(assets.bg, currentBgX, 0, bgScaledWidth, availableHeight);
+    ctx.drawImage(assets.bg, currentBgX + bgScaledWidth, 0, bgScaledWidth, availableHeight);
+    if (currentBgX + bgScaledWidth < canvas.width) {
+      ctx.drawImage(assets.bg, currentBgX + (bgScaledWidth * 2), 0, bgScaledWidth, availableHeight);
+    }
+  } else {
+    ctx.fillStyle = '#fce4ec';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  // BANDEAU NOIR DU BAS (ZONE DE JEU & ZONES DE CONTRÔLE TACTILE)
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, GROUND_Y, canvas.width, canvas.height - GROUND_Y);
+
+  platforms.forEach(p => {
+    const img = assets.platforms[p.key];
+    if (img && img.complete && img.naturalWidth > 0) {
+      ctx.drawImage(img, p.x, p.y, p.w, p.h);
+    } else {
+      ctx.fillStyle = p.key.includes('bleu') ? '#4fc3f7' : p.key.includes('rouge') ? '#e57373' : '#81c784';
+      ctx.fillRect(p.x, p.y, p.w, p.h);
+    }
+  });
+
+  let shadowTargetY = ENTITY_GROUND_Y;
+  platforms.forEach(p => {
+    const surfaceY = p.y + 14;
+    if (cat.x + cat.width > p.x && cat.x < p.x + p.w && cat.y + cat.height <= surfaceY + 20) {
+      shadowTargetY = surfaceY;
+    }
+  });
+  const jumpDistance = Math.max(0, shadowTargetY - (cat.y + cat.height));
+  const catShadowRadius = Math.max(12, 35 - (jumpDistance * 0.12));
+  const catShadowOpacity = Math.max(0.1, 0.40 - (jumpDistance * 0.002));
+  drawShadow(cat.x + cat.width / 2, shadowTargetY, catShadowRadius, 6, catShadowOpacity);
+
+  obstacles.forEach(o => {
+    const conf = assets.obstaclesConfig[o.configIdx];
+    let obsShadowY = o.y + o.h - 4;
+    let radiusX = o.w * 0.35;
+    let opacity = 0.35;
+
+    if (conf.type === 'air') {
+      let targetUnderY = ENTITY_GROUND_Y;
+      platforms.forEach(p => {
+        const surfaceY = p.y + 14;
+        if (o.x + o.w > p.x && o.x < p.x + p.w && o.y + o.h < surfaceY) {
+          targetUnderY = surfaceY;
+        }
+      });
+      obsShadowY = targetUnderY;
+      const airDistance = targetUnderY - (o.y + o.h);
+      radiusX = Math.max(15, (o.w * 0.35) - (airDistance * 0.05));
+      opacity = Math.max(0.12, 0.35 - (airDistance * 0.0015));
+    }
+
+    drawShadow(o.x + o.w / 2, obsShadowY, radiusX, 5, opacity);
+  });
+
+  obstacles.forEach(o => {
+    const conf = assets.obstaclesConfig[o.configIdx];
+    let imgToDraw = null;
+
+    if (conf.type === 'anim') {
+      imgToDraw = conf.frames[o.frame];
+    } else {
+      imgToDraw = conf.img;
+    }
+
+    if (imgToDraw && imgToDraw.complete && imgToDraw.naturalWidth > 0) {
+      if (o.flipX) {
+        ctx.save();
+        ctx.translate(o.x + o.w, o.y);
+        ctx.scale(-1, 1);
+        ctx.drawImage(imgToDraw, 0, 0, o.w, o.h);
+        ctx.restore();
+      } else {
+        ctx.drawImage(imgToDraw, o.x, o.y, o.w, o.h);
+      }
+    } else {
+      ctx.fillStyle = '#ff9800';
+      ctx.fillRect(o.x, o.y, o.w, o.h);
+    }
+  });
+
+  if (superSayen.active && superSayen.state === 'FLY') {
+    ctx.save();
+    ctx.shadowBlur = 0;
+    ctx.shadowColor = 'transparent';
+
+    const displaySize = 270;
+    const catCenterX = cat.x + (cat.width / 2);
+    const catCenterY = cat.y + cat.height - (displaySize / 2) + 40;
+
+    const trailGradient = ctx.createLinearGradient(catCenterX - 350, catCenterY, catCenterX, catCenterY);
+    trailGradient.addColorStop(0, 'rgba(255, 215, 0, 0)');
+    trailGradient.addColorStop(0.5, 'rgba(255, 223, 0, 0.35)');
+    trailGradient.addColorStop(1, 'rgba(255, 235, 59, 0.85)');
+
+    ctx.fillStyle = trailGradient;
+    ctx.beginPath();
+    ctx.moveTo(catCenterX + 20, catCenterY - 40);
+    ctx.lineTo(catCenterX - 350, catCenterY - 15);
+    ctx.lineTo(catCenterX - 350, catCenterY + 15);
+    ctx.lineTo(catCenterX + 20, catCenterY + 40);
+    ctx.closePath();
+    ctx.fill();
+
+    for (let i = 0; i < 12; i++) {
+      const pX = catCenterX - 40 - (Math.random() * 280);
+      const pY = catCenterY + (Math.random() * 70 - 35);
+      const pSize = Math.random() * 6 + 2;
+      ctx.fillStyle = Math.random() < 0.5 ? '#ffffff' : '#ffd54f';
+      ctx.fillRect(pX, pY, pSize, pSize);
+    }
+    ctx.restore();
+  }
+
+  const isBlinking = invulnerableTimer > 0 && Math.floor(invulnerableTimer / 6) % 2 === 0;
+
+  if (!isBlinking) {
+    let catSprite;
+
+    if (superSayen.active) {
+      let displaySize = 310;
+
+      if (superSayen.state === 'TRANSFORM') {
+        catSprite = assets.cat.transform[superSayen.transformFrame];
+        if (superSayen.transformFrame >= 3) {
+          displaySize = 270;
+        }
+      } else if (superSayen.state === 'FLY') {
+        catSprite = assets.cat.fly[superSayen.flyFrame];
+        displaySize = 270;
+      } else if (superSayen.state === 'LANDING') {
+        catSprite = assets.cat.transform[5];
+        displaySize = 270;
+      }
+
+      if (catSprite && catSprite.complete && catSprite.naturalWidth > 0) {
+        ctx.save();
+        if (superSayen.state === 'FLY') {
+          ctx.shadowColor = '#ffd54f';
+          ctx.shadowBlur = 20;
+        }
+
+        const drawX = cat.x + (cat.width / 2) - (displaySize / 2);
+        const drawY = cat.y + cat.height - displaySize + 40;
+
+        ctx.drawImage(catSprite, drawX, drawY, displaySize, displaySize);
+        ctx.restore();
+      }
+    } else {
+      if (cat.state === 'FAIL') {
+        catSprite = assets.cat.fail;
+      } else if (!cat.isGrounded) {
+        catSprite = assets.cat.jump[Math.min(1, cat.animFrame % 3)];
+      } else if (cat.isCrouching) {
+        catSprite = assets.cat.crouch;
+      } else if (cat.isRun4Pose) {
+        catSprite = assets.cat.run4;
+      } else {
+        catSprite = assets.cat.runSequence[cat.animFrame % 4];
+      }
+
+      if (cat.state !== 'FAIL') {
+        if (catSprite && catSprite.complete && catSprite.naturalWidth > 0) {
+          ctx.drawImage(catSprite, cat.x, cat.y, cat.width, cat.height);
+        } else {
+          ctx.fillStyle = '#ab47bc';
+          ctx.fillRect(cat.x, cat.y, cat.width, cat.height);
+        }
+      }
+    }
+  }
+
+  ctx.save();
+  ctx.shadowBlur = 0;
+  ctx.shadowColor = 'transparent';
+
+  items.forEach(it => {
+    const letterFrames = assets.letters[it.char];
+    const img = letterFrames ? letterFrames[it.frame] : null;
+
+    if (img && img.complete && img.naturalWidth > 0) {
+      ctx.drawImage(img, it.x, it.y, it.w, it.h);
+    } else {
+      ctx.fillStyle = '#ffd54f';
+      ctx.beginPath();
+      ctx.arc(it.x + it.w/2, it.y + it.h/2, 28, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#000';
+      ctx.font = 'bold 28px Courier New';
+      ctx.fillText(it.char, it.x + 20, it.y + 45);
+    }
+  });
+  ctx.restore();
+
+  ctx.fillStyle = 'rgba(0,0,0,0.65)';
+  ctx.fillRect(20, 20, 220, 45);
+  ctx.fillStyle = superSayen.active ? '#ffd54f' : '#fff';
+  ctx.font = 'bold 22px Courier New';
+  ctx.fillText(`SCORE: ${score}`, 32, 50);
+
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+  ctx.fillRect(canvas.width - 340, 20, 320, 65);
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(canvas.width - 340, 20, 320, 65);
+
+  ctx.fillStyle = '#ffd54f';
+  ctx.font = 'bold 14px Courier New';
+  ctx.fillText("ESPACE     : SAUTER", canvas.width - 325, 44);
+  ctx.fillText("FLECHE BAS : SE BAISSER", canvas.width - 325, 68);
+
+  const hudX = canvas.width - 340;
+  const hudY = canvas.height - 85;
+  ctx.fillStyle = '#000000'; 
+  ctx.fillRect(hudX - 10, hudY - 10, 335, 80);
+  ctx.strokeStyle = '#ffd54f';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(hudX - 10, hudY - 10, 335, 80);
+
+  rogerLetters.forEach((char, idx) => {
+    const slotX = hudX + (idx * 64);
+    const isCollected = rogerCollected[idx];
+    const hudImg = assets.letters[char] ? assets.letters[char][0] : null;
+
+    if (hudImg && hudImg.complete && hudImg.naturalWidth > 0) {
+      ctx.globalAlpha = isCollected ? 1.0 : 0.25;
+      ctx.drawImage(hudImg, slotX, hudY, 52, 60);
+      ctx.globalAlpha = 1.0;
+    } else {
+      ctx.fillStyle = isCollected ? '#ffd54f' : '#555';
+      ctx.font = 'bold 36px Courier New';
+      ctx.fillText(char, slotX + 14, hudY + 44);
+    }
+  });
+
+  const masterHudX = 20;
+  const masterHudY = canvas.height - 115;
+
+  rogerLetters.forEach((char, idx) => {
+    const slotX = masterHudX + (idx * 95);
+    const isWordCompleted = idx < completedWordsCount;
+
+    if (isWordCompleted) {
+      const hudImg = assets.letters[char] ? assets.letters[char][0] : null;
+      
+      const bounceOffset = Math.sin(bounceTimer + idx * 0.6) * 12;
+      const currentY = masterHudY + bounceOffset;
+
+      ctx.save();
+
+      if (freezeForSequence && idx === sequenceCurrentLetterIndex) {
+        const letterWidth = 90;
+        const letterHeight = 105;
+        
+        ctx.translate(slotX + letterWidth / 2, currentY + letterHeight / 2);
+        ctx.scale(Math.cos(sequenceAngle), 1);
+        ctx.translate(-(slotX + letterWidth / 2), -(currentY + letterHeight / 2));
+      }
+
+      if (hudImg && hudImg.complete && hudImg.naturalWidth > 0) {
+        ctx.drawImage(hudImg, slotX, currentY, 90, 105);
+      } else {
+        ctx.fillStyle = '#ffd54f';
+        ctx.font = 'bold 64px Courier New';
+        ctx.fillText(char, slotX + 15, currentY + 75);
+      }
+
+      ctx.restore();
+    }
+  });
+
+  fallingLetters.forEach(fl => {
+    const hudImg = assets.letters[fl.char] ? assets.letters[fl.char][0] : null;
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, fl.alpha);
+    ctx.translate(fl.x + 45, fl.y + 50);
+    ctx.rotate(fl.angle);
+
+    if (hudImg && hudImg.complete && hudImg.naturalWidth > 0) {
+      ctx.drawImage(hudImg, -45, -50, 90, 105);
+    } else {
+      ctx.fillStyle = '#ff3333';
+      ctx.font = 'bold 64px Courier New';
+      ctx.fillText(fl.char, -30, 25);
+    }
+    ctx.restore();
+  });
+
+  if (bonusEffectTimer > 0) {
+    ctx.save();
+    const alpha = Math.min(1, bonusEffectTimer / 30);
+    ctx.fillStyle = `rgba(255, 215, 0, ${alpha * 0.25})`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = `rgba(255, 215, 0, ${alpha})`;
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 46px Courier New';
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 5;
+    const textY = canvas.height / 2 - (90 - bonusEffectTimer);
+    ctx.strokeText('★ BONUS ROGER ! +1000 PT ★', canvas.width / 2, textY);
+    ctx.fillText('★ BONUS ROGER ! +1000 PT ★', canvas.width / 2, textY);
+    ctx.restore();
+  }
+
+  if (gameOver) {
+    drawGameOverOverlay();
+  }
+}
+
+function drawGameOverOverlay() {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.textAlign = 'center';
+  
+  ctx.fillStyle = '#ff3333';
+  ctx.font = '900 64px Courier New';
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 4;
+  ctx.strokeText("AÏE !", canvas.width / 2, 110);
+  ctx.fillText("AÏE !", canvas.width / 2, 110);
+
+  const failImg = assets.cat.fail;
+  if (failImg && failImg.complete && failImg.naturalWidth > 0) {
+    const targetHeight = 140;
+    const aspectRatio = failImg.naturalWidth / failImg.naturalHeight;
+    const targetWidth = targetHeight * aspectRatio;
+    
+    ctx.drawImage(
+      failImg, 
+      canvas.width / 2 - (targetWidth / 2), 
+      150, 
+      targetWidth, 
+      targetHeight
+    );
+  }
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 24px Courier New';
+  ctx.fillText(`SCORE FINAL: ${score}`, canvas.width / 2, 330);
+
+  ctx.textAlign = 'left';
+}
+
+function gameLoop() {
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+spawnWorldElements();
+gameLoop();
+</script>
+</body>
+</html>
