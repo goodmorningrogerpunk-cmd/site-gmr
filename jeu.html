@@ -119,7 +119,7 @@
     #restart-btn {
       display: none;
       position: absolute;
-      top: 75%;
+      top: 78%;
       left: 50%;
       transform: translate(-50%, -50%);
       padding: 16px 36px;
@@ -262,8 +262,8 @@
       Le but est d'obtenir le plus grand score. Tu gagnes des points au fur et mesure que tu avances dans le parcours. Des points bonus sont déclenchés lorsque tu passes sur une lettre dorée ou quand tu as réussi à former le mot "ROGER".
     </div>
     <ul>
-      <li>🎮 <b>ESPACE / TAP DROITE</b> : Sauter</li>
-      <li>🎮 <b>FLÈCHE BAS / TAP GAUCHE</b> : Se baisser / Descendre des plateformes</li>
+      <li>🎮 <b>ESPACE / TAP DROITE</b> : Sauter (ou Monter en Super Sayen)</li>
+      <li>🎮 <b>FLÈCHE BAS / TAP GAUCHE</b> : Se baisser (ou Descendre en Super Sayen)</li>
       <li><img src="R1.png" alt="R" class="rule-icon"> <b>LETTRES ROGER</b> : Collecte 5 petites lettres R O G E R pour créer une GROSSE lettre.</li>
       <li>❤️ <b>SYSTÈME DE VIES</b> : Chaque GROSSE lettre te protège contre un choc !</li>
     </ul>
@@ -521,7 +521,6 @@ const rogerLetters = ['R', 'O', 'G', 'E', 'R'];
 let rogerCollected = [false, false, false, false, false];
 let completedWordsCount = 0;
 
-// Variable de suivi de la séquence d'apparition des lettres
 let nextSpawnLetterIndex = 0;
 
 let invulnerableTimer = 0;
@@ -683,13 +682,11 @@ function spawnWorldElements() {
   }
 }
 
-// Génération séquentielle R -> O -> G -> E -> R dans une zone entièrement dégagée après l'obstacle
 function handleObstacleSpawned(obsX, obsY, obsW) {
   obstacleCounter++;
   if (obstacleCounter % 3 === 0) {
     const char = rogerLetters[nextSpawnLetterIndex];
     
-    // Positionnement 120px après la fin de l'obstacle pour éviter tout chevauchement
     const safeX = obsX + obsW + 120;
     const safeY = ENTITY_GROUND_Y - 100;
     
@@ -775,17 +772,29 @@ function handleTouchAction(e, isTouchStart) {
   for (let i = 0; i < e.touches.length; i++) {
     const touch = e.touches[i];
     const touchX = (touch.clientX - rect.left) * (canvas.width / rect.width);
-    const touchY = (touch.clientY - rect.top) * (canvas.height / rect.height);
 
-    if (touchY >= GROUND_Y) {
-      if (gameOver) {
-        if (isTouchStart) {
-          startBgMusic();
-          resetGame();
-        }
-        return;
+    if (gameOver) {
+      if (isTouchStart) {
+        startBgMusic();
+        resetGame();
       }
+      return;
+    }
 
+    if (superSayen.active && superSayen.state === 'FLY') {
+      // MODE SUPER SAYEN :
+      // Côté GAUCHE = BAS
+      // Côté DROIT = HAUT
+      if (touchX < canvas.width / 2) {
+        keys['ArrowDown'] = isTouchStart;
+      } else {
+        keys['ArrowUp'] = isTouchStart;
+        keys['Space'] = isTouchStart;
+      }
+    } else {
+      // MODE NORMAL :
+      // Côté GAUCHE = BAISSER
+      // Côté DROIT = SAUTER
       if (touchX < canvas.width / 2) {
         keys['ArrowDown'] = isTouchStart;
       } else {
@@ -815,7 +824,6 @@ canvas.addEventListener('touchend', (e) => {
   }
 }, { passive: false });
 
-// FONCTION DE PASSAGE EN PLEIN ÉCRAN SUR SMARTPHONE
 function requestGameFullscreen() {
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
                  || (window.matchMedia && window.matchMedia("(max-width: 900px) and (pointer: coarse)").matches);
@@ -1607,27 +1615,28 @@ function drawGameOverOverlay() {
   ctx.font = '900 64px Courier New';
   ctx.strokeStyle = '#ffffff';
   ctx.lineWidth = 4;
-  ctx.strokeText("AÏE !", canvas.width / 2, 110);
-  ctx.fillText("AÏE !", canvas.width / 2, 110);
+  ctx.strokeText("AÏE !", canvas.width / 2, 100);
+  ctx.fillText("AÏE !", canvas.width / 2, 100);
+
+  ctx.fillStyle = '#ffd54f';
+  ctx.font = 'bold 28px Courier New';
+  ctx.fillText(`SCORE FINAL: ${score}`, canvas.width / 2, 150);
 
   const failImg = assets.cat.fail;
   if (failImg && failImg.complete && failImg.naturalWidth > 0) {
-    const targetHeight = 140;
+    const targetHeight = 150;
     const aspectRatio = failImg.naturalWidth / failImg.naturalHeight;
     const targetWidth = targetHeight * aspectRatio;
     
     ctx.drawImage(
       failImg, 
       canvas.width / 2 - (targetWidth / 2), 
-      150, 
+      180, 
       targetWidth, 
       targetHeight
     );
   }
 
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 24px Courier New';
-  ctx.fillText(`SCORE FINAL: ${score}`, canvas.width / 2, 330);
   ctx.textAlign = 'left';
 }
 
