@@ -155,6 +155,27 @@ input[type="password"] {
     transition: 0.3s;
 }
 .btn-pro:hover { background: #fff; transform: scale(1.1); }
+
+.btn-launch-game {
+    background: #FFD700;
+    color: #1a1a24;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 2rem;
+    padding: 18px 36px;
+    border: 3px solid #ffffff;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 6px 0px #b29320, 0 10px 20px rgba(0,0,0,0.8);
+    transition: all 0.2s ease;
+    margin-top: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.btn-launch-game:hover {
+    background: #ffe082;
+    transform: scale(1.05);
+}
+
 #error-msg { color: #ff4d4d; font-weight: bold; margin-top: 20px; display: none; }
 
 /* 4. STYLE DU BLOC CONTACT */
@@ -201,6 +222,7 @@ html {
     input[type="password"] { width: 100%; }
     .btn-pro { width: 100%; margin-top: 10px; }
     .contact-title-cyan { font-size: 1.8rem; }
+    .btn-launch-game { font-size: 1.5rem; padding: 14px 24px; }
 }
     </style>
 </head>
@@ -237,13 +259,23 @@ html {
         <p id="error-msg">Oups, c'est pas le bon code !</p>
     </div>
 
-    <!-- CONTENEUR DU JEU MASQUÉ PAR DÉFAUT -->
-    <div id="game-secret-container" class="pro-container" style="display: none; max-width: 850px;">
-        <h2 style="font-family: 'Bebas Neue', sans-serif; color: #12C3FF; font-size: 2.5rem; margin: 0 0 15px 0;">
+    <!-- 1. PAGE INTERMÉDIAIRE D'ACCUEIL DU JEU -->
+    <div id="game-welcome-container" class="pro-container" style="display: none;">
+        <h2 style="font-family: 'Bebas Neue', sans-serif; color: #12C3FF; font-size: 2.8rem; margin-bottom: 10px;">
             SECRET UNLOCKED: SKATE CAT RUNNER 🛹🐱
         </h2>
-        <div style="position: relative; width: 100%; overflow: hidden; border-radius: 8px; border: 2px solid #12C3FF;">
-            <iframe id="gameIframe" src="" width="800" height="450" style="border: none; width: 100%; max-width: 100%; display: block; margin: 0 auto;"></iframe>
+        <p style="font-size: 1.2rem; color: #e0e0e0; margin-bottom: 20px;">
+            Prêt à aider Roger à faire le meilleur score en skate ?
+        </p>
+        <button class="btn-launch-game" onclick="launchGame()">
+            JOUER à Good Morning Roger Sk8in' Cat
+        </button>
+    </div>
+
+    <!-- 2. CONTENEUR DU JEU AVEC IFRAME -->
+    <div id="game-secret-container" class="pro-container" style="display: none; max-width: 980px;">
+        <div style="position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; border: 2px solid #12C3FF;">
+            <iframe id="gameIframe" src="" width="960" height="540" style="border: none; width: 100%; height: 100%; display: block;" allow="fullscreen"></iframe>
         </div>
     </div>
 
@@ -291,17 +323,15 @@ html {
         function verify() {
             const inputVal = document.getElementById('passInput').value.trim();
             const error = document.getElementById('error-msg');
-            const gameContainer = document.getElementById('game-secret-container');
             const loginContainer = document.getElementById('pro-login-container');
-            const iframe = document.getElementById('gameIframe');
+            const welcomeContainer = document.getElementById('game-welcome-container');
 
             // 1. VÉRIFICATION CODE SECRET JEU VIDEO ("sk8")
             if (inputVal.toLowerCase() === "sk8") {
                 error.style.display = "none";
                 loginContainer.style.display = "none"; // Masque le formulaire de connexion
-                iframe.src = "jeu.html"; // Charge le jeu vidéo
-                gameContainer.style.display = "block"; // Affiche l'écran du jeu
-                gameContainer.scrollIntoView({ behavior: 'smooth' });
+                welcomeContainer.style.display = "block"; // Affiche la page avec le bouton Jouer
+                welcomeContainer.scrollIntoView({ behavior: 'smooth' });
                 return;
             }
 
@@ -313,6 +343,18 @@ html {
                 error.style.display = "block";
                 document.getElementById('passInput').value = "";
             }
+        }
+
+        // LANCEMENT DU JEU
+        function launchGame() {
+            const welcomeContainer = document.getElementById('game-welcome-container');
+            const gameContainer = document.getElementById('game-secret-container');
+            const iframe = document.getElementById('gameIframe');
+
+            welcomeContainer.style.display = "none"; // Masque le bouton de lancement
+            iframe.src = "jeu.html"; // Charge le jeu vidéo
+            gameContainer.style.display = "block"; // Affiche le jeu
+            gameContainer.scrollIntoView({ behavior: 'smooth' });
         }
 
         document.getElementById('passInput').addEventListener('keypress', function (e) {
