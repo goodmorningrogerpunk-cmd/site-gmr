@@ -272,7 +272,7 @@ html {
         </button>
     </div>
 
-    <!-- 2. CONTENEUR DU JEU AVEC IFRAME -->
+    <!-- 2. CONTENEUR DU JEU AVEC IFRAME (ORDINATEUR) -->
     <div id="game-secret-container" class="pro-container" style="display: none; max-width: 980px;">
         <div style="position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; border: 2px solid #12C3FF;">
             <iframe id="gameIframe" src="" width="960" height="540" style="border: none; width: 100%; height: 100%; display: block;" allow="fullscreen"></iframe>
@@ -345,16 +345,25 @@ html {
             }
         }
 
-        // LANCEMENT DU JEU
+        // LANCEMENT DU JEU (SOLUTION 1 ADAPTÉE)
         function launchGame() {
-            const welcomeContainer = document.getElementById('game-welcome-container');
-            const gameContainer = document.getElementById('game-secret-container');
-            const iframe = document.getElementById('gameIframe');
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+                           || (window.matchMedia && window.matchMedia("(max-width: 900px) and (pointer: coarse)").matches);
 
-            welcomeContainer.style.display = "none"; // Masque le bouton de lancement
-            iframe.src = "jeu.html"; // Charge le jeu vidéo
-            gameContainer.style.display = "block"; // Affiche le jeu
-            gameContainer.scrollIntoView({ behavior: 'smooth' });
+            // Sur mobile : Redirection directe pour ouvrir le jeu en plein écran réel
+            if (isMobile) {
+                window.location.href = "jeu.html";
+            } else {
+                // Sur ordinateur : Affichage intégré dans la page pro
+                const welcomeContainer = document.getElementById('game-welcome-container');
+                const gameContainer = document.getElementById('game-secret-container');
+                const iframe = document.getElementById('gameIframe');
+
+                welcomeContainer.style.display = "none";
+                iframe.src = "jeu.html";
+                gameContainer.style.display = "block";
+                gameContainer.scrollIntoView({ behavior: 'smooth' });
+            }
         }
 
         document.getElementById('passInput').addEventListener('keypress', function (e) {
