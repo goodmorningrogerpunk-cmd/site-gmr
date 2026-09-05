@@ -810,21 +810,31 @@ canvas.addEventListener('touchend', (e) => {
   }
 }, { passive: false });
 
-// DETECTE ET ACTIVE LE MODE PLEIN ECRAN UNIQUEMENT SUR SMARTPHONE/TABLETTE
-function enableMobileFullscreen() {
+// FONCTION DE PASSAGE EN PLEIN ÉCRAN SUR SMARTPHONE
+function requestGameFullscreen() {
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
-                   || (window.matchMedia && window.matchMedia("(max-width: 900px) and (pointer: coarse)").matches);
-  
+                 || (window.matchMedia && window.matchMedia("(max-width: 900px) and (pointer: coarse)").matches);
+
   if (isMobile) {
     gameContainer.classList.add('mobile-fullscreen');
+
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen().catch(() => {});
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen().catch(() => {});
+    }
+
     if (screen.orientation && screen.orientation.lock) {
       screen.orientation.lock('landscape').catch(() => {});
     }
+
+    window.scrollTo(0, 1);
   }
 }
 
 startMainBtn.addEventListener('click', () => {
-  enableMobileFullscreen();
+  requestGameFullscreen();
   
   if (introVideo) {
     introVideo.pause();
@@ -867,7 +877,7 @@ function resetGame() {
   lastObstacleX = -1000;
   obstacleCounter = 0;
   completedWordsCount = 0;
-  nextSpawnLetterIndex = 0; // Réinitialise l'ordre d'apparition sur R
+  nextSpawnLetterIndex = 0;
   invulnerableTimer = 0;
   fallingLetters = [];
   superSayen.active = false;
