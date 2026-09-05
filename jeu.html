@@ -521,6 +521,9 @@ const rogerLetters = ['R', 'O', 'G', 'E', 'R'];
 let rogerCollected = [false, false, false, false, false];
 let completedWordsCount = 0;
 
+// Variable de suivi de la séquence d'apparition des lettres
+let nextSpawnLetterIndex = 0;
+
 let invulnerableTimer = 0;
 let fallingLetters = [];
 
@@ -680,21 +683,23 @@ function spawnWorldElements() {
   }
 }
 
+// Génération séquentielle R -> O -> G -> E -> R
 function handleObstacleSpawned(obsX, obsY, obsW) {
   obstacleCounter++;
   if (obstacleCounter % 3 === 0) {
-    const randLetterIdx = Math.floor(Math.random() * 5);
-    const char = rogerLetters[randLetterIdx];
+    const char = rogerLetters[nextSpawnLetterIndex];
     items.push({
       x: obsX + (obsW / 2) - 32, 
       y: Math.max(50, obsY - 90), 
       w: 65, 
       h: 75,
       char: char, 
-      letterIdx: randLetterIdx, 
+      letterIdx: nextSpawnLetterIndex, 
       frame: 0, 
       animTimer: 0
     });
+
+    nextSpawnLetterIndex = (nextSpawnLetterIndex + 1) % rogerLetters.length;
   }
 }
 
@@ -862,6 +867,7 @@ function resetGame() {
   lastObstacleX = -1000;
   obstacleCounter = 0;
   completedWordsCount = 0;
+  nextSpawnLetterIndex = 0; // Réinitialise l'ordre d'apparition sur R
   invulnerableTimer = 0;
   fallingLetters = [];
   superSayen.active = false;
