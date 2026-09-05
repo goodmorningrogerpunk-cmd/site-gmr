@@ -259,7 +259,7 @@
   <div id="rules-modal" class="game-modal">
     <h2>RÈGLES ET CONTRÔLES</h2>
     <div class="goal-text">
-      Le but est d'obtenir le plus grand score. Tu gagnes des points au fur et mesure que tu avances dans le parcours. Des points bonus sont déclenchés lorsque tu passes sur une lettre dorée ou quand tu as réussi à former le mot "ROGER".
+      Le but est d'obtenir le plus grand score. Tu gagnes des points au fur et mesure que tu advances dans le parcours. Des points bonus sont déclenchés lorsque tu passes sur une lettre dorée ou quand tu as réussi à former le mot "ROGER".
     </div>
     <ul>
       <li>🎮 <b>ESPACE / TAP DROITE</b> : Sauter (ou Monter en Super Sayen)</li>
@@ -637,22 +637,6 @@ function spawnWorldElements() {
     const newPlat = { x, y: targetY, w, h: 65, key: `${color}_${type}` };
     platforms.push(newPlat);
 
-    // Occasionnellement placer une lettre isolée sur la plateforme sans obstacle
-    if (type !== 'short' && Math.random() < 0.35) {
-      const char = rogerLetters[nextSpawnLetterIndex];
-      items.push({
-        x: x + (w / 2) - 32,
-        y: targetY - 80,
-        w: 65,
-        h: 75,
-        char: char,
-        letterIdx: nextSpawnLetterIndex,
-        frame: 0,
-        animTimer: 0
-      });
-      nextSpawnLetterIndex = (nextSpawnLetterIndex + 1) % rogerLetters.length;
-    }
-
     if (type !== 'short' && Math.random() < 0.60 && (x - lastObstacleX) > 200) {
       const platIndices = [0, 1, 3, 4];
       const configIdx = platIndices[Math.floor(Math.random() * platIndices.length)];
@@ -700,20 +684,24 @@ function spawnWorldElements() {
 
 function handleObstacleSpawned(obsX, obsY, obsW) {
   obstacleCounter++;
-  if (obstacleCounter % 3 === 0) {
+  if (obstacleCounter % 2 === 0) {
     const char = rogerLetters[nextSpawnLetterIndex];
-    const lastObs = obstacles[obstacles.length - 1];
     
-    let letterX = obsX + (obsW / 2) - 32;
-    let letterY;
-
-    // Obstacle aérien -> Lettre passe en bas (se baisser)
-    if (lastObs && lastObs.type === 'air') {
-      letterY = ENTITY_GROUND_Y - 45; 
-    } 
-    // Obstacle au sol -> Lettre au-dessus de l'obstacle (sauter)
-    else {
-      letterY = Math.max(40, obsY - 110); 
+    // Positionner la lettre NETTEMENT APRÈS l'obstacle pour éviter TOUTE superposition
+    const letterX = obsX + obsW + 160 + (Math.random() * 80);
+    
+    // Varier les hauteurs de spawn (au sol, en l'air, ou mi-hauteur)
+    const heights = [
+      ENTITY_GROUND_Y - 75, // Hauteur normale (au sol)
+      ENTITY_GROUND_Y - 180, // En l'air (nécessite un saut)
+      ENTITY_GROUND_Y - 250  // Très haut
+    ];
+    
+    // Si la lettre tombe sur une plateforme, s'ajuster dessus
+    let letterY = heights[Math.floor(Math.random() * heights.length)];
+    const matchingPlat = platforms.find(p => letterX + 65 > p.x && letterX < p.x + p.w);
+    if (matchingPlat) {
+      letterY = matchingPlat.y - 75;
     }
 
     items.push({
@@ -808,9 +796,6 @@ function handleTouchAction(e, isTouchStart) {
     }
 
     if (superSayen.active && superSayen.state === 'FLY') {
-      // MODE SUPER SAYEN :
-      // Côté GAUCHE = BAS
-      // Côté DROIT = HAUT
       if (touchX < canvas.width / 2) {
         keys['ArrowDown'] = isTouchStart;
       } else {
@@ -818,9 +803,6 @@ function handleTouchAction(e, isTouchStart) {
         keys['Space'] = isTouchStart;
       }
     } else {
-      // MODE NORMAL :
-      // Côté GAUCHE = BAISSER
-      // Côté DROIT = SAUTER
       if (touchX < canvas.width / 2) {
         keys['ArrowDown'] = isTouchStart;
       } else {
@@ -1318,6 +1300,7 @@ function drawHomeScreen() {
 
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.textAlign = 'left';
 
   if (!gameStarted) {
     drawHomeScreen();
