@@ -14,19 +14,19 @@
       -webkit-touch-callout: none;
       touch-action: none;
     }
-    body {
+    html, body {
+      width: 100%;
+      height: 100%;
       background-color: #1a1a24;
+      font-family: 'Courier New', Courier, monospace;
+      color: #ffffff;
+      overflow: hidden;
+    }
+    body {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      font-family: 'Courier New', Courier, monospace;
-      color: #ffffff;
-      overflow: hidden;
-      position: fixed;
-      width: 100%;
-      height: 100%;
     }
     #game-container {
       position: relative;
@@ -38,6 +38,14 @@
       overflow: hidden;
       border: 4px solid #2e2e40;
       background: #000;
+    }
+    /* Mode plein écran mobile */
+    #game-container:fullscreen, #game-container:-webkit-full-screen {
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: none !important;
+      border-radius: 0 !important;
+      border: none !important;
     }
     canvas {
       width: 100%;
@@ -76,10 +84,6 @@
       background-color: #ffe082;
       transform: translateY(-52%);
     }
-    #start-main-btn:active {
-      transform: translateY(-48%);
-      box-shadow: 0 2px 0px #b29320;
-    }
 
     .right-buttons-stack {
       position: absolute;
@@ -101,16 +105,7 @@
       box-shadow: 0 4px 0px #000, 0 6px 12px rgba(0,0,0,0.7);
       text-align: center;
     }
-    .secondary-btn:hover {
-      background-color: #2a2a38;
-      color: #fff;
-      transform: translateY(-2px);
-    }
-    .secondary-btn:active {
-      transform: translateY(1px);
-      box-shadow: 0 1px 0px #000;
-    }
-    
+
     #restart-btn {
       display: none;
       position: absolute;
@@ -177,7 +172,7 @@
       object-fit: contain;
       image-rendering: pixelated;
     }
-    
+
     .modal-close-btn {
       display: block;
       margin: 0 auto;
@@ -188,12 +183,7 @@
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
-      text-shadow: none;
       box-shadow: 0 4px 0px #b29320;
-    }
-    .modal-close-btn:active {
-      transform: translateY(2px);
-      box-shadow: 0 2px 0px #b29320;
     }
 
     /* --- OVERLAY ORIENTATION MOBILES --- */
@@ -259,13 +249,13 @@
   <div id="rules-modal" class="game-modal">
     <h2>RÈGLES ET CONTRÔLES</h2>
     <div class="goal-text">
-      Le but est d'obtenir le plus grand score. Tu gagnes des points au fur et mesure que tu avance dans le parcours. Des points bonus sont déclenchés lorsque tu passes sur une lettre doré ou quand tu as réussi à former le mot "ROGER" par exemple. Attention à éviter les obstacles sur ta route !
+      Le but est d'obtenir le plus grand score. Tu gagnes des points au fur et mesure que tu avances dans le parcours. Des points bonus sont déclenchés lorsque tu passes sur une lettre dorée ou quand tu as réussi à former le mot "ROGER".
     </div>
     <ul>
       <li>🎮 <b>ESPACE / TAP DROITE</b> : Sauter</li>
       <li>🎮 <b>FLÈCHE BAS / TAP GAUCHE</b> : Se baisser / Descendre des plateformes</li>
-      <li><img src="R1.png" alt="R" class="rule-icon"> <b>LETTRES ROGER</b> : Collecte 5 petites lettres R O G E R pour créer une GROSSE lettre et écrire R O G E R en gros.</li>
-      <li>❤️ <b>SYSTÈME DE VIES</b> : Chaque GROSSE lettre accumulée en bas à gauche te protège contre un choc !</li>
+      <li><img src="R1.png" alt="R" class="rule-icon"> <b>LETTRES ROGER</b> : Collecte 5 petites lettres R O G E R pour créer une GROSSE lettre.</li>
+      <li>❤️ <b>SYSTÈME DE VIES</b> : Chaque GROSSE lettre te protège contre un choc !</li>
     </ul>
     <button id="close-rules-btn" class="pixel-btn modal-close-btn">FERMER</button>
   </div>
@@ -278,9 +268,9 @@
 </div>
 
 <script>
-// Prévention des menus contextuels au toucher long
 document.addEventListener('contextmenu', e => e.preventDefault());
 
+const gameContainer = document.getElementById('game-container');
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
@@ -292,7 +282,6 @@ const restartBtn = document.getElementById('restart-btn');
 
 const rulesModal = document.getElementById('rules-modal');
 const closeRulesBtn = document.getElementById('close-rules-btn');
-
 const aboutModal = document.getElementById('about-modal');
 const closeAboutBtn = document.getElementById('close-about-btn');
 
@@ -390,7 +379,6 @@ function playSoundEffect(sound) {
 
 function transitionSuperSayanToNormal() {
   if (fadeInterval) clearInterval(fadeInterval);
-  
   bgMusic.muted = false;
   bgMusic.volume = 0;
   
@@ -400,7 +388,6 @@ function transitionSuperSayanToNormal() {
   fadeInterval = setInterval(() => {
     step++;
     const progress = step / fadeSteps;
-    
     superSayanTheme.volume = Math.max(0, 1.0 * (1 - progress));
     bgMusic.volume = Math.min(0.8, 0.8 * progress);
     
@@ -414,6 +401,7 @@ function transitionSuperSayanToNormal() {
   }, 50);
 }
 
+// NOUVEAU : Chargement sécurisé qui force l'actualisation si le sprite est déjà chargé
 function loadSmartImage(baseName) {
   const img = new Image();
   const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG'];
@@ -527,13 +515,11 @@ let completedWordsCount = 0;
 let invulnerableTimer = 0;
 let fallingLetters = [];
 
-// --- ETAT CINÉMATIQUE FREEZE & ANIMATION LETTRES GAUCHE ---
 let freezeForSequence = false;
 let sequenceCurrentLetterIndex = 0;
 let sequenceAngle = 0;
 let bounceTimer = 0;
 
-// --- ETAT SUPER SAYEN ---
 const superSayen = {
   active: false,
   state: 'NONE', 
@@ -716,6 +702,10 @@ function drawShadow(centerX, centerY, radiusX, radiusY, opacity = 0.35) {
 const keys = {};
 
 window.addEventListener('keydown', (e) => {
+  if (['Space', 'ArrowUp', 'ArrowDown'].includes(e.code)) {
+    e.preventDefault();
+  }
+
   unlockAudio();
   keys[e.code] = true;
 
@@ -757,7 +747,6 @@ window.addEventListener('keyup', (e) => {
   }
 });
 
-// --- GESTION DES COMMANDES TACTILES DANS LA BANDE NOIRE DU CANVAS ---
 function handleTouchAction(e, isTouchStart) {
   if (!gameStarted || rulesModal.style.display === 'block' || aboutModal.style.display === 'block') return;
 
@@ -768,7 +757,6 @@ function handleTouchAction(e, isTouchStart) {
     const touchX = (touch.clientX - rect.left) * (canvas.width / rect.width);
     const touchY = (touch.clientY - rect.top) * (canvas.height / rect.height);
 
-    // Si le toucher est dans la bande noire inférieure
     if (touchY >= GROUND_Y) {
       if (gameOver) {
         if (isTouchStart) {
@@ -779,10 +767,8 @@ function handleTouchAction(e, isTouchStart) {
       }
 
       if (touchX < canvas.width / 2) {
-        // Côté GAUCHE : Se baisser
         keys['ArrowDown'] = isTouchStart;
       } else {
-        // Côté DROITE : Sauter
         keys['Space'] = isTouchStart;
         keys['ArrowUp'] = isTouchStart;
         if (!isTouchStart) cat.isJumping = false;
@@ -809,8 +795,21 @@ canvas.addEventListener('touchend', (e) => {
   }
 }, { passive: false });
 
-// GESTION DES BOUTONS IHM
+// --- NOUVEAU : ACTIVATION DU PLEIN ÉCRAN ET ORIENTATION PAYSAGE SUR MOBILE ---
+function requestFullscreenAndLandscape() {
+  if (gameContainer.requestFullscreen) {
+    gameContainer.requestFullscreen().catch(() => {});
+  } else if (gameContainer.webkitRequestFullscreen) {
+    gameContainer.webkitRequestFullscreen();
+  }
+
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock('landscape').catch(() => {});
+  }
+}
+
 startMainBtn.addEventListener('click', () => {
+  requestFullscreenAndLandscape();
   if (introVideo) {
     introVideo.pause();
   }
@@ -966,11 +965,9 @@ function update() {
 
       if (superSayen.timer >= 450) {
         superSayen.state = 'LANDING';
-        
         obstacles = obstacles.filter(o => o.x < cat.x - 100 || o.x > cat.x + 800);
         platforms = platforms.filter(p => p.x < cat.x - 100 || p.x > cat.x + 800);
         lastObstacleX = canvas.width + 500;
-
         transitionSuperSayanToNormal();
       }
     } else if (superSayen.state === 'LANDING') {
@@ -1024,7 +1021,6 @@ function update() {
       cat.jumpTimer = 0;
       cat.isRun4Pose = false;
       cat.state = 'RUN';
-      
       stopRunSound();
       playSoundEffect(sounds.jump);
     }
@@ -1037,22 +1033,18 @@ function update() {
     }
 
     cat.isCrouching = downPressed;
-
     cat.vy += GRAVITY;
     cat.y += cat.vy;
   }
 
-  // Box de collision par défaut (Mode normal)
   let catBoxX = cat.x + 25;
   let catBoxWidth = cat.width - 50;
   let catBoxY = cat.isCrouching ? cat.y + 60 : cat.y + 12;
   let catBoxHeight = cat.isCrouching ? 45 : cat.height - 24;
 
-  // Hitbox du chat en vol Super Sayen
   if (superSayen.active && superSayen.state === 'FLY') {
     const hitBoxHeight = 110;
     const speedBuffer = currentGameSpeed * 2.0;
-    
     catBoxX = cat.x + (cat.width / 2) - 45 - speedBuffer;
     catBoxWidth = 90 + (speedBuffer * 2);
     catBoxY = cat.y + (cat.height / 2) - (hitBoxHeight / 2);
@@ -1099,7 +1091,6 @@ function update() {
     if (!cat.wasGrounded && cat.isGrounded) {
       playSoundEffect(sounds.reception);
     }
-
     if (cat.isGrounded) {
       playRunSound();
     } else {
@@ -1159,13 +1150,11 @@ function update() {
 
   items.forEach(it => {
     it.x -= currentGameSpeed;
-    
     it.animTimer++;
     if (it.animTimer % 6 === 0) {
       it.frame = (it.frame + 1) % 8;
     }
 
-    // Zone de ramassage élargie en mode vol Super Sayen (effet aimant)
     let hitW = it.w;
     let hitH = it.h;
     let hitX = it.x;
@@ -1186,9 +1175,7 @@ function update() {
     );
 
     if (itemHit) {
-      // +100 points à chaque lettre dorée collectée
       score += 100;
-
       const targetIndices = [];
       rogerLetters.forEach((char, idx) => {
         if (char === it.char) targetIndices.push(idx);
@@ -1211,7 +1198,6 @@ function update() {
         
         if (completedWordsCount < 5) {
           completedWordsCount++;
-          
           if (completedWordsCount === 5) {
             freezeForSequence = true;
             sequenceCurrentLetterIndex = 0;
@@ -1243,7 +1229,6 @@ function drawHomeScreen() {
   if (introVideo.readyState >= 2) {
     const vidRatio = introVideo.videoWidth / introVideo.videoHeight;
     const canvasRatio = canvas.width / canvas.height;
-    
     let renderW, renderH, offsetX, offsetY;
 
     if (canvasRatio > vidRatio) {
@@ -1268,7 +1253,6 @@ function drawHomeScreen() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // ÉCRAN D'ACCUEIL
   if (!gameStarted) {
     drawHomeScreen();
     if (gameOver) {
@@ -1277,7 +1261,7 @@ function draw() {
     return;
   }
 
-  // EN JEU
+  // AFFICHAGE DU FOND DE JEU
   if (assets.bg.complete && assets.bg.naturalWidth > 0) {
     const availableHeight = GROUND_Y;
     const bgScale = availableHeight / assets.bg.naturalHeight;
@@ -1290,11 +1274,10 @@ function draw() {
       ctx.drawImage(assets.bg, currentBgX + (bgScaledWidth * 2), 0, bgScaledWidth, availableHeight);
     }
   } else {
-    ctx.fillStyle = '#fce4ec';
+    ctx.fillStyle = '#1a1a24';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  // BANDEAU NOIR DU BAS (ZONE DE JEU & ZONES DE CONTRÔLE TACTILE)
   ctx.fillStyle = '#000000';
   ctx.fillRect(0, GROUND_Y, canvas.width, canvas.height - GROUND_Y);
 
@@ -1345,13 +1328,7 @@ function draw() {
 
   obstacles.forEach(o => {
     const conf = assets.obstaclesConfig[o.configIdx];
-    let imgToDraw = null;
-
-    if (conf.type === 'anim') {
-      imgToDraw = conf.frames[o.frame];
-    } else {
-      imgToDraw = conf.img;
-    }
+    let imgToDraw = (conf.type === 'anim') ? conf.frames[o.frame] : conf.img;
 
     if (imgToDraw && imgToDraw.complete && imgToDraw.naturalWidth > 0) {
       if (o.flipX) {
@@ -1409,12 +1386,9 @@ function draw() {
 
     if (superSayen.active) {
       let displaySize = 310;
-
       if (superSayen.state === 'TRANSFORM') {
         catSprite = assets.cat.transform[superSayen.transformFrame];
-        if (superSayen.transformFrame >= 3) {
-          displaySize = 270;
-        }
+        if (superSayen.transformFrame >= 3) displaySize = 270;
       } else if (superSayen.state === 'FLY') {
         catSprite = assets.cat.fly[superSayen.flyFrame];
         displaySize = 270;
@@ -1429,10 +1403,8 @@ function draw() {
           ctx.shadowColor = '#ffd54f';
           ctx.shadowBlur = 20;
         }
-
         const drawX = cat.x + (cat.width / 2) - (displaySize / 2);
         const drawY = cat.y + cat.height - displaySize + 40;
-
         ctx.drawImage(catSprite, drawX, drawY, displaySize, displaySize);
         ctx.restore();
       }
@@ -1532,16 +1504,13 @@ function draw() {
 
     if (isWordCompleted) {
       const hudImg = assets.letters[char] ? assets.letters[char][0] : null;
-      
       const bounceOffset = Math.sin(bounceTimer + idx * 0.6) * 12;
       const currentY = masterHudY + bounceOffset;
 
       ctx.save();
-
       if (freezeForSequence && idx === sequenceCurrentLetterIndex) {
         const letterWidth = 90;
         const letterHeight = 105;
-        
         ctx.translate(slotX + letterWidth / 2, currentY + letterHeight / 2);
         ctx.scale(Math.cos(sequenceAngle), 1);
         ctx.translate(-(slotX + letterWidth / 2), -(currentY + letterHeight / 2));
@@ -1601,7 +1570,6 @@ function draw() {
 function drawGameOverOverlay() {
   ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-
   ctx.textAlign = 'center';
   
   ctx.fillStyle = '#ff3333';
@@ -1629,7 +1597,6 @@ function drawGameOverOverlay() {
   ctx.fillStyle = '#ffffff';
   ctx.font = 'bold 24px Courier New';
   ctx.fillText(`SCORE FINAL: ${score}`, canvas.width / 2, 330);
-
   ctx.textAlign = 'left';
 }
 
