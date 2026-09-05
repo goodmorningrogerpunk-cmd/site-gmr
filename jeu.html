@@ -29,7 +29,6 @@
       justify-content: center;
     }
     
-    /* Conteneur standard (Ordinateur) */
     #game-container {
       position: relative;
       width: 100%;
@@ -43,7 +42,6 @@
       transition: all 0.2s ease;
     }
 
-    /* Fullscreen adaptatif uniquement déclenché sur smartphone */
     #game-container.mobile-fullscreen {
       position: fixed !important;
       top: 0 !important;
@@ -65,7 +63,6 @@
       image-rendering: crisp-edges;
     }
 
-    /* --- BOUTONS PIXEL ART --- */
     .pixel-btn {
       font-family: 'Courier New', Courier, monospace;
       font-weight: bold;
@@ -131,7 +128,6 @@
       z-index: 20;
     }
 
-    /* --- MODALS --- */
     .game-modal {
       display: none;
       position: absolute;
@@ -196,7 +192,6 @@
       box-shadow: 0 4px 0px #b29320;
     }
 
-    /* --- OVERLAY ORIENTATION MOBILES --- */
     #rotate-device-overlay {
       display: none;
       position: fixed;
@@ -259,7 +254,7 @@
   <div id="rules-modal" class="game-modal">
     <h2>RÈGLES ET CONTRÔLES</h2>
     <div class="goal-text">
-      Le but est d'obtenir le plus grand score. Tu gagnes des points au fur et mesure que tu advances dans le parcours. Des points bonus sont déclenchés lorsque tu passes sur une lettre dorée ou quand tu as réussi à former le mot "ROGER".
+      Le but est d'obtenir le plus grand score. Tu gagnes des points au fur et mesure que tu avances dans le parcours. Des points bonus sont déclenchés lorsque tu passes sur une lettre dorée ou quand tu as réussi à former le mot "ROGER".
     </div>
     <ul>
       <li>🎮 <b>ESPACE / TAP DROITE</b> : Sauter (ou Monter en Super Sayen)</li>
@@ -295,14 +290,12 @@ const closeRulesBtn = document.getElementById('close-rules-btn');
 const aboutModal = document.getElementById('about-modal');
 const closeAboutBtn = document.getElementById('close-about-btn');
 
-// --- VIDÉO ACCUEIL ---
 const introVideo = document.createElement('video');
 introVideo.src = 'video_intro_gmr_skate.mp4';
 introVideo.loop = true;
 introVideo.muted = true;
 introVideo.playsInline = true;
 
-// --- SYSTÈME AUDIO ---
 const bgMusic = new Audio('roger_8bitok.mp3');
 bgMusic.loop = true;
 bgMusic.volume = 0.8; 
@@ -426,7 +419,6 @@ function loadSmartImage(baseName) {
   return img;
 }
 
-// --- ASSETS ---
 const assets = {
   bg: loadSmartImage('background'),
   cat: {
@@ -500,7 +492,6 @@ function getObstacleDimensions(conf) {
   return { w, h };
 }
 
-// --- PHYSIQUE & ETAT ---
 const BASE_GAME_SPEED = 6.5;
 let currentGameSpeed = BASE_GAME_SPEED;
 const GROUND_Y = 430;        
@@ -522,6 +513,7 @@ let rogerCollected = [false, false, false, false, false];
 let completedWordsCount = 0;
 
 let nextSpawnLetterIndex = 0;
+let lastLetterX = -1000; // Protection anti-doublon
 
 let invulnerableTimer = 0;
 let fallingLetters = [];
@@ -685,19 +677,21 @@ function spawnWorldElements() {
 function handleObstacleSpawned(obsX, obsY, obsW) {
   obstacleCounter++;
   if (obstacleCounter % 2 === 0) {
+    const letterX = obsX + obsW + 180 + (Math.random() * 60);
+
+    // Sécurité absolue : empêcher toute apparition de lettre trop proche de la précédente
+    if (letterX - lastLetterX < 280) {
+      return;
+    }
+
     const char = rogerLetters[nextSpawnLetterIndex];
     
-    // Positionner la lettre NETTEMENT APRÈS l'obstacle pour éviter TOUTE superposition
-    const letterX = obsX + obsW + 160 + (Math.random() * 80);
-    
-    // Varier les hauteurs de spawn (au sol, en l'air, ou mi-hauteur)
     const heights = [
-      ENTITY_GROUND_Y - 75, // Hauteur normale (au sol)
-      ENTITY_GROUND_Y - 180, // En l'air (nécessite un saut)
-      ENTITY_GROUND_Y - 250  // Très haut
+      ENTITY_GROUND_Y - 75,
+      ENTITY_GROUND_Y - 180,
+      ENTITY_GROUND_Y - 250
     ];
     
-    // Si la lettre tombe sur une plateforme, s'ajuster dessus
     let letterY = heights[Math.floor(Math.random() * heights.length)];
     const matchingPlat = platforms.find(p => letterX + 65 > p.x && letterX < p.x + p.w);
     if (matchingPlat) {
@@ -715,6 +709,7 @@ function handleObstacleSpawned(obsX, obsY, obsW) {
       animTimer: 0
     });
 
+    lastLetterX = letterX;
     nextSpawnLetterIndex = (nextSpawnLetterIndex + 1) % rogerLetters.length;
   }
 }
@@ -728,7 +723,6 @@ function drawShadow(centerX, centerY, radiusX, radiusY, opacity = 0.35) {
   ctx.restore();
 }
 
-// --- CONTRÔLES CLAVIER & TACTILE ---
 const keys = {};
 
 window.addEventListener('keydown', (e) => {
@@ -896,6 +890,7 @@ function resetGame() {
   gameStarted = true;
   bonusEffectTimer = 0;
   lastObstacleX = -1000;
+  lastLetterX = -1000;
   obstacleCounter = 0;
   completedWordsCount = 0;
   nextSpawnLetterIndex = 0;
@@ -1016,6 +1011,7 @@ function update() {
         obstacles = obstacles.filter(o => o.x < cat.x - 100 || o.x > cat.x + 800);
         platforms = platforms.filter(p => p.x < cat.x - 100 || p.x > cat.x + 800);
         lastObstacleX = canvas.width + 500;
+        lastLetterX = canvas.width + 500;
         transitionSuperSayanToNormal();
       }
     } else if (superSayen.state === 'LANDING') {
@@ -1044,6 +1040,7 @@ function update() {
         });
 
         lastObstacleX = cat.x + 400;
+        lastLetterX = cat.x + 400;
       }
     }
   } else {
@@ -1052,6 +1049,7 @@ function update() {
 
   bgX -= currentGameSpeed * 0.4;
   lastObstacleX -= currentGameSpeed;
+  lastLetterX -= currentGameSpeed;
 
   if (!superSayen.active) {
     if (downPressed && cat.isPlatformGrounded) {
