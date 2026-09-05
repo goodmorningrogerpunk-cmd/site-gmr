@@ -259,7 +259,7 @@ html {
         <p id="error-msg">Oups, c'est pas le bon code !</p>
     </div>
 
-    <!-- 1. PAGE INTERMÉDIAIRE D'ACCUEIL DU JEU -->
+    <!-- PAGE INTERMÉDIAIRE D'ACCUEIL DU JEU -->
     <div id="game-welcome-container" class="pro-container" style="display: none;">
         <h2 style="font-family: 'Bebas Neue', sans-serif; color: #12C3FF; font-size: 2.8rem; margin-bottom: 10px;">
             SECRET UNLOCKED: SKATE CAT RUNNER 🛹🐱
@@ -270,13 +270,6 @@ html {
         <button class="btn-launch-game" onclick="launchGame()">
             JOUER à Good Morning Roger Sk8in' Cat
         </button>
-    </div>
-
-    <!-- 2. CONTENEUR DU JEU AVEC IFRAME (ORDINATEUR) -->
-    <div id="game-secret-container" class="pro-container" style="display: none; max-width: 980px;">
-        <div style="position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; border: 2px solid #12C3FF;">
-            <iframe id="gameIframe" src="" width="960" height="540" style="border: none; width: 100%; height: 100%; display: block;" allow="fullscreen"></iframe>
-        </div>
     </div>
 
     <div class="pro-container">
@@ -345,25 +338,9 @@ html {
             }
         }
 
-        // LANCEMENT DU JEU (SOLUTION 1 ADAPTÉE)
+        // REDIRECTION DIRECTE VERS LE JEU SUR SA PAGE D'ACCUEIL
         function launchGame() {
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
-                           || (window.matchMedia && window.matchMedia("(max-width: 900px) and (pointer: coarse)").matches);
-
-            // Sur mobile : Redirection directe pour ouvrir le jeu en plein écran réel
-            if (isMobile) {
-                window.location.href = "jeu.html";
-            } else {
-                // Sur ordinateur : Affichage intégré dans la page pro
-                const welcomeContainer = document.getElementById('game-welcome-container');
-                const gameContainer = document.getElementById('game-secret-container');
-                const iframe = document.getElementById('gameIframe');
-
-                welcomeContainer.style.display = "none";
-                iframe.src = "jeu.html";
-                gameContainer.style.display = "block";
-                gameContainer.scrollIntoView({ behavior: 'smooth' });
-            }
+            window.location.href = "jeu.html";
         }
 
         document.getElementById('passInput').addEventListener('keypress', function (e) {
