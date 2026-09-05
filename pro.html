@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="chat_tete.png">
     <link rel="apple-touch-icon" href="chat_tete.png">
     <style>
-/* 1. POLICES LOCALES (MISES À JOUR POUR CORRESPONDRE À L'INDEX) */
+/* 1. POLICES LOCALES */
 @font-face {
   font-family: 'Bebas Neue';
   font-style: normal;
@@ -199,13 +199,7 @@ html {
     h1 { font-size: 2.8rem; }
     .logo-wrapper { max-width: 320px; }
     input[type="password"] { width: 100%; }
-    .contact-title-cyan { font-size: 1.8rem; }
-}
-        @media (max-width: 800px) {
-    h1 { font-size: 2.8rem; }
-    .logo-wrapper { max-width: 320px; }
-    input[type="password"] { width: 100%; }
-    .btn-pro { width: 100%; margin-top: 10px; } /* Ajoute cette ligne */
+    .btn-pro { width: 100%; margin-top: 10px; }
     .contact-title-cyan { font-size: 1.8rem; }
 }
     </style>
@@ -230,7 +224,7 @@ html {
 
     <h1>ESPACE PRO</h1>
 
-    <div class="pro-container">
+    <div class="pro-container" id="pro-login-container">
         <p style="font-size: 1.2rem;">
             Tu as programmé <strong>Good Morning Roger</strong> ? Très bon choix !<br><br>
             En te connectant ici, tu trouveras tout ce qu'il faut pour ta communication <br>(photos, vidéos, textes...)
@@ -241,6 +235,16 @@ html {
             <button class="btn-pro" onclick="verify()">VALIDER</button>
         </div>
         <p id="error-msg">Oups, c'est pas le bon code !</p>
+    </div>
+
+    <!-- CONTENEUR DU JEU MASQUÉ PAR DÉFAUT -->
+    <div id="game-secret-container" class="pro-container" style="display: none; max-width: 850px;">
+        <h2 style="font-family: 'Bebas Neue', sans-serif; color: #12C3FF; font-size: 2.5rem; margin: 0 0 15px 0;">
+            SECRET UNLOCKED: SKATE CAT RUNNER 🛹🐱
+        </h2>
+        <div style="position: relative; width: 100%; overflow: hidden; border-radius: 8px; border: 2px solid #12C3FF;">
+            <iframe id="gameIframe" src="" width="800" height="450" style="border: none; width: 100%; max-width: 100%; display: block; margin: 0 auto;"></iframe>
+        </div>
     </div>
 
     <div class="pro-container">
@@ -257,10 +261,10 @@ html {
                 <img src="logomail.png" class="img-mail" alt="Contact">
             </a>
             <div style="margin-top: 10px;">
-            <a href="mailto:goodmorningroger.punk@gmail.com" style="color: #fff; font-weight: bold; text-decoration: none; font-size: 1.1rem;">
-                goodmorningroger.punk@gmail.com
+                <a href="mailto:goodmorningroger.punk@gmail.com" style="color: #fff; font-weight: bold; text-decoration: none; font-size: 1.1rem;">
+                    goodmorningroger.punk@gmail.com
                 </a>
-        </div>
+            </div>
         </div>
 
         <div style="margin-top: 40px; margin-bottom: 20px;">
@@ -277,24 +281,40 @@ html {
     </div>
 
     <footer style="padding: 40px 0; text-align: center;">
-    <p style="font-size: 0.7rem; color: #444; text-transform: uppercase; letter-spacing: 2px;">
-        © 2026 Good Morning Roger - Clisson, France | 
-        <a href="mentions-legales.html" style="color: #444; text-decoration: none; border-bottom: 1px solid #444;">Mentions Légales</a>
-    </p>
-</footer>
+        <p style="font-size: 0.7rem; color: #444; text-transform: uppercase; letter-spacing: 2px;">
+            © 2026 Good Morning Roger - Clisson, France | 
+            <a href="mentions-legales.html" style="color: #444; text-decoration: none; border-bottom: 1px solid #444;">Mentions Légales</a>
+        </p>
+    </footer>
 
     <script>
         function verify() {
-            const inputVal = document.getElementById('passInput').value;
+            const inputVal = document.getElementById('passInput').value.trim();
             const error = document.getElementById('error-msg');
+            const gameContainer = document.getElementById('game-secret-container');
+            const loginContainer = document.getElementById('pro-login-container');
+            const iframe = document.getElementById('gameIframe');
+
+            // 1. VÉRIFICATION CODE SECRET JEU VIDEO ("sk8")
+            if (inputVal.toLowerCase() === "sk8") {
+                error.style.display = "none";
+                loginContainer.style.display = "none"; // Masque le formulaire de connexion
+                iframe.src = "jeu.html"; // Charge le jeu vidéo
+                gameContainer.style.display = "block"; // Affiche l'écran du jeu
+                gameContainer.scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
+
+            // 2. VÉRIFICATION CODE ACCÈS ESPACE PRO ("GMRchat")
             if (btoa(inputVal) === "R01SY2hhdA==") {
                 window.open("https://drive.google.com/drive/folders/12jIgEcx42RbfitwHfGqMaTeCGtrOwEV7?usp=drive_link", "_blank");
-            error.style.display = "none";
+                error.style.display = "none";
             } else {
                 error.style.display = "block";
                 document.getElementById('passInput').value = "";
             }
         }
+
         document.getElementById('passInput').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') verify();
         });
