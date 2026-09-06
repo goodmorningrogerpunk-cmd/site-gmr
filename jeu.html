@@ -443,6 +443,12 @@
 </div>
 
 <script>
+// CONFIGURATION GOOGLE FORMS
+const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScUTfXrzeEMICD6qd0xO1kFRONA26Roie8UswMismRyeLI1JQ/formResponse';
+const ENTRY_PSEUDO    = 'entry.1092302864';
+const ENTRY_EMAIL     = 'entry.1741606296';
+const ENTRY_SCORE     = 'entry.1451417508';
+
 document.addEventListener('contextmenu', e => e.preventDefault());
 
 const gameContainer = document.getElementById('game-container');
@@ -1243,13 +1249,18 @@ saveScoreForm.addEventListener('submit', (e) => {
   saveBtn.disabled = true;
   saveBtn.textContent = 'ENVOI...';
 
-  // Envoi à Formspree
-  fetch('https://formspree.io/f/xbgjawae', {
+  // Envoi des données vers Google Forms
+  const formData = new FormData();
+  formData.append(ENTRY_PSEUDO, pseudo);
+  formData.append(ENTRY_EMAIL, email);
+  formData.append(ENTRY_SCORE, score);
+
+  fetch(GOOGLE_FORM_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: JSON.stringify({ pseudo: pseudo, email: email, score: score })
+    mode: 'no-cors',
+    body: formData
   })
-  .then(res => {
+  .then(() => {
     saveLocalScore(pseudo, score);
     saveScoreModal.style.display = 'none';
     saveBtn.disabled = false;
