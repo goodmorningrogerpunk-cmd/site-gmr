@@ -224,6 +224,7 @@
       text-align: center;
     }
 
+    /* Fenêtre de Saisie */
     #save-score-modal {
       display: none;
       position: absolute;
@@ -233,7 +234,7 @@
       width: 92%;
       max-width: 500px;
       max-height: 85vh;
-      overflow-y: scroll !important;
+      overflow-y: auto !important;
       -webkit-overflow-scrolling: touch !important;
       touch-action: pan-y !important;
       background: #111118;
@@ -244,14 +245,40 @@
       text-align: center;
     }
 
+    /* Ajustement ultra-haut quand le clavier est actif */
     #save-score-modal.keyboard-active {
       top: 0px !important;
       left: 50% !important;
       transform: translateX(-50%) !important;
-      height: 50vh !important;
-      max-height: 200px !important;
+      height: auto !important;
+      max-height: 48vh !important;
       border-top: none;
       border-radius: 0 0 8px 8px;
+      padding: 4px 10px 8px 10px !important;
+    }
+
+    #save-score-modal.keyboard-active h2 {
+      font-size: 13px !important;
+      margin-bottom: 2px !important;
+    }
+
+    #save-score-modal.keyboard-active .score-input-group {
+      margin: 3px 0 !important;
+    }
+
+    #save-score-modal.keyboard-active label {
+      font-size: 10px !important;
+    }
+
+    #save-score-modal.keyboard-active input {
+      padding: 4px 6px !important;
+      font-size: 14px !important;
+    }
+
+    #save-score-modal.keyboard-active #save-btn {
+      margin-top: 5px !important;
+      padding: 4px 14px !important;
+      font-size: 12px !important;
     }
 
     .choice-btns {
@@ -596,7 +623,7 @@ function requestGameFullscreen() {
     }
 
     setTimeout(() => {
-      window.scrollTo(0, 1);
+      window.scrollTo(0, 0);
     }, 100);
   }
 }
@@ -608,8 +635,9 @@ function focusAndScroll(el) {
     if (giftNotice) giftNotice.style.display = 'none';
   }
   setTimeout(() => {
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, 100);
+    el.scrollIntoView({ behavior: 'auto', block: 'start' });
+    saveScoreModal.scrollTop = el.offsetTop - 10;
+  }, 50);
 }
 
 const inputs = [inputPseudo, inputEmail];
