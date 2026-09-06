@@ -128,35 +128,7 @@
       z-index: 20;
     }
 
-    /* Mobile Quick UI Overlay Buttons (P and R) */
-    .mobile-hud-btn {
-      display: none;
-      position: absolute;
-      top: 15px;
-      width: 42px;
-      height: 42px;
-      background-color: #111118;
-      border: 3px solid #ffd54f;
-      color: #ffd54f;
-      font-size: 20px;
-      font-weight: bold;
-      border-radius: 8px;
-      z-index: 40;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 0px #000;
-    }
-    .mobile-hud-btn:active {
-      transform: translateY(2px);
-      box-shadow: 0 2px 0px #000;
-    }
-    #mobile-pause-btn {
-      right: 65px;
-    }
-    #mobile-home-btn {
-      right: 15px;
-    }
-
+    /* Modals */
     .game-modal {
       display: none;
       position: absolute;
@@ -169,7 +141,7 @@
       border: 4px solid #ffd54f;
       border-radius: 8px;
       padding: 24px;
-      z-index: 50;
+      z-index: 30;
       box-shadow: 0 0 30px rgba(0,0,0,0.9);
       color: #fff;
     }
@@ -180,7 +152,7 @@
       font-size: 24px;
     }
     .game-modal .goal-text {
-      font-size: 13px;
+      font-size: 14px;
       line-height: 1.5;
       color: #e0e0e0;
       margin-bottom: 18px;
@@ -189,12 +161,9 @@
       padding: 10px 14px;
       border-radius: 4px;
     }
-    .game-modal .goal-text p {
-      margin-bottom: 4px;
-    }
     .game-modal ul {
       list-style-type: none;
-      font-size: 13px;
+      font-size: 14px;
       line-height: 1.5;
       margin-bottom: 20px;
     }
@@ -222,6 +191,30 @@
       font-weight: bold;
       cursor: pointer;
       box-shadow: 0 4px 0px #b29320;
+    }
+
+    /* Boutons Pause et Retour Accueil pour Mobile */
+    #mobile-hud-controls {
+      display: none;
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      gap: 8px;
+      z-index: 40;
+    }
+    .hud-touch-btn {
+      width: 42px;
+      height: 42px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid #ffd54f;
+      color: #ffd54f;
+      font-weight: bold;
+      font-size: 18px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
     }
 
     #rotate-device-overlay {
@@ -280,23 +273,25 @@
     <button id="rules-btn" class="pixel-btn secondary-btn">RÈGLES & CONTRÔLES</button>
     <button id="about-btn" class="pixel-btn secondary-btn">EN SAVOIR PLUS</button>
   </div>
+
+  <div id="mobile-hud-controls">
+    <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
+    <button id="mobile-home-btn" class="hud-touch-btn">R</button>
+  </div>
   
   <button id="restart-btn" class="pixel-btn">RECOMMENCER</button>
-
-  <button id="mobile-pause-btn" class="pixel-btn mobile-hud-btn">P</button>
-  <button id="mobile-home-btn" class="pixel-btn mobile-hud-btn">R</button>
   
   <div id="rules-modal" class="game-modal">
     <h2>RÈGLES ET CONTRÔLES</h2>
     <div class="goal-text">
-      <p style="font-weight: bold; color: #ffd54f;">But du jeu</p>
-      <p>Obtiens le plus grand score. Tu gagnes des points :</p>
-      <p>- en avançant dans le parcours (50 pts par seconde)</p>
-      <p>- en collectant des lettres dorées (100 pts)</p>
-      <p>- en formant le mot ROGER avec les lettres dorées (1000 pts)</p>
+      <b>But du jeu</b><br>
+      Obtiens le plus grand score. Tu gagnes des points :<br>
+      - En avançant dans le parcours (50 pts par seconde)<br>
+      - En collectant des lettres dorées (100 pts)<br>
+      - En formant le mot ROGER avec les lettres dorées (1000 pts)
     </div>
-    <ul id="rules-list-content">
-      <!-- Dynamic populating by platform (PC vs Mobile) -->
+    <ul id="rules-list">
+      <!-- Rempli en JS selon Mobile ou PC -->
     </ul>
     <button id="close-rules-btn" class="pixel-btn modal-close-btn">FERMER</button>
   </div>
@@ -311,9 +306,6 @@
 <script>
 document.addEventListener('contextmenu', e => e.preventDefault());
 
-const isMobilePlatform = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
-                 || (window.matchMedia && window.matchMedia("(max-width: 900px) and (pointer: coarse)").matches);
-
 const gameContainer = document.getElementById('game-container');
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -323,14 +315,16 @@ const rightStack = document.getElementById('right-stack');
 const rulesBtn = document.getElementById('rules-btn');
 const aboutBtn = document.getElementById('about-btn');
 const restartBtn = document.getElementById('restart-btn');
+
+const mobileHudControls = document.getElementById('mobile-hud-controls');
 const mobilePauseBtn = document.getElementById('mobile-pause-btn');
 const mobileHomeBtn = document.getElementById('mobile-home-btn');
 
 const rulesModal = document.getElementById('rules-modal');
+const rulesList = document.getElementById('rules-list');
 const closeRulesBtn = document.getElementById('close-rules-btn');
 const aboutModal = document.getElementById('about-modal');
 const closeAboutBtn = document.getElementById('close-about-btn');
-const rulesListContent = document.getElementById('rules-list-content');
 
 const introVideo = document.createElement('video');
 introVideo.src = 'video_intro_gmr_skate.mp4';
@@ -338,6 +332,7 @@ introVideo.loop = true;
 introVideo.muted = true;
 introVideo.playsInline = true;
 
+// Musiques
 const introMusic = new Audio('ecranintro.mp3');
 introMusic.loop = true;
 introMusic.volume = 0.8;
@@ -370,11 +365,15 @@ sounds.speedFly.volume = 0.15;
 
 let audioUnlocked = false;
 let fadeInterval = null;
-let gamePaused = false;
+let isPaused = false;
+
+const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+                 || (window.matchMedia && window.matchMedia("(max-width: 900px) and (pointer: coarse)").matches);
 
 function unlockAudio() {
   if (!audioUnlocked) {
-    introMusic.play().then(() => {
+    sounds.run.play().then(() => {
+      sounds.run.pause();
       audioUnlocked = true;
     }).catch(() => {});
   }
@@ -382,12 +381,7 @@ function unlockAudio() {
 
 function playIntroMusic() {
   unlockAudio();
-  bgMusic.pause();
-  bgMusic.currentTime = 0;
-  superSayanTheme.pause();
-  superSayanTheme.currentTime = 0;
-  
-  if (introMusic.paused) {
+  if (introMusic.paused && !gameStarted) {
     introMusic.play().catch(() => {});
   }
 }
@@ -424,7 +418,7 @@ function stopAllSounds() {
 }
 
 function playRunSound() {
-  if (audioUnlocked && gameStarted && !gameOver && !gamePaused && cat.isGrounded && !superSayen.active && !freezeForSequence) {
+  if (audioUnlocked && gameStarted && !gameOver && !isPaused && cat.isGrounded && !superSayen.active && !freezeForSequence) {
     if (sounds.run.paused) {
       sounds.run.currentTime = 0;
       sounds.run.play().catch(() => {});
@@ -439,35 +433,41 @@ function stopRunSound() {
 }
 
 function playSoundEffect(sound) {
-  if (audioUnlocked && !gamePaused) {
+  if (audioUnlocked && !isPaused) {
     sound.currentTime = 0;
     sound.play().catch(() => {});
   }
 }
 
-function updateRulesModalContent() {
-  if (isMobilePlatform) {
-    rulesListContent.innerHTML = `
-      <li>🎮 <b>Tap droite</b> : Sauter (appui court ou long pour ajuster le niveau du saut)</li>
-      <li>🎮 <b>Tap gauche</b> : Se baisser</li>
-      <li><img src="R1.png" alt="R" class="rule-icon"> <b>Lettres ROGER</b> : collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
-      <li>❤️ <b>Système de vies</b> : Chaque GROSSE lettre te protège contre un choc. Une surprise t’attend si tu obtiens 5 GROSSES lettres R O G E R.</li>
-      <li>⏸️ <b>Bouton [P]</b> : Mettre le jeu en pause / Reprendre le jeu</li>
-      <li>🚪 <b>Bouton [R]</b> : Revenir à l’écran d’accueil</li>
-    `;
+function togglePause() {
+  if (!gameStarted || gameOver) return;
+  isPaused = !isPaused;
+  if (isPaused) {
+    stopRunSound();
+    if (!bgMusic.paused) bgMusic.pause();
+    if (!superSayanTheme.paused) superSayanTheme.pause();
   } else {
-    rulesListContent.innerHTML = `
-      <li>🎮 <b>Espace</b> : Sauter (appui court ou long pour ajuster le niveau du saut)</li>
-      <li>🎮 <b>Flèche du bas</b> : Se baisser</li>
-      <li><img src="R1.png" alt="R" class="rule-icon"> <b>Lettres ROGER</b> : collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
-      <li>❤️ <b>Système de vies</b> : Chaque GROSSE lettre te protège contre un choc. Une surprise t’attend si tu obtiens 5 GROSSES lettres R O G E R.</li>
-      <li>⏸️ <b>Entrée</b> : Mettre le jeu en pause / Reprendre le jeu</li>
-      <li>🚪 <b>Echap</b> : Revenir à l’écran d’accueil</li>
-    `;
+    if (superSayen.active) {
+      superSayanTheme.play().catch(() => {});
+    } else {
+      bgMusic.play().catch(() => {});
+    }
   }
 }
 
-updateRulesModalContent();
+function returnToHome() {
+  gameStarted = false;
+  gameOver = false;
+  isPaused = false;
+  superSayen.active = false;
+  freezeForSequence = false;
+  startMainBtn.style.display = 'block';
+  rightStack.style.display = 'flex';
+  mobileHudControls.style.display = 'none';
+  gameContainer.classList.remove('mobile-fullscreen');
+  stopAllSounds();
+  playIntroMusic();
+}
 
 function transitionSuperSayanToNormal() {
   if (fadeInterval) clearInterval(fadeInterval);
@@ -815,39 +815,8 @@ function drawShadow(centerX, centerY, radiusX, radiusY, opacity = 0.35) {
 
 const keys = {};
 
-function togglePause() {
-  if (!gameStarted || gameOver) return;
-  gamePaused = !gamePaused;
-  if (gamePaused) {
-    stopRunSound();
-    if (bgMusic) bgMusic.pause();
-    if (superSayanTheme) superSayanTheme.pause();
-  } else {
-    if (superSayen.active) {
-      superSayanTheme.play().catch(() => {});
-    } else {
-      bgMusic.play().catch(() => {});
-    }
-  }
-}
-
-function returnToHome() {
-  gameStarted = false;
-  gameOver = false;
-  gamePaused = false;
-  superSayen.active = false;
-  freezeForSequence = false;
-  startMainBtn.style.display = 'block';
-  rightStack.style.display = 'flex';
-  mobilePauseBtn.style.display = 'none';
-  mobileHomeBtn.style.display = 'none';
-  gameContainer.classList.remove('mobile-fullscreen');
-  stopAllSounds();
-  playIntroMusic();
-}
-
 window.addEventListener('keydown', (e) => {
-  if (['Space', 'ArrowUp', 'ArrowDown', 'Enter'].includes(e.code)) {
+  if (['Space', 'ArrowUp', 'ArrowDown'].includes(e.code)) {
     e.preventDefault();
   }
 
@@ -858,9 +827,22 @@ window.addEventListener('keydown', (e) => {
     return;
   }
 
-  if (gamePaused) return;
+  if (e.code === 'Escape') {
+    if (rulesModal.style.display === 'block') {
+      rulesModal.style.display = 'none';
+    } else if (aboutModal.style.display === 'block') {
+      aboutModal.style.display = 'none';
+    } else {
+      returnToHome();
+    }
+    return;
+  }
 
-  keys[e.code] = true;
+  if (isPaused) return;
+
+  if (!e.repeat) {
+    keys[e.code] = true;
+  }
 
   if (e.code === 'Space' && gameOver) {
     startBgMusic();
@@ -875,16 +857,6 @@ window.addEventListener('keydown', (e) => {
   if ((e.key === 'r' || e.key === 'R' || e.code === 'KeyR') && gameStarted && !gameOver && !superSayen.active) {
     cat.isRun4Pose = true;
   }
-
-  if (e.code === 'Escape') {
-    if (rulesModal.style.display === 'block') {
-      rulesModal.style.display = 'none';
-    } else if (aboutModal.style.display === 'block') {
-      aboutModal.style.display = 'none';
-    } else {
-      returnToHome();
-    }
-  }
 });
 
 window.addEventListener('keyup', (e) => {
@@ -898,10 +870,8 @@ window.addEventListener('keyup', (e) => {
 function handleTouchAction(e, isTouchStart) {
   if (!gameStarted || rulesModal.style.display === 'block' || aboutModal.style.display === 'block') return;
 
-  if (gamePaused) {
-    if (isTouchStart) {
-      togglePause();
-    }
+  if (isPaused) {
+    if (isTouchStart) togglePause();
     return;
   }
 
@@ -957,18 +927,8 @@ canvas.addEventListener('touchend', (e) => {
   }
 }, { passive: false });
 
-mobilePauseBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  togglePause();
-});
-
-mobileHomeBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  returnToHome();
-});
-
 function requestGameFullscreen() {
-  if (isMobilePlatform) {
+  if (isMobileDevice) {
     gameContainer.classList.add('mobile-fullscreen');
 
     const elem = document.documentElement;
@@ -986,6 +946,28 @@ function requestGameFullscreen() {
   }
 }
 
+function updateRulesText() {
+  if (isMobileDevice) {
+    rulesList.innerHTML = `
+      <li>🎮 <b>Espace / Tap droite</b> : (Appui court ou long pour ajuster le niveau du saut)</li>
+      <li>🎮 <b>Tap gauche</b> : Se baisser</li>
+      <li><img src="R1.png" alt="R" class="rule-icon"> <b>Lettres ROGER</b> : Collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
+      <li>❤️ <b>Système de vies</b> : Chaque GROSSE lettre te protège contre un choc. Une surprise t'attend si tu obtiens 5 GROSSES lettres R O G E R.</li>
+      <li>⏸️ <b>Bouton P</b> : Mettre le jeu en pause / Reprendre le jeu</li>
+      <li>🏠 <b>Bouton R</b> : Revenir à l'écran d'accueil</li>
+    `;
+  } else {
+    rulesList.innerHTML = `
+      <li>🎮 <b>Espace</b> : Sauter (Appui court ou long pour ajuster le niveau du saut)</li>
+      <li>🎮 <b>Flèche du bas</b> : Se baisser</li>
+      <li><img src="R1.png" alt="R" class="rule-icon"> <b>Lettres ROGER</b> : Collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
+      <li>❤️ <b>Système de vies</b> : Chaque GROSSE lettre te protège contre un choc. Une surprise t'attend si tu obtiens 5 GROSSES lettres R O G E R.</li>
+      <li>⏸️ <b>Entrée</b> : Mettre le jeu en pause / Reprendre le jeu</li>
+      <li>🏠 <b>Echap</b> : Revenir à l'écran d'accueil</li>
+    `;
+  }
+}
+
 startMainBtn.addEventListener('click', () => {
   requestGameFullscreen();
   
@@ -994,18 +976,16 @@ startMainBtn.addEventListener('click', () => {
   }
   startMainBtn.style.display = 'none';
   rightStack.style.display = 'none';
-  
-  if (isMobilePlatform) {
-    mobilePauseBtn.style.display = 'flex';
-    mobileHomeBtn.style.display = 'flex';
+  if (isMobileDevice) {
+    mobileHudControls.style.display = 'flex';
   }
-
   startBgMusic();
   resetGame();
 });
 
 rulesBtn.addEventListener('click', () => {
-  unlockAudio();
+  playIntroMusic();
+  updateRulesText();
   rulesModal.style.display = 'block';
 });
 
@@ -1014,7 +994,7 @@ closeRulesBtn.addEventListener('click', () => {
 });
 
 aboutBtn.addEventListener('click', () => {
-  unlockAudio();
+  playIntroMusic();
   aboutModal.style.display = 'block';
 });
 
@@ -1027,12 +1007,31 @@ restartBtn.addEventListener('click', () => {
   resetGame();
 });
 
+mobilePauseBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  togglePause();
+});
+
+mobileHomeBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  returnToHome();
+});
+
+window.addEventListener('load', () => {
+  playIntroMusic();
+  updateRulesText();
+});
+
+document.addEventListener('click', () => {
+  if (!gameStarted) playIntroMusic();
+}, { once: true });
+
 function resetGame() {
   score = 0;
   lastScoreTime = Date.now();
   gameOver = false;
   gameStarted = true;
-  gamePaused = false;
+  isPaused = false;
   bonusEffectTimer = 0;
   lastObstacleX = -1000;
   lastLetterX = -1000;
@@ -1067,7 +1066,7 @@ function resetGame() {
 }
 
 function update() {
-  if (!gameStarted || gameOver || gamePaused) {
+  if (!gameStarted || gameOver || isPaused) {
     stopRunSound();
     return;
   }
@@ -1420,8 +1419,6 @@ function update() {
 }
 
 function drawHomeScreen() {
-  playIntroMusic();
-
   if (introVideo.paused) {
     introVideo.play().catch(() => {});
   }
@@ -1654,41 +1651,33 @@ function draw() {
   });
   ctx.restore();
 
-  // Score display
+  // Affichage Score
   ctx.fillStyle = 'rgba(0,0,0,0.65)';
   ctx.fillRect(20, 20, 220, 45);
   ctx.fillStyle = superSayen.active ? '#ffd54f' : '#fff';
   ctx.font = 'bold 22px Courier New';
   ctx.fillText(`SCORE: ${score}`, 32, 50);
 
-  // Top Right HUD
-  if (isMobilePlatform) {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
-    ctx.fillRect(canvas.width - 340, 20, 210, 65);
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(canvas.width - 340, 20, 210, 65);
+  // HUD d'aide en haut à droite
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+  ctx.fillRect(canvas.width - 340, 20, 320, 65);
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(canvas.width - 340, 20, 320, 65);
 
-    ctx.fillStyle = '#ffd54f';
-    ctx.font = 'bold 13px Courier New';
-    ctx.fillText("TAP DROITE : SAUTER", canvas.width - 325, 44);
-    ctx.fillText("TAP GAUCHE : SE BAISSER", canvas.width - 325, 68);
+  ctx.fillStyle = '#ffd54f';
+  ctx.font = 'bold 13px Courier New';
+  if (isMobileDevice) {
+    ctx.fillText("TAP DROITE  : SAUTER", canvas.width - 325, 40);
+    ctx.fillText("TAP GAUCHE  : SE BAISSER", canvas.width - 325, 58);
+    ctx.fillText("BOUTON P    : PAUSE", canvas.width - 325, 76);
   } else {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
-    ctx.fillRect(canvas.width - 340, 20, 320, 85);
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(canvas.width - 340, 20, 320, 85);
-
-    ctx.fillStyle = '#ffd54f';
-    ctx.font = 'bold 12px Courier New';
-    ctx.fillText("ESPACE     : SAUTER", canvas.width - 325, 38);
-    ctx.fillText("FLECHE BAS : SE BAISSER", canvas.width - 325, 54);
-    ctx.fillText("ENTREE     : PAUSE", canvas.width - 325, 70);
-    ctx.fillText("ECHAP      : ACCUEIL", canvas.width - 325, 86);
+    ctx.fillText("ESPACE : SAUTER | BAS : BAISSER", canvas.width - 325, 40);
+    ctx.fillText("ENTRÉE : PAUSE", canvas.width - 325, 58);
+    ctx.fillText("ECHAP  : ACCUEIL", canvas.width - 325, 76);
   }
 
-  // Letters Collected HUD
+  // HUD des lettres ROGER
   const hudX = canvas.width - 340;
   const hudY = canvas.height - 85;
   ctx.fillStyle = '#000000'; 
@@ -1780,25 +1769,24 @@ function draw() {
     ctx.restore();
   }
 
-  // Pause Overlay Screen
-  if (gamePaused) {
-    ctx.save();
+  // Écran de Pause Overlay
+  if (isPaused) {
     ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
     ctx.textAlign = 'center';
+
     ctx.fillStyle = '#ffd54f';
-    ctx.font = 'bold 36px Courier New';
+    ctx.font = '900 48px Courier New';
     ctx.fillText("PARTIE EN PAUSE", canvas.width / 2, canvas.height / 2 - 20);
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 18px Courier New';
-    if (isMobilePlatform) {
-      ctx.fillText("Appuyer de nouveau sur l'écran pour reprendre la partie", canvas.width / 2, canvas.height / 2 + 30);
+    ctx.font = 'bold 20px Courier New';
+    if (isMobileDevice) {
+      ctx.fillText("Appuyer de nouveau l'écran pour reprendre la partie", canvas.width / 2, canvas.height / 2 + 40);
     } else {
-      ctx.fillText("Appuyer sur Entrée pour reprendre la partie", canvas.width / 2, canvas.height / 2 + 30);
+      ctx.fillText("Appuyer sur Entrée pour reprendre la partie", canvas.width / 2, canvas.height / 2 + 40);
     }
-    ctx.restore();
+    ctx.textAlign = 'left';
   }
 
   if (gameOver) {
