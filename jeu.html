@@ -523,7 +523,7 @@ let freezeForSequence = false;
 let sequenceCurrentLetterIndex = 0;
 let sequenceAngle = 0;
 let bounceTimer = 0;
-let touchJumpLock = false;
+let jumpKeyReleased = true; // Verrou qui exige de relâcher la touche avant de ressauter
 
 const superSayen = {
   active: false,
@@ -768,8 +768,9 @@ window.addEventListener('keydown', (e) => {
 
 window.addEventListener('keyup', (e) => {
   keys[e.code] = false;
-  if (e.code === 'Space') {
+  if (e.code === 'Space' || e.code === 'ArrowUp') {
     cat.isJumping = false;
+    jumpKeyReleased = true; // Libère le verrou au relâchement de la touche
   }
 });
 
@@ -783,7 +784,7 @@ function handleTouchAction(e, isTouchStart) {
     keys['Space'] = false;
     keys['ArrowUp'] = false;
     cat.isJumping = false;
-    touchJumpLock = false;
+    jumpKeyReleased = true; // Libère le verrou au levé du doigt
     return;
   }
 
@@ -808,10 +809,8 @@ function handleTouchAction(e, isTouchStart) {
       if (touchX < canvas.width / 2) {
         keys['ArrowDown'] = true;
       } else {
-        if (!touchJumpLock) {
-          keys['Space'] = true;
-          keys['ArrowUp'] = true;
-        }
+        keys['Space'] = true;
+        keys['ArrowUp'] = true;
       }
     }
   }
@@ -907,7 +906,7 @@ function resetGame() {
   sequenceAngle = 0;
   baseSpeedMultiplier = 1.0;
   currentGameSpeed = BASE_GAME_SPEED;
-  touchJumpLock = false;
+  jumpKeyReleased = true;
   
   cat.y = ENTITY_GROUND_Y - cat.height;
   cat.vy = 0;
@@ -973,7 +972,7 @@ function update() {
   baseSpeedMultiplier = Math.pow(1.15, speedLevel);
   const effectiveBaseSpeed = BASE_GAME_SPEED * baseSpeedMultiplier;
 
-  const jumpPressed = !!keys['Space'];
+  const jumpPressed = !!(keys['Space'] || keys['ArrowUp']);
   const flyUpPressed = !!(keys['Space'] || keys['ArrowUp'] || keys['KeyW']);
   const downPressed = !!(keys['ArrowDown'] || keys['KeyS']);
 
@@ -1069,7 +1068,8 @@ function update() {
       stopRunSound();
     }
 
-    if (jumpPressed && cat.isGrounded) {
+    // Déclencher un nouveau saut UNIQUEMENT si la touche a été relâchée au préalable
+    if (jumpPressed && cat.isGrounded && jumpKeyReleased) {
       cat.vy = JUMP_FORCE;
       cat.isGrounded = false;
       cat.isPlatformGrounded = false;
@@ -1077,7 +1077,7 @@ function update() {
       cat.jumpTimer = 0;
       cat.isRun4Pose = false;
       cat.state = 'RUN';
-      touchJumpLock = true;
+      jumpKeyReleased = false; // Verrouille : il faut relâcher pour réautoriser
       stopRunSound();
       playSoundEffect(sounds.jump);
     }
@@ -1117,7 +1117,7 @@ function update() {
       cat.y = ENTITY_GROUND_Y - cat.height;
       cat.vy = 0;
       cat.isGrounded = true;
-      cat.isJumping = false;
+      cat.isJumping = false; // Arrête la poussée dès l'atterrissage
     }
 
     if (!downPressed || cat.vy < 0) {
@@ -1136,7 +1136,7 @@ function update() {
           cat.vy = 0;
           cat.isGrounded = true;
           cat.isPlatformGrounded = true;
-          cat.isJumping = false;
+          cat.isJumping = false; // Arrête la poussée dès l'atterrissage sur plateforme
         }
       });
     }
