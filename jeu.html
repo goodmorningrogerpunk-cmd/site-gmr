@@ -493,6 +493,7 @@ function getObstacleDimensions(conf) {
 }
 
 const BASE_GAME_SPEED = 6.5;
+let baseSpeedMultiplier = 1.0;
 let currentGameSpeed = BASE_GAME_SPEED;
 const GROUND_Y = 430;        
 const ENTITY_GROUND_Y = 418; 
@@ -513,7 +514,7 @@ let rogerCollected = [false, false, false, false, false];
 let completedWordsCount = 0;
 
 let nextSpawnLetterIndex = 0;
-let lastLetterX = -1000; // Protection anti-doublon
+let lastLetterX = -1000;
 
 let invulnerableTimer = 0;
 let fallingLetters = [];
@@ -522,6 +523,7 @@ let freezeForSequence = false;
 let sequenceCurrentLetterIndex = 0;
 let sequenceAngle = 0;
 let bounceTimer = 0;
+let touchJumpLock = false;
 
 const superSayen = {
   active: false,
@@ -679,7 +681,6 @@ function handleObstacleSpawned(obsX, obsY, obsW) {
   if (obstacleCounter % 2 === 0) {
     const letterX = obsX + obsW + 180 + (Math.random() * 60);
 
-    // Sécurité absolue : empêcher toute apparition de lettre trop proche de la précédente
     if (letterX - lastLetterX < 280) {
       return;
     }
@@ -776,33 +777,42 @@ function handleTouchAction(e, isTouchStart) {
   if (!gameStarted || rulesModal.style.display === 'block' || aboutModal.style.display === 'block') return;
 
   const rect = canvas.getBoundingClientRect();
-  
+
+  if (!isTouchStart) {
+    keys['ArrowDown'] = false;
+    keys['Space'] = false;
+    keys['ArrowUp'] = false;
+    cat.isJumping = false;
+    touchJumpLock = false;
+    return;
+  }
+
   for (let i = 0; i < e.touches.length; i++) {
     const touch = e.touches[i];
     const touchX = (touch.clientX - rect.left) * (canvas.width / rect.width);
 
     if (gameOver) {
-      if (isTouchStart) {
-        startBgMusic();
-        resetGame();
-      }
+      startBgMusic();
+      resetGame();
       return;
     }
 
     if (superSayen.active && superSayen.state === 'FLY') {
       if (touchX < canvas.width / 2) {
-        keys['ArrowDown'] = isTouchStart;
+        keys['ArrowDown'] = true;
       } else {
-        keys['ArrowUp'] = isTouchStart;
-        keys['Space'] = isTouchStart;
+        keys['ArrowUp'] = true;
+        keys['Space'] = true;
       }
     } else {
       if (touchX < canvas.width / 2) {
-        keys['ArrowDown'] = isTouchStart;
+        keys['ArrowDown'] = true;
       } else {
-        keys['Space'] = isTouchStart;
-        keys['ArrowUp'] = isTouchStart;
-        if (!isTouchStart) cat.isJumping = false;
+        if (!touchJumpLock) {
+          keys['Space'] = true;
+          keys['ArrowUp'] = true;
+          touchJumpLock = true;
+        }
       }
     }
   }
@@ -817,11 +827,6 @@ canvas.addEventListener('touchstart', (e) => {
 canvas.addEventListener('touchend', (e) => {
   e.preventDefault();
   if (e.touches.length === 0) {
-    keys['ArrowDown'] = false;
-    keys['Space'] = false;
-    keys['ArrowUp'] = false;
-    cat.isJumping = false;
-  } else {
     handleTouchAction(e, false);
   }
 }, { passive: false });
@@ -901,7 +906,9 @@ function resetGame() {
   freezeForSequence = false;
   sequenceCurrentLetterIndex = 0;
   sequenceAngle = 0;
+  baseSpeedMultiplier = 1.0;
   currentGameSpeed = BASE_GAME_SPEED;
+  touchJumpLock = false;
   
   cat.y = ENTITY_GROUND_Y - cat.height;
   cat.vy = 0;
@@ -963,6 +970,10 @@ function update() {
     lastScoreTime = now;
   }
 
+  const speedLevel = Math.floor(score / 100000);
+  baseSpeedMultiplier = Math.pow(1.15, speedLevel);
+  const effectiveBaseSpeed = BASE_GAME_SPEED * baseSpeedMultiplier;
+
   const jumpPressed = !!keys['Space'];
   const flyUpPressed = !!(keys['Space'] || keys['ArrowUp'] || keys['KeyW']);
   const downPressed = !!(keys['ArrowDown'] || keys['KeyS']);
@@ -971,7 +982,7 @@ function update() {
     superSayen.animTimer++;
 
     if (superSayen.state === 'TRANSFORM') {
-      currentGameSpeed = BASE_GAME_SPEED * 0.5;
+      currentGameSpeed = effectiveBaseSpeed * 0.5;
       
       if (cat.y > superSayen.targetY) {
         cat.y -= 3;
@@ -988,7 +999,7 @@ function update() {
         }
       }
     } else if (superSayen.state === 'FLY') {
-      currentGameSpeed = BASE_GAME_SPEED * 3.5;
+      currentGameSpeed = effectiveBaseSpeed * 3.5;
       superSayen.timer++;
       score += 15;
 
@@ -1015,7 +1026,7 @@ function update() {
         transitionSuperSayanToNormal();
       }
     } else if (superSayen.state === 'LANDING') {
-      currentGameSpeed = BASE_GAME_SPEED;
+      currentGameSpeed = effectiveBaseSpeed;
 
       if (cat.y < ENTITY_GROUND_Y - cat.height) {
         cat.y += 6;
@@ -1044,7 +1055,7 @@ function update() {
       }
     }
   } else {
-    currentGameSpeed = BASE_GAME_SPEED;
+    currentGameSpeed = effectiveBaseSpeed;
   }
 
   bgX -= currentGameSpeed * 0.4;
@@ -1067,6 +1078,7 @@ function update() {
       cat.jumpTimer = 0;
       cat.isRun4Pose = false;
       cat.state = 'RUN';
+      keys['Space'] = false;
       stopRunSound();
       playSoundEffect(sounds.jump);
     }
