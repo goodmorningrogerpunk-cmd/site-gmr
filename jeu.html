@@ -130,7 +130,6 @@
       z-index: 20;
     }
 
-    /* Modals */
     .game-modal {
       display: none;
       position: absolute;
@@ -209,7 +208,6 @@
       flex-shrink: 0;
     }
 
-    /* Formulaire & Overlay Game Over */
     #score-prompt-box, #save-score-modal {
       display: none;
       position: absolute;
@@ -246,8 +244,8 @@
     .score-input-group {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      margin: 16px 0;
+      gap: 8px;
+      margin: 14px 0;
       text-align: left;
     }
 
@@ -286,7 +284,6 @@
       border-bottom: 2px solid #ffd54f;
     }
 
-    /* Controls overlay */
     #mobile-hud-controls {
       display: none;
       position: absolute;
@@ -375,7 +372,7 @@
   
   <button id="restart-btn" class="pixel-btn">RECOMMENCER</button>
 
-  <!-- Prompt enregistrer score -->
+  <!-- Demande d'enregistrement du score -->
   <div id="score-prompt-box">
     <p style="font-size: 18px; line-height: 1.4; color: #fff;">Veux-tu enregistrer ce score au<br><b style="color:#ffd54f;">Good Morning Classement</b> ?</p>
     <div class="choice-btns">
@@ -384,24 +381,24 @@
     </div>
   </div>
 
-  <!-- Formulaire de sauvegarde -->
+  <!-- Formulaire de saisie -->
   <div id="save-score-modal">
     <h2 style="color:#ffd54f; margin-bottom:10px;">ENREGISTRER TON SCORE</h2>
     <p style="font-size: 12px; color: #ffd54f; line-height: 1.3; margin-bottom: 12px;">Pense à ajouter ton adresse mail pour que Roger te contacte s'il a envie de te donner des cadeaux !</p>
     <form id="save-score-form">
       <div class="score-input-group">
         <label for="player-pseudo">PSEUDO :</label>
-        <input type="text" id="player-pseudo" required maxlength="15" autocomplete="off">
+        <input type="text" id="player-pseudo" name="pseudo" required maxlength="15" autocomplete="off">
       </div>
       <div class="score-input-group">
         <label for="player-email">ADRESSE MAIL :</label>
-        <input type="email" id="player-email" required autocomplete="off">
+        <input type="email" id="player-email" name="email" required autocomplete="off">
       </div>
       <button type="submit" id="save-btn" class="pixel-btn modal-close-btn" style="margin-top:15px;">SAVE</button>
     </form>
   </div>
   
-  <!-- Modales standard -->
+  <!-- Modales -->
   <div id="rules-modal" class="game-modal">
     <h2>RÈGLES ET CONTRÔLES</h2>
     <div class="modal-content-scroll">
@@ -1152,30 +1149,33 @@ function updateRulesText() {
   }
 }
 
-// Gestion des scores API Backend
+// Enregistrement des scores en local et affichage du Top 10
+function saveLocalScore(pseudo, scoreVal) {
+  let scores = JSON.parse(localStorage.getItem('skateCatScores')) || [];
+  scores.push({ pseudo: pseudo, score: scoreVal });
+  scores.sort((a, b) => b.score - a.score);
+  scores = scores.slice(0, 10);
+  localStorage.setItem('skateCatScores', JSON.stringify(scores));
+}
+
 function fetchLeaderboard() {
-  leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Chargement...</td></tr>';
-  fetch('save_score.php')
-    .then(res => res.json())
-    .then(data => {
-      leaderboardBody.innerHTML = '';
-      if (!data || data.length === 0) {
-        leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Aucun score pour le moment !</td></tr>';
-        return;
-      }
-      data.slice(0, 10).forEach((row, idx) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><b>${idx + 1}</b></td>
-          <td>${row.pseudo}</td>
-          <td style="color:#ffd54f; font-weight:bold;">${row.score}</td>
-        `;
-        leaderboardBody.appendChild(tr);
-      });
-    })
-    .catch(() => {
-      leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#ff3333;">Erreur de chargement.</td></tr>';
-    });
+  leaderboardBody.innerHTML = '';
+  let scores = JSON.parse(localStorage.getItem('skateCatScores')) || [];
+  
+  if (scores.length === 0) {
+    leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Aucun score pour le moment !</td></tr>';
+    return;
+  }
+  
+  scores.forEach((row, idx) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><b>${idx + 1}</b></td>
+      <td>${row.pseudo}</td>
+      <td style="color:#ffd54f; font-weight:bold;">${row.score}</td>
+    `;
+    leaderboardBody.appendChild(tr);
+  });
 }
 
 startMainBtn.addEventListener('click', () => {
@@ -1243,22 +1243,25 @@ saveScoreForm.addEventListener('submit', (e) => {
   saveBtn.disabled = true;
   saveBtn.textContent = 'ENVOI...';
 
-  fetch('save_score.php', {
+  // Envoi à Formspree
+  fetch('https://formspree.io/f/xbgjawae', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ pseudo, email, score })
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({ pseudo: pseudo, email: email, score: score })
   })
-  .then(res => res.json())
-  .then(data => {
+  .then(res => {
+    saveLocalScore(pseudo, score);
     saveScoreModal.style.display = 'none';
     saveBtn.disabled = false;
     saveBtn.textContent = 'SAVE';
     restartBtn.style.display = 'block';
   })
   .catch(() => {
-    alert("Erreur lors de la sauvegarde.");
+    saveLocalScore(pseudo, score);
+    saveScoreModal.style.display = 'none';
     saveBtn.disabled = false;
     saveBtn.textContent = 'SAVE';
+    restartBtn.style.display = 'block';
   });
 });
 
