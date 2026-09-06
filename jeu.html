@@ -224,7 +224,6 @@
       text-align: center;
     }
 
-    /* Fenêtre de Saisie avec Scroll Intégré */
     #save-score-modal {
       display: none;
       position: absolute;
@@ -245,7 +244,6 @@
       text-align: center;
     }
 
-    /* Mode Clavier Actif sur Mobile : Modale compacte fixée en haut */
     #save-score-modal.keyboard-active {
       top: 0px !important;
       left: 50% !important;
@@ -404,7 +402,6 @@
   
   <button id="restart-btn" class="pixel-btn">RECOMMENCER</button>
 
-  <!-- Demande d'enregistrement du score -->
   <div id="score-prompt-box">
     <p style="font-size: 18px; line-height: 1.4; color: #fff;">Veux-tu enregistrer ce score au<br><b style="color:#ffd54f;">Good Morning Classement</b> ?</p>
     <div class="choice-btns">
@@ -413,7 +410,6 @@
     </div>
   </div>
 
-  <!-- Formulaire de saisie -->
   <div id="save-score-modal">
     <h2 id="score-modal-title" style="color:#ffd54f; margin-bottom:8px; font-size:16px; line-height:1.2;">ENREGISTRER TON SCORE</h2>
     
@@ -426,17 +422,16 @@
     <form id="save-score-form">
       <div class="score-input-group">
         <label for="player-pseudo">PSEUDO :</label>
-        <input type="text" id="player-pseudo" name="pseudo" required maxlength="15" autocomplete="off">
+        <input type="text" id="player-pseudo" name="pseudo" required maxlength="15" autocomplete="off" enterkeyhint="next">
       </div>
       <div class="score-input-group">
         <label for="player-email">ADRESSE MAIL :</label>
-        <input type="email" id="player-email" name="email" required autocomplete="off">
+        <input type="email" id="player-email" name="email" required autocomplete="off" enterkeyhint="done">
       </div>
       <button type="submit" id="save-btn" class="pixel-btn modal-close-btn" style="margin-top:10px; padding:8px 20px; font-size:14px;">SAVE</button>
     </form>
   </div>
   
-  <!-- Modales -->
   <div id="rules-modal" class="game-modal">
     <h2>RÈGLES ET CONTRÔLES</h2>
     <div class="modal-content-scroll">
@@ -481,7 +476,6 @@
 </div>
 
 <script>
-// CONFIGURATION GOOGLE FORMS ET GOOGLE SHEETS
 const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScUTfXrzeEMICD6qd0xO1kFRONA26Roie8UswMismRyeLI1JQ/formResponse';
 const ENTRY_PSEUDO    = 'entry.1092302864';
 const ENTRY_EMAIL     = 'entry.1741606296';
@@ -524,6 +518,9 @@ const saveScoreModal = document.getElementById('save-score-modal');
 const saveScoreForm = document.getElementById('save-score-form');
 const scoreModalTitle = document.getElementById('score-modal-title');
 const giftNotice = document.getElementById('gift-notice');
+
+const inputPseudo = document.getElementById('player-pseudo');
+const inputEmail = document.getElementById('player-email');
 
 const introVideo = document.createElement('video');
 introVideo.src = 'video_intro_gmr_skate.mp4';
@@ -604,24 +601,36 @@ function requestGameFullscreen() {
   }
 }
 
-// Gestion dynamique du clavier virtuel sur mobile
-const inputs = [document.getElementById('player-pseudo'), document.getElementById('player-email')];
+function focusAndScroll(el) {
+  if (!el) return;
+  if (isMobileDevice) {
+    saveScoreModal.classList.add('keyboard-active');
+    if (giftNotice) giftNotice.style.display = 'none';
+  }
+  setTimeout(() => {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 100);
+}
+
+const inputs = [inputPseudo, inputEmail];
 inputs.forEach(input => {
   input.addEventListener('focus', () => {
-    if (isMobileDevice) {
-      saveScoreModal.classList.add('keyboard-active');
-      if (giftNotice) giftNotice.style.display = 'none';
-      setTimeout(() => {
-        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 150);
-    }
+    focusAndScroll(input);
   });
   input.addEventListener('blur', () => {
-    if (isMobileDevice) {
+    if (isMobileDevice && !document.activeElement.tagName.match(/INPUT/i)) {
       saveScoreModal.classList.remove('keyboard-active');
       if (giftNotice) giftNotice.style.display = 'block';
     }
   });
+});
+
+inputPseudo.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    inputEmail.focus();
+    focusAndScroll(inputEmail);
+  }
 });
 
 function unlockAudio() {
@@ -1356,8 +1365,8 @@ promptNoBtn.addEventListener('click', () => {
 
 saveScoreForm.addEventListener('submit', (e) => {
   e.preventDefault();
-  const pseudo = document.getElementById('player-pseudo').value.trim();
-  const email = document.getElementById('player-email').value.trim();
+  const pseudo = inputPseudo.value.trim();
+  const email = inputEmail.value.trim();
 
   if (!pseudo || !email) return;
 
@@ -2038,14 +2047,12 @@ function draw() {
   });
   ctx.restore();
 
-  // Affichage Score
   ctx.fillStyle = 'rgba(0,0,0,0.65)';
   ctx.fillRect(20, 20, 220, 45);
   ctx.fillStyle = superSayen.active ? '#ffd54f' : '#fff';
   ctx.font = 'bold 22px Courier New';
   ctx.fillText(`SCORE: ${score}`, 32, 50);
 
-  // HUD d'aide en haut à droite
   ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
   ctx.fillRect(canvas.width - 340, 20, 320, 65);
   ctx.strokeStyle = '#ffffff';
@@ -2064,7 +2071,6 @@ function draw() {
     ctx.fillText("ECHAP  : ACCUEIL", canvas.width - 325, 76);
   }
 
-  // HUD des lettres ROGER
   const hudX = canvas.width - 340;
   const hudY = canvas.height - 85;
   ctx.fillStyle = '#000000'; 
@@ -2156,7 +2162,6 @@ function draw() {
     ctx.restore();
   }
 
-  // Écran de Pause Overlay
   if (isPaused) {
     ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
