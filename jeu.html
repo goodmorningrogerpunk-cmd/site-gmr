@@ -811,7 +811,6 @@ function handleTouchAction(e, isTouchStart) {
         if (!touchJumpLock) {
           keys['Space'] = true;
           keys['ArrowUp'] = true;
-          touchJumpLock = true;
         }
       }
     }
@@ -1078,7 +1077,7 @@ function update() {
       cat.jumpTimer = 0;
       cat.isRun4Pose = false;
       cat.state = 'RUN';
-      keys['Space'] = false;
+      touchJumpLock = true;
       stopRunSound();
       playSoundEffect(sounds.jump);
     }
