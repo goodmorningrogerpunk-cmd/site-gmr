@@ -148,6 +148,8 @@
       z-index: 50000;
       box-shadow: 0 0 30px rgba(0,0,0,0.9);
       color: #fff;
+      overflow: hidden;
+      touch-action: pan-y !important;
     }
 
     .modal-content-scroll {
@@ -156,6 +158,8 @@
       -webkit-overflow-scrolling: touch;
       touch-action: pan-y !important;
       padding-right: 8px;
+      user-select: text;
+      -webkit-user-select: text;
     }
 
     .game-modal h2 {
@@ -396,7 +400,9 @@ function handleFullscreenChange() {
       gameContainer.classList.add('mobile-fullscreen');
     }
   } else {
-    gameContainer.classList.remove('mobile-fullscreen');
+    if (!isMobileDevice) {
+      gameContainer.classList.remove('mobile-fullscreen');
+    }
   }
 }
 
@@ -494,7 +500,11 @@ function returnToHome() {
   startMainBtn.style.display = 'block';
   rightStack.style.display = 'flex';
   mobileHudControls.style.display = 'none';
-  gameContainer.classList.remove('mobile-fullscreen');
+  if (isMobileDevice) {
+    gameContainer.classList.add('mobile-fullscreen');
+  } else {
+    gameContainer.classList.remove('mobile-fullscreen');
+  }
   stopAllSounds();
   playIntroMusic();
 }
@@ -959,6 +969,21 @@ canvas.addEventListener('touchend', (e) => {
   }
 }, { passive: false });
 
+// Autoriser le scrolling partout à l'intérieur des boîtes modales sur mobile
+[rulesModal, aboutModal].forEach(modal => {
+  modal.addEventListener('touchstart', (e) => {
+    e.stopPropagation();
+  }, { passive: true });
+  
+  modal.addEventListener('touchmove', (e) => {
+    e.stopPropagation();
+  }, { passive: true });
+
+  modal.addEventListener('touchend', (e) => {
+    e.stopPropagation();
+  }, { passive: true });
+});
+
 function requestGameFullscreen() {
   if (isMobileDevice) {
     gameContainer.classList.add('mobile-fullscreen');
@@ -1144,8 +1169,9 @@ function update() {
     lastScoreTime = now;
   }
 
-  const speedLevel = Math.floor(score / 100000);
-  baseSpeedMultiplier = Math.pow(1.15, speedLevel);
+  // Augmentation de la vitesse de 5% tous les 20 000 points
+  const speedLevel = Math.floor(score / 20000);
+  baseSpeedMultiplier = Math.pow(1.05, speedLevel);
   const effectiveBaseSpeed = BASE_GAME_SPEED * baseSpeedMultiplier;
 
   const jumpPressed = !!(keys['Space'] || keys['ArrowUp']);
