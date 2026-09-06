@@ -208,7 +208,7 @@
       flex-shrink: 0;
     }
 
-    #score-prompt-box, #save-score-modal {
+    #score-prompt-box {
       display: none;
       position: absolute;
       top: 50%;
@@ -222,6 +222,33 @@
       padding: 20px;
       z-index: 60000;
       text-align: center;
+    }
+
+    /* Modal Saisie optimisée Clavier Mobile */
+    #save-score-modal {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y !important;
+      background: #111118;
+      border: 4px solid #ffd54f;
+      border-radius: 8px;
+      padding: 16px;
+      z-index: 60000;
+      text-align: center;
+    }
+
+    #save-score-modal.keyboard-active {
+      top: 10px !important;
+      transform: translateX(-50%) !important;
+      max-height: 80vh !important;
     }
 
     .choice-btns {
@@ -244,8 +271,8 @@
     .score-input-group {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      margin: 14px 0;
+      gap: 6px;
+      margin: 10px 0;
       text-align: left;
     }
 
@@ -383,10 +410,10 @@
 
   <!-- Formulaire de saisie -->
   <div id="save-score-modal">
-    <h2 id="score-modal-title" style="color:#ffd54f; margin-bottom:12px; font-size:20px; line-height:1.3;">ENREGISTRER TON SCORE</h2>
+    <h2 id="score-modal-title" style="color:#ffd54f; margin-bottom:10px; font-size:18px; line-height:1.3;">ENREGISTRER TON SCORE</h2>
     
-    <div style="background: rgba(255, 213, 79, 0.15); border: 2px dashed #ffd54f; border-radius: 6px; padding: 12px; margin-bottom: 14px;">
-      <p style="font-size: 13px; color: #ffffff; line-height: 1.4; font-weight: bold; margin: 0;">
+    <div style="background: rgba(255, 213, 79, 0.15); border: 2px dashed #ffd54f; border-radius: 6px; padding: 10px; margin-bottom: 10px;">
+      <p style="font-size: 12px; color: #ffffff; line-height: 1.3; font-weight: bold; margin: 0;">
         🎁 Pense à ajouter ton adresse mail pour que Roger te contacte s'il a envie de te donner des cadeaux !
       </p>
     </div>
@@ -400,7 +427,7 @@
         <label for="player-email">ADRESSE MAIL :</label>
         <input type="email" id="player-email" name="email" required autocomplete="off">
       </div>
-      <button type="submit" id="save-btn" class="pixel-btn modal-close-btn" style="margin-top:15px;">SAVE</button>
+      <button type="submit" id="save-btn" class="pixel-btn modal-close-btn" style="margin-top:12px;">SAVE</button>
     </form>
   </div>
   
@@ -549,6 +576,57 @@ function handleFullscreenChange() {
     }
   }
 }
+
+function requestGameFullscreen() {
+  if (isMobileDevice) {
+    gameContainer.classList.add('mobile-fullscreen');
+
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen().catch(() => {});
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen().catch(() => {});
+    }
+
+    if (screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock('landscape').catch(() => {});
+    }
+
+    setTimeout(() => {
+      window.scrollTo(0, 1);
+    }, 100);
+  }
+}
+
+document.addEventListener('touchstart', () => {
+  if (!gameStarted) {
+    requestGameFullscreen();
+  }
+}, { once: true });
+
+window.addEventListener('orientationchange', () => {
+  setTimeout(() => {
+    window.scrollTo(0, 1);
+  }, 200);
+});
+
+// Ajustement visuel pour la saisie sur Smartphone
+const inputs = [document.getElementById('player-pseudo'), document.getElementById('player-email')];
+inputs.forEach(input => {
+  input.addEventListener('focus', () => {
+    if (isMobileDevice) {
+      saveScoreModal.classList.add('keyboard-active');
+      setTimeout(() => {
+        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 300);
+    }
+  });
+  input.addEventListener('blur', () => {
+    if (isMobileDevice) {
+      saveScoreModal.classList.remove('keyboard-active');
+    }
+  });
+});
 
 function unlockAudio() {
   if (!audioUnlocked) {
@@ -1123,25 +1201,6 @@ document.addEventListener('touchend', (e) => {
   }
 }, { passive: false });
 
-function requestGameFullscreen() {
-  if (isMobileDevice) {
-    gameContainer.classList.add('mobile-fullscreen');
-
-    const elem = document.documentElement;
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen().catch(() => {});
-    } else if (elem.webkitRequestFullscreen) {
-      elem.webkitRequestFullscreen().catch(() => {});
-    }
-
-    if (screen.orientation && screen.orientation.lock) {
-      screen.orientation.lock('landscape').catch(() => {});
-    }
-
-    window.scrollTo(0, 1);
-  }
-}
-
 function updateRulesText() {
   if (isMobileDevice) {
     rulesList.innerHTML = `
@@ -1164,7 +1223,6 @@ function updateRulesText() {
   }
 }
 
-// Analyse d'une ligne CSV respectant le guillemetage standard
 function parseCSVLine(line) {
   const result = [];
   let cur = '';
@@ -1185,7 +1243,6 @@ function parseCSVLine(line) {
   return result;
 }
 
-// Récupération dynamique du Top 10 en direct depuis Google Sheets
 function fetchLeaderboard() {
   leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Chargement du Top 10...</td></tr>';
   
@@ -1312,7 +1369,6 @@ saveScoreForm.addEventListener('submit', (e) => {
   saveBtn.disabled = true;
   saveBtn.textContent = 'ENVOI...';
 
-  // Envoi des données vers Google Forms
   const formData = new FormData();
   formData.append(ENTRY_PSEUDO, pseudo);
   formData.append(ENTRY_EMAIL, email);
@@ -1444,7 +1500,6 @@ function update() {
     lastScoreTime = now;
   }
 
-  // Accélération de 5% tous les 20 000 points
   const speedLevel = Math.floor(score / 20000);
   baseSpeedMultiplier = Math.pow(1.05, speedLevel);
   const effectiveBaseSpeed = BASE_GAME_SPEED * baseSpeedMultiplier;
