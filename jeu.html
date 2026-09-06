@@ -140,39 +140,38 @@
       transform: translate(-50%, -50%);
       width: 90%;
       max-width: 680px;
-      max-height: 80vh;
+      max-height: 85vh;
       background: #111118;
       border: 4px solid #ffd54f;
       border-radius: 8px;
-      padding: 20px;
+      padding: 16px;
       z-index: 50000;
       box-shadow: 0 0 30px rgba(0,0,0,0.9);
       color: #fff;
-      overflow: hidden;
-      touch-action: pan-y !important;
+      flex-direction: column;
     }
 
     .modal-content-scroll {
-      max-height: calc(80vh - 100px);
+      flex: 1;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       touch-action: pan-y !important;
-      padding-right: 8px;
-      user-select: text;
-      -webkit-user-select: text;
+      padding-right: 6px;
+      margin-bottom: 12px;
     }
 
     .game-modal h2 {
       color: #ffd54f;
       text-align: center;
-      margin-bottom: 14px;
-      font-size: 22px;
+      margin-bottom: 12px;
+      font-size: 20px;
+      flex-shrink: 0;
     }
     .game-modal .goal-text {
       font-size: 13px;
       line-height: 1.4;
       color: #e0e0e0;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       background: rgba(255, 213, 79, 0.1);
       border-left: 3px solid #ffd54f;
       padding: 10px 12px;
@@ -182,7 +181,7 @@
       list-style-type: none;
       font-size: 13px;
       line-height: 1.4;
-      margin-bottom: 16px;
+      margin-bottom: 8px;
     }
     .game-modal li {
       margin-bottom: 8px;
@@ -199,7 +198,7 @@
 
     .modal-close-btn {
       display: block;
-      margin: 15px auto 0 auto;
+      margin: 0 auto;
       padding: 10px 24px;
       background: #ffd54f;
       color: #1a1a24;
@@ -208,6 +207,7 @@
       font-weight: bold;
       cursor: pointer;
       box-shadow: 0 4px 0px #b29320;
+      flex-shrink: 0;
     }
 
     /* Boutons Pause et Retour Accueil pour Mobile */
@@ -500,11 +500,14 @@ function returnToHome() {
   startMainBtn.style.display = 'block';
   rightStack.style.display = 'flex';
   mobileHudControls.style.display = 'none';
+  restartBtn.style.display = 'none';
+  
   if (isMobileDevice) {
     gameContainer.classList.add('mobile-fullscreen');
   } else {
     gameContainer.classList.remove('mobile-fullscreen');
   }
+  
   stopAllSounds();
   playIntroMusic();
 }
@@ -868,9 +871,9 @@ window.addEventListener('keydown', (e) => {
   }
 
   if (e.code === 'Escape') {
-    if (rulesModal.style.display === 'block') {
+    if (rulesModal.style.display === 'block' || rulesModal.style.display === 'flex') {
       rulesModal.style.display = 'none';
-    } else if (aboutModal.style.display === 'block') {
+    } else if (aboutModal.style.display === 'block' || aboutModal.style.display === 'flex') {
       aboutModal.style.display = 'none';
     } else {
       returnToHome();
@@ -894,8 +897,12 @@ window.addEventListener('keydown', (e) => {
     triggerSuperSayen();
   }
 
-  if ((e.key === 'r' || e.key === 'R' || e.code === 'KeyR') && gameStarted && !gameOver && !superSayen.active) {
-    cat.isRun4Pose = true;
+  if (e.key === 'r' || e.key === 'R' || e.code === 'KeyR') {
+    if (gameOver) {
+      returnToHome();
+    } else if (gameStarted && !superSayen.active) {
+      cat.isRun4Pose = true;
+    }
   }
 });
 
@@ -908,14 +915,12 @@ window.addEventListener('keyup', (e) => {
 });
 
 function handleTouchAction(e, isTouchStart) {
-  if (!gameStarted || rulesModal.style.display === 'block' || aboutModal.style.display === 'block') return;
+  if (!gameStarted || rulesModal.style.display === 'flex' || rulesModal.style.display === 'block' || aboutModal.style.display === 'flex' || aboutModal.style.display === 'block') return;
 
   if (isPaused) {
     if (isTouchStart) togglePause();
     return;
   }
-
-  const rect = canvas.getBoundingClientRect();
 
   if (!isTouchStart) {
     keys['ArrowDown'] = false;
@@ -926,9 +931,11 @@ function handleTouchAction(e, isTouchStart) {
     return;
   }
 
+  const viewportWidth = window.innerWidth;
+
   for (let i = 0; i < e.touches.length; i++) {
     const touch = e.touches[i];
-    const touchX = (touch.clientX - rect.left) * (canvas.width / rect.width);
+    const clientX = touch.clientX;
 
     if (gameOver) {
       startBgMusic();
@@ -937,14 +944,14 @@ function handleTouchAction(e, isTouchStart) {
     }
 
     if (superSayen.active && superSayen.state === 'FLY') {
-      if (touchX < canvas.width / 2) {
+      if (clientX < viewportWidth / 2) {
         keys['ArrowDown'] = true;
       } else {
         keys['ArrowUp'] = true;
         keys['Space'] = true;
       }
     } else {
-      if (touchX < canvas.width / 2) {
+      if (clientX < viewportWidth / 2) {
         keys['ArrowDown'] = true;
       } else {
         keys['Space'] = true;
@@ -954,35 +961,20 @@ function handleTouchAction(e, isTouchStart) {
   }
 }
 
-canvas.addEventListener('touchstart', (e) => {
-  if (rulesModal.style.display === 'block' || aboutModal.style.display === 'block') return;
+document.addEventListener('touchstart', (e) => {
+  if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn')) return;
   e.preventDefault();
   unlockAudio();
   handleTouchAction(e, true);
 }, { passive: false });
 
-canvas.addEventListener('touchend', (e) => {
-  if (rulesModal.style.display === 'block' || aboutModal.style.display === 'block') return;
+document.addEventListener('touchend', (e) => {
+  if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn')) return;
   e.preventDefault();
   if (e.touches.length === 0) {
     handleTouchAction(e, false);
   }
 }, { passive: false });
-
-// Autoriser le scrolling partout à l'intérieur des boîtes modales sur mobile
-[rulesModal, aboutModal].forEach(modal => {
-  modal.addEventListener('touchstart', (e) => {
-    e.stopPropagation();
-  }, { passive: true });
-  
-  modal.addEventListener('touchmove', (e) => {
-    e.stopPropagation();
-  }, { passive: true });
-
-  modal.addEventListener('touchend', (e) => {
-    e.stopPropagation();
-  }, { passive: true });
-});
 
 function requestGameFullscreen() {
   if (isMobileDevice) {
@@ -1043,7 +1035,7 @@ startMainBtn.addEventListener('click', () => {
 rulesBtn.addEventListener('click', () => {
   playIntroMusic();
   updateRulesText();
-  rulesModal.style.display = 'block';
+  rulesModal.style.display = 'flex';
 });
 
 closeRulesBtn.addEventListener('click', () => {
@@ -1052,7 +1044,7 @@ closeRulesBtn.addEventListener('click', () => {
 
 aboutBtn.addEventListener('click', () => {
   playIntroMusic();
-  aboutModal.style.display = 'block';
+  aboutModal.style.display = 'flex';
 });
 
 closeAboutBtn.addEventListener('click', () => {
@@ -1169,7 +1161,7 @@ function update() {
     lastScoreTime = now;
   }
 
-  // Augmentation de la vitesse de 5% tous les 20 000 points
+  // Accélération de 5% tous les 20 000 points
   const speedLevel = Math.floor(score / 20000);
   baseSpeedMultiplier = Math.pow(1.05, speedLevel);
   const effectiveBaseSpeed = BASE_GAME_SPEED * baseSpeedMultiplier;
