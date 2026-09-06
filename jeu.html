@@ -20,6 +20,7 @@
       font-family: 'Courier New', Courier, monospace;
       color: #ffffff;
       overflow: hidden;
+      touch-action: none !important;
     }
     body {
       display: flex;
@@ -39,7 +40,7 @@
       border: 4px solid #2e2e40;
       background: #000;
       transition: all 0.2s ease;
-      touch-action: none;
+      touch-action: none !important;
     }
 
     #game-container.mobile-fullscreen {
@@ -63,6 +64,7 @@
       display: block;
       image-rendering: pixelated;
       image-rendering: crisp-edges;
+      touch-action: none !important;
     }
 
     .pixel-btn {
@@ -224,7 +226,6 @@
       text-align: center;
     }
 
-    /* Fenêtre de Saisie */
     #save-score-modal {
       display: none;
       position: absolute;
@@ -245,7 +246,6 @@
       text-align: center;
     }
 
-    /* Ajustement ultra-haut quand le clavier est actif */
     #save-score-modal.keyboard-active {
       top: 0px !important;
       left: 50% !important;
@@ -275,9 +275,42 @@
       font-size: 14px !important;
     }
 
-    #save-score-modal.keyboard-active #save-btn {
+    .form-actions-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    #save-score-modal.keyboard-active .form-actions-row {
       margin-top: 5px !important;
-      padding: 4px 14px !important;
+    }
+
+    .btn-save-action {
+      background: #ffd54f;
+      color: #1a1a24;
+      border: 3px solid #ffffff;
+      box-shadow: 0 4px 0px #b29320;
+      padding: 8px 20px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-back-action {
+      background: #2e2e40;
+      color: #ffffff;
+      border: 3px solid #ffd54f;
+      box-shadow: 0 4px 0px #000;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #save-score-modal.keyboard-active .btn-save-action,
+    #save-score-modal.keyboard-active .btn-back-action {
+      padding: 4px 12px !important;
       font-size: 12px !important;
     }
 
@@ -344,8 +377,8 @@
     #mobile-hud-controls {
       display: none;
       position: absolute;
-      top: 20px;
-      right: 20px;
+      top: 15px;
+      right: 15px;
       gap: 8px;
       z-index: 40;
     }
@@ -455,7 +488,10 @@
         <label for="player-email">ADRESSE MAIL :</label>
         <input type="email" id="player-email" name="email" required autocomplete="off" enterkeyhint="done">
       </div>
-      <button type="submit" id="save-btn" class="pixel-btn modal-close-btn" style="margin-top:10px; padding:8px 20px; font-size:14px;">SAVE</button>
+      <div class="form-actions-row">
+        <button type="button" id="cancel-save-btn" class="pixel-btn btn-back-action">RETOUR</button>
+        <button type="submit" id="save-btn" class="pixel-btn btn-save-action">SAVE</button>
+      </div>
     </form>
   </div>
   
@@ -545,6 +581,7 @@ const saveScoreModal = document.getElementById('save-score-modal');
 const saveScoreForm = document.getElementById('save-score-form');
 const scoreModalTitle = document.getElementById('score-modal-title');
 const giftNotice = document.getElementById('gift-notice');
+const cancelSaveBtn = document.getElementById('cancel-save-btn');
 
 const inputPseudo = document.getElementById('player-pseudo');
 const inputEmail = document.getElementById('player-email');
@@ -1191,6 +1228,9 @@ function handleTouchAction(e, isTouchStart) {
 
   const viewportWidth = window.innerWidth;
 
+  let wantDown = false;
+  let wantJump = false;
+
   for (let i = 0; i < e.touches.length; i++) {
     const touch = e.touches[i];
     const clientX = touch.clientX;
@@ -1201,22 +1241,16 @@ function handleTouchAction(e, isTouchStart) {
       return;
     }
 
-    if (superSayen.active && superSayen.state === 'FLY') {
-      if (clientX < viewportWidth / 2) {
-        keys['ArrowDown'] = true;
-      } else {
-        keys['ArrowUp'] = true;
-        keys['Space'] = true;
-      }
+    if (clientX < viewportWidth / 2) {
+      wantDown = true;
     } else {
-      if (clientX < viewportWidth / 2) {
-        keys['ArrowDown'] = true;
-      } else {
-        keys['Space'] = true;
-        keys['ArrowUp'] = true;
-      }
+      wantJump = true;
     }
   }
+
+  keys['ArrowDown'] = wantDown;
+  keys['Space'] = wantJump;
+  keys['ArrowUp'] = wantJump;
 }
 
 document.addEventListener('touchstart', (e) => {
@@ -1226,11 +1260,21 @@ document.addEventListener('touchstart', (e) => {
   handleTouchAction(e, true);
 }, { passive: false });
 
+document.addEventListener('touchmove', (e) => {
+  if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn') || e.target.closest('#score-prompt-box') || e.target.closest('#save-score-modal')) return;
+  e.preventDefault();
+  if (e.touches.length > 0) {
+    handleTouchAction(e, true);
+  }
+}, { passive: false });
+
 document.addEventListener('touchend', (e) => {
   if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn') || e.target.closest('#score-prompt-box') || e.target.closest('#save-score-modal')) return;
   e.preventDefault();
   if (e.touches.length === 0) {
     handleTouchAction(e, false);
+  } else {
+    handleTouchAction(e, true);
   }
 }, { passive: false });
 
@@ -1388,6 +1432,11 @@ promptYesBtn.addEventListener('click', () => {
 
 promptNoBtn.addEventListener('click', () => {
   scorePromptBox.style.display = 'none';
+  restartBtn.style.display = 'block';
+});
+
+cancelSaveBtn.addEventListener('click', () => {
+  saveScoreModal.style.display = 'none';
   restartBtn.style.display = 'block';
 });
 
@@ -2081,22 +2130,25 @@ function draw() {
   ctx.font = 'bold 22px Courier New';
   ctx.fillText(`SCORE: ${score}`, 32, 50);
 
+  const isMobile = isMobileDevice;
+  const hudWidth = isMobile ? 260 : 320;
+  const hudXPos = isMobile ? canvas.width - 370 : canvas.width - 340;
+
   ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
-  ctx.fillRect(canvas.width - 340, 20, 320, 65);
+  ctx.fillRect(hudXPos, 20, hudWidth, 65);
   ctx.strokeStyle = '#ffffff';
   ctx.lineWidth = 1;
-  ctx.strokeRect(canvas.width - 340, 20, 320, 65);
+  ctx.strokeRect(hudXPos, 20, hudWidth, 65);
 
   ctx.fillStyle = '#ffd54f';
   ctx.font = 'bold 13px Courier New';
-  if (isMobileDevice) {
-    ctx.fillText("TAP DROITE  : SAUTER", canvas.width - 325, 40);
-    ctx.fillText("TAP GAUCHE  : SE BAISSER", canvas.width - 325, 58);
-    ctx.fillText("BOUTON P    : PAUSE", canvas.width - 325, 76);
+  if (isMobile) {
+    ctx.fillText("TAP DROITE : SAUTER", hudXPos + 15, 40);
+    ctx.fillText("TAP GAUCHE : BAISSER", hudXPos + 15, 58);
   } else {
-    ctx.fillText("ESPACE : SAUTER | BAS : BAISSER", canvas.width - 325, 40);
-    ctx.fillText("ENTRÉE : PAUSE", canvas.width - 325, 58);
-    ctx.fillText("ECHAP  : ACCUEIL", canvas.width - 325, 76);
+    ctx.fillText("ESPACE : SAUTER | BAS : BAISSER", hudXPos + 15, 40);
+    ctx.fillText("ENTRÉE : PAUSE", hudXPos + 15, 58);
+    ctx.fillText("ECHAP  : ACCUEIL", hudXPos + 15, 76);
   }
 
   const hudX = canvas.width - 340;
