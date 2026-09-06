@@ -322,8 +322,8 @@ html {
             // 1. VÉRIFICATION CODE SECRET JEU VIDEO ("sk8")
             if (inputVal.toLowerCase() === "sk8") {
                 error.style.display = "none";
-                loginContainer.style.display = "none"; // Masque le formulaire de connexion
-                welcomeContainer.style.display = "block"; // Affiche la page avec le bouton Jouer
+                loginContainer.style.display = "none";
+                welcomeContainer.style.display = "block";
                 welcomeContainer.scrollIntoView({ behavior: 'smooth' });
                 return;
             }
@@ -338,9 +338,23 @@ html {
             }
         }
 
-        // REDIRECTION DIRECTE VERS LE JEU SUR SA PAGE D'ACCUEIL
+        // REDIRECTION ET DEMANDE DU PLEIN ÉCRAN DÈS LE CLIC
         function launchGame() {
-            window.location.href = "jeu.html";
+            const elem = document.documentElement;
+
+            // Tentative de passer en plein écran immédiatement sur smartphone
+            const requestFS = elem.requestFullscreen || elem.webkitRequestFullscreen || elem.msRequestFullscreen;
+            if (requestFS) {
+                requestFS.call(elem).then(() => {
+                    if (screen.orientation && screen.orientation.lock) {
+                        screen.orientation.lock('landscape').catch(() => {});
+                    }
+                }).catch(() => {}).finally(() => {
+                    window.location.href = "jeu.html";
+                });
+            } else {
+                window.location.href = "jeu.html";
+            }
         }
 
         document.getElementById('passInput').addEventListener('keypress', function (e) {
