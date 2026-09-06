@@ -79,7 +79,7 @@
 
     #start-main-btn {
       position: absolute;
-      top: 80%; 
+      top: 75%; 
       left: 5%;
       transform: translateY(-50%);
       padding: 18px 32px;
@@ -94,9 +94,10 @@
       transform: translateY(-52%);
     }
 
+    /* Boutons de droite remontés pour éviter le bas d'écran mobile */
     .right-buttons-stack {
       position: absolute;
-      top: 80%;
+      top: 68%;
       right: 5%;
       transform: translateY(-50%);
       display: flex;
@@ -224,7 +225,7 @@
       text-align: center;
     }
 
-    /* Modal Saisie optimisée Clavier Mobile */
+    /* Fenêtre de saisie optimisée pour le Clavier Mobile */
     #save-score-modal {
       display: none;
       position: absolute;
@@ -233,22 +234,24 @@
       transform: translate(-50%, -50%);
       width: 90%;
       max-width: 520px;
-      max-height: 90vh;
+      max-height: 95vh;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       touch-action: pan-y !important;
       background: #111118;
       border: 4px solid #ffd54f;
       border-radius: 8px;
-      padding: 16px;
+      padding: 14px;
       z-index: 60000;
       text-align: center;
+      transition: top 0.2s ease, transform 0.2s ease;
     }
 
+    /* Quand un champ est cliqué : la modale monte tout en haut de l'écran */
     #save-score-modal.keyboard-active {
-      top: 10px !important;
+      top: 2px !important;
       transform: translateX(-50%) !important;
-      max-height: 80vh !important;
+      padding: 8px !important;
     }
 
     .choice-btns {
@@ -271,19 +274,19 @@
     .score-input-group {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      margin: 10px 0;
+      gap: 4px;
+      margin: 8px 0;
       text-align: left;
     }
 
     .score-input-group label {
-      font-size: 12px;
+      font-size: 11px;
       color: #ffd54f;
     }
 
     .score-input-group input {
-      padding: 10px;
-      font-size: 16px;
+      padding: 8px;
+      font-size: 15px;
       font-family: 'Courier New', Courier, monospace;
       background: #1a1a24;
       border: 2px solid #ffd54f;
@@ -410,10 +413,10 @@
 
   <!-- Formulaire de saisie -->
   <div id="save-score-modal">
-    <h2 id="score-modal-title" style="color:#ffd54f; margin-bottom:10px; font-size:18px; line-height:1.3;">ENREGISTRER TON SCORE</h2>
+    <h2 id="score-modal-title" style="color:#ffd54f; margin-bottom:6px; font-size:16px; line-height:1.2;">ENREGISTRER TON SCORE</h2>
     
-    <div style="background: rgba(255, 213, 79, 0.15); border: 2px dashed #ffd54f; border-radius: 6px; padding: 10px; margin-bottom: 10px;">
-      <p style="font-size: 12px; color: #ffffff; line-height: 1.3; font-weight: bold; margin: 0;">
+    <div id="gift-notice" style="background: rgba(255, 213, 79, 0.15); border: 1px dashed #ffd54f; border-radius: 4px; padding: 6px; margin-bottom: 8px;">
+      <p style="font-size: 11px; color: #ffffff; line-height: 1.2; font-weight: bold; margin: 0;">
         🎁 Pense à ajouter ton adresse mail pour que Roger te contacte s'il a envie de te donner des cadeaux !
       </p>
     </div>
@@ -427,7 +430,7 @@
         <label for="player-email">ADRESSE MAIL :</label>
         <input type="email" id="player-email" name="email" required autocomplete="off">
       </div>
-      <button type="submit" id="save-btn" class="pixel-btn modal-close-btn" style="margin-top:12px;">SAVE</button>
+      <button type="submit" id="save-btn" class="pixel-btn modal-close-btn" style="margin-top:8px; padding:8px 18px; font-size:13px;">SAVE</button>
     </form>
   </div>
   
@@ -518,6 +521,7 @@ const promptNoBtn = document.getElementById('prompt-no-btn');
 const saveScoreModal = document.getElementById('save-score-modal');
 const saveScoreForm = document.getElementById('save-score-form');
 const scoreModalTitle = document.getElementById('score-modal-title');
+const giftNotice = document.getElementById('gift-notice');
 
 const introVideo = document.createElement('video');
 introVideo.src = 'video_intro_gmr_skate.mp4';
@@ -598,33 +602,16 @@ function requestGameFullscreen() {
   }
 }
 
-document.addEventListener('touchstart', () => {
-  if (!gameStarted) {
-    requestGameFullscreen();
-  }
-}, { once: true });
-
-window.addEventListener('orientationchange', () => {
-  setTimeout(() => {
-    window.scrollTo(0, 1);
-  }, 200);
-});
-
-// Ajustement visuel pour la saisie sur Smartphone
+// Positionnement dynamique au moment de la saisie au clavier
 const inputs = [document.getElementById('player-pseudo'), document.getElementById('player-email')];
 inputs.forEach(input => {
   input.addEventListener('focus', () => {
-    if (isMobileDevice) {
-      saveScoreModal.classList.add('keyboard-active');
-      setTimeout(() => {
-        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 300);
-    }
+    saveScoreModal.classList.add('keyboard-active');
+    if (giftNotice) giftNotice.style.display = 'none'; // Masque l'encadré bonus pour faire de la place
   });
   input.addEventListener('blur', () => {
-    if (isMobileDevice) {
-      saveScoreModal.classList.remove('keyboard-active');
-    }
+    saveScoreModal.classList.remove('keyboard-active');
+    if (giftNotice) giftNotice.style.display = 'block';
   });
 });
 
