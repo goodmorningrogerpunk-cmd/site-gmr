@@ -1022,6 +1022,24 @@ function triggerLetterFall(char, x, y) {
   });
 }
 
+function isPositionNearObstacle(targetX, targetW = 65, safeMargin = 180) {
+  for (let obs of obstacles) {
+    if (targetX + targetW + safeMargin > obs.x && targetX < obs.x + obs.w + safeMargin) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isPositionNearLetter(targetX, targetW = 100, safeMargin = 180) {
+  for (let item of items) {
+    if (targetX + targetW + safeMargin > item.x && targetX < item.x + item.w + safeMargin) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function spawnWorldElements() {
   if (superSayen.state === 'LANDING' || freezeForSequence) return;
 
@@ -1064,14 +1082,17 @@ function spawnWorldElements() {
       const dim = getObstacleDimensions(conf);
 
       const obsX = x + (w / 2) - (dim.w / 2);
-      const depthAdjustment = (configIdx === 3) ? 33 : 25;
-      const obsY = targetY - dim.h + depthAdjustment; 
-      const flipX = Math.random() < 0.5;
+      
+      if (!isPositionNearLetter(obsX, dim.w, 180)) {
+        const depthAdjustment = (configIdx === 3) ? 33 : 25;
+        const obsY = targetY - dim.h + depthAdjustment; 
+        const flipX = Math.random() < 0.5;
 
-      obstacles.push({ x: obsX, y: obsY, w: dim.w, h: dim.h, configIdx, frame: 0, animTimer: 0, flipX });
-      lastObstacleX = obsX + dim.w;
+        obstacles.push({ x: obsX, y: obsY, w: dim.w, h: dim.h, configIdx, frame: 0, animTimer: 0, flipX });
+        lastObstacleX = obsX + dim.w;
 
-      handleObstacleSpawned(obsX, obsY, dim.w);
+        handleObstacleSpawned(obsX, obsY, dim.w);
+      }
     }
   }
 
@@ -1082,33 +1103,64 @@ function spawnWorldElements() {
     const dim = getObstacleDimensions(conf);
 
     const obsX = canvas.width + 120 + Math.random() * 100;
-    const flipX = Math.random() < 0.5;
-    let obsY;
 
-    if (conf.type === 'air') {
-      obsY = ENTITY_GROUND_Y - 170;
-      obstacles.push({
-        x: obsX, baseY: obsY, y: obsY, w: dim.w, h: dim.h,
-        configIdx, type: 'air', floatPhase: Math.random() * Math.PI * 2, flipX
-      });
-    } else {
-      const extraOffset = (configIdx === 0 || configIdx === 1) ? 5 : 0;
-      obsY = ENTITY_GROUND_Y - dim.h + extraOffset;
-      obstacles.push({ x: obsX, y: obsY, w: dim.w, h: dim.h, configIdx, frame: 0, animTimer: 0, flipX });
+    if (!isPositionNearLetter(obsX, dim.w, 180)) {
+      const flipX = Math.random() < 0.5;
+      let obsY;
+
+      if (conf.type === 'air') {
+        obsY = ENTITY_GROUND_Y - 170;
+        obstacles.push({
+          x: obsX, baseY: obsY, y: obsY, w: dim.w, h: dim.h,
+          configIdx, type: 'air', floatPhase: Math.random() * Math.PI * 2, flipX
+        });
+      } else {
+        const extraOffset = (configIdx === 0 || configIdx === 1) ? 5 : 0;
+        obsY = ENTITY_GROUND_Y - dim.h + extraOffset;
+        obstacles.push({ x: obsX, y: obsY, w: dim.w, h: dim.h, configIdx, frame: 0, animTimer: 0, flipX });
+      }
+
+      lastObstacleX = obsX + dim.w;
+      handleObstacleSpawned(obsX, obsY, dim.w);
     }
+  }
 
-    lastObstacleX = obsX + dim.w;
-    handleObstacleSpawned(obsX, obsY, dim.w);
+  if (superSayen.active && superSayen.state === 'FLY') {
+    if (canvas.width + 100 - lastLetterX > 220) {
+      let letterX = canvas.width + 120 + Math.random() * 150;
+      let letterY = 40 + Math.random() * 310; 
+      
+      const char = rogerLetters[nextSpawnLetterIndex];
+      items.push({
+        x: letterX, 
+        y: letterY, 
+        w: 65, 
+        h: 75,
+        char: char, 
+        letterIdx: nextSpawnLetterIndex, 
+        frame: 0, 
+        animTimer: 0
+      });
+
+      lastLetterX = letterX;
+      nextSpawnLetterIndex = (nextSpawnLetterIndex + 1) % rogerLetters.length;
+    }
   }
 }
 
 function handleObstacleSpawned(obsX, obsY, obsW) {
+  if (superSayen.active) return; 
+
   obstacleCounter++;
   if (obstacleCounter % 2 === 0) {
-    const letterX = obsX + obsW + 180 + (Math.random() * 60);
+    let letterX = obsX + obsW + 180 + (Math.random() * 60);
 
     if (letterX - lastLetterX < 280) {
       return;
+    }
+
+    if (isPositionNearObstacle(letterX, 65, 180)) {
+      letterX += 250;
     }
 
     const char = rogerLetters[nextSpawnLetterIndex];
