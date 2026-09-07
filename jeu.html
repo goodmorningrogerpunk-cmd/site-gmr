@@ -1124,33 +1124,9 @@ function spawnWorldElements() {
       handleObstacleSpawned(obsX, obsY, dim.w);
     }
   }
-
-  if (superSayen.active && superSayen.state === 'FLY') {
-    if (canvas.width + 100 - lastLetterX > 220) {
-      let letterX = canvas.width + 120 + Math.random() * 150;
-      let letterY = 40 + Math.random() * 310; 
-      
-      const char = rogerLetters[nextSpawnLetterIndex];
-      items.push({
-        x: letterX, 
-        y: letterY, 
-        w: 65, 
-        h: 75,
-        char: char, 
-        letterIdx: nextSpawnLetterIndex, 
-        frame: 0, 
-        animTimer: 0
-      });
-
-      lastLetterX = letterX;
-      nextSpawnLetterIndex = (nextSpawnLetterIndex + 1) % rogerLetters.length;
-    }
-  }
 }
 
 function handleObstacleSpawned(obsX, obsY, obsW) {
-  if (superSayen.active) return; 
-
   obstacleCounter++;
   if (obstacleCounter % 2 === 0) {
     let letterX = obsX + obsW + 180 + (Math.random() * 60);
@@ -1159,22 +1135,26 @@ function handleObstacleSpawned(obsX, obsY, obsW) {
       return;
     }
 
-    if (isPositionNearObstacle(letterX, 65, 180)) {
+    if (!superSayen.active && isPositionNearObstacle(letterX, 65, 180)) {
       letterX += 250;
     }
 
     const char = rogerLetters[nextSpawnLetterIndex];
-    
-    const heights = [
-      ENTITY_GROUND_Y - 75,
-      ENTITY_GROUND_Y - 180,
-      ENTITY_GROUND_Y - 250
-    ];
-    
-    let letterY = heights[Math.floor(Math.random() * heights.length)];
-    const matchingPlat = platforms.find(p => letterX + 65 > p.x && letterX < p.x + p.w);
-    if (matchingPlat) {
-      letterY = matchingPlat.y - 75;
+    let letterY;
+
+    if (superSayen.active && superSayen.state === 'FLY') {
+      letterY = 40 + Math.random() * 320;
+    } else {
+      const heights = [
+        ENTITY_GROUND_Y - 75,
+        ENTITY_GROUND_Y - 180,
+        ENTITY_GROUND_Y - 250
+      ];
+      letterY = heights[Math.floor(Math.random() * heights.length)];
+      const matchingPlat = platforms.find(p => letterX + 65 > p.x && letterX < p.x + p.w);
+      if (matchingPlat) {
+        letterY = matchingPlat.y - 75;
+      }
     }
 
     items.push({
