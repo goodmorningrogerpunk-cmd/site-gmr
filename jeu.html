@@ -907,8 +907,7 @@ function transitionSuperSayanToNormal() {
   }, 50);
 }
 
-// Numéro de version pour forcer le rechargement des images
-const ASSET_VERSION = 'v3'; 
+const ASSET_VERSION = 'v4'; 
 
 function loadSmartImage(baseName) {
   const img = new Image();
@@ -1135,14 +1134,15 @@ function spawnWorldElements() {
   const lastX = lastPlat ? lastPlat.x + lastPlat.w : 350;
 
   if (lastX < canvas.width + 300) {
-    const minHeightY = ENTITY_GROUND_Y - 230;
-    const maxHeightY = ENTITY_GROUND_Y - 90;
+    // Distribution équitable sur 3 tranches de hauteur (Haut, Milieu, Bas)
+    const heightZones = [
+      ENTITY_GROUND_Y - 230 + Math.random() * 50, // Zone haute
+      ENTITY_GROUND_Y - 160 + Math.random() * 40, // Zone milieu
+      ENTITY_GROUND_Y - 100 + Math.random() * 30  // Zone basse
+    ];
 
     const prevY = lastPlat ? lastPlat.y : ENTITY_GROUND_Y - 100;
-    
-    let targetY = prevY + (Math.random() * 160 - 80);
-    if (targetY < minHeightY) targetY = minHeightY;
-    if (targetY > maxHeightY) targetY = maxHeightY;
+    let targetY = heightZones[Math.floor(Math.random() * heightZones.length)];
 
     const heightDifference = prevY - targetY;
     let gap = 130 + Math.random() * 80;
