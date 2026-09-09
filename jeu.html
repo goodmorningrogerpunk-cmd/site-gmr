@@ -907,6 +907,9 @@ function transitionSuperSayanToNormal() {
   }, 50);
 }
 
+// Numéro de version pour forcer le rechargement des images
+const ASSET_VERSION = 'v2'; 
+
 function loadSmartImage(baseName) {
   const img = new Image();
   const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG'];
@@ -915,10 +918,10 @@ function loadSmartImage(baseName) {
   img.onerror = () => {
     extIdx++;
     if (extIdx < extensions.length) {
-      img.src = `${baseName}.${extensions[extIdx]}`;
+      img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`;
     }
   };
-  img.src = `${baseName}.${extensions[0]}`;
+  img.src = `${baseName}.${extensions[0]}?v=${ASSET_VERSION}`;
   return img;
 }
 
