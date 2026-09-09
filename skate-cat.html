@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skate Cat Runner | Good Morning Roger</title>
+    <link rel="icon" type="image/png" href="chat_tete.png">
+    <link rel="apple-touch-icon" href="chat_tete.png">
+    <style>
+/* 1. POLICES LOCALES */
+@font-face {
+  font-family: 'Bebas Neue';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/bebas-neue-v16-latin-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/robotov51-latin-regular.woff2') format('woff2');
+}
+
+body {
+    background-color: #0a0a0a;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+}
+
+/* LOGO & MASCOTTE */
+.logo-wrapper {
+    position: relative;
+    max-width: 450px;
+    margin: 40px auto;
+    cursor: pointer;
+}
+.logo-groupe-principal {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.4));
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    z-index: 2;
+}
+.mascotte-pop {
+    position: absolute;
+    top: -60px;
+    left: 60%;
+    width: 140px;
+    height: auto;
+    transform: rotate(-15deg) scale(0); 
+    opacity: 0;
+    z-index: 1;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.5));
+}
+.logo-wrapper:hover .logo-groupe-principal {
+    transform: scale(1.08) rotate(3deg);
+    filter: drop-shadow(0px 0px 25px rgba(18, 195, 255, 0.7));
+}
+.logo-wrapper:hover .mascotte-pop { opacity: 1; transform: rotate(15deg) scale(1); }
+
+nav {
+    background: rgba(0, 0, 0, 0.9);
+    padding: 15px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 2px solid #12C3FF;
+    text-align: center;
+}
+nav a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 15px;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.4rem;
+    transition: 0.3s;
+    display: inline-block;
+}
+nav a:hover {
+    color: #12C3FF;
+    text-shadow: 0px 0px 10px rgba(18, 195, 255, 0.7);
+    transform: scale(1.2) rotate(-2deg);
+}
+
+.game-container {
+    max-width: 800px;
+    margin: 60px auto 40px auto; 
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid #333;
+    text-align: center;
+}
+
+h1 { 
+    font-family: 'Bebas Neue', sans-serif; 
+    font-size: 3.5rem; 
+    color: #12C3FF; 
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.btn-launch-game {
+    background: #FFD700;
+    color: #1a1a24;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 2rem;
+    padding: 18px 36px;
+    border: 3px solid #ffffff;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 6px 0px #b29320, 0 10px 20px rgba(0,0,0,0.8);
+    transition: all 0.2s ease;
+    margin-top: 25px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.btn-launch-game:hover {
+    background: #ffe082;
+    transform: scale(1.05);
+}
+
+@media (max-width: 800px) {
+    h1 { font-size: 2.2rem; }
+    .logo-wrapper { max-width: 320px; }
+    .btn-launch-game { font-size: 1.5rem; padding: 14px 24px; }
+}
+    </style>
+</head>
+<body>
+
+    <a href="index.html" style="text-decoration: none;">
+        <div class="logo-wrapper">
+            <img src="Goodmorningrogerlogo.png" class="logo-groupe-principal" alt="Logo">
+            <img src="rogerchat.png" class="mascotte-pop" alt="Roger">
+        </div>
+    </a>
+
+    <nav>
+        <a href="index.html#presentation">Présentation</a>
+        <a href="index.html#actus">Actus</a>
+        <a href="index.html#concerts">Concerts</a>
+        <a href="index.html#musiques">Musiques</a>
+        <a href="index.html#contact">Contact</a>
+        <a href="pro.html">Espace Pro</a>
+    </nav>
+
+    <div class="game-container">
+        <h1>SECRET UNLOCKED: SKATE CAT RUNNER 🛹🐱</h1>
+        <p style="font-size: 1.2rem; color: #e0e0e0;">
+            Prêt à aider Roger à faire le meilleur score en skate ?
+        </p>
+        <button class="btn-launch-game" onclick="window.location.href='jeu.html'">
+            JOUER à Good Morning Roger Sk8in' Cat
+        </button>
+    </div>
+
+    <footer style="padding: 40px 0; text-align: center;">
+        <p style="font-size: 0.7rem; color: #444; text-transform: uppercase; letter-spacing: 2px;">
+            © 2026 Good Morning Roger - Clisson, France | 
+            <a href="mentions-legales.html" style="color: #444; text-decoration: none; border-bottom: 1px solid #444;">Mentions Légales</a>
+        </p>
+    </footer>
+
+</body>
+</html>
