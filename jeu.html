@@ -933,7 +933,11 @@ const assets = {
     ],
     run4: loadSmartImage('chat_run4'),
     jump: [loadSmartImage('chat_jump1'), loadSmartImage('chat_jump2'), loadSmartImage('chat_jump3')],
-    crouch: loadSmartImage('chat_reception2'),
+    crouchSequence: [
+      loadSmartImage('chat_reception2'),
+      loadSmartImage('chat_reception2-1'),
+      loadSmartImage('chat_reception2-2')
+    ],
     fail: loadSmartImage('chat_fail'),
     transform: [
       loadSmartImage('chat_transform1'),
@@ -1055,6 +1059,8 @@ const cat = {
   isJumping: false,
   animFrame: 0,
   animTimer: 0,
+  crouchFrame: 0,
+  crouchTimer: 0,
   state: 'RUN'
 };
 
@@ -1765,6 +1771,8 @@ function resetGame() {
   cat.isRun4Pose = false;
   cat.isJumping = false;
   cat.jumpTimer = 0;
+  cat.crouchFrame = 0;
+  cat.crouchTimer = 0;
   cat.state = 'RUN';
   platforms = [];
   obstacles = [];
@@ -1929,6 +1937,16 @@ function update() {
     }
 
     cat.isCrouching = downPressed;
+    if (cat.isCrouching) {
+      cat.crouchTimer++;
+      if (cat.crouchTimer % 6 === 0) {
+        cat.crouchFrame = (cat.crouchFrame + 1) % 3;
+      }
+    } else {
+      cat.crouchFrame = 0;
+      cat.crouchTimer = 0;
+    }
+
     cat.vy += GRAVITY;
     cat.y += cat.vy;
   }
@@ -2311,7 +2329,7 @@ function draw() {
       } else if (!cat.isGrounded) {
         catSprite = assets.cat.jump[Math.min(1, cat.animFrame % 3)];
       } else if (cat.isCrouching) {
-        catSprite = assets.cat.crouch;
+        catSprite = assets.cat.crouchSequence[cat.crouchFrame % 3];
       } else if (cat.isRun4Pose) {
         catSprite = assets.cat.run4;
       } else {
