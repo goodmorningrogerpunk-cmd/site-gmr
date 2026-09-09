@@ -78,11 +78,11 @@
       image-rendering: pixelated;
     }
 
-    .pixel-btn.nav-selected {
+    .pixel-btn.nav-selected, input.nav-selected {
       background-color: #ffffff !important;
       border-color: #ff3333 !important;
       color: #1a1a24 !important;
-      transform: scale(1.06);
+      transform: scale(1.04);
       box-shadow: 0 0 15px #ffd54f !important;
     }
 
@@ -610,6 +610,7 @@ const saveScoreForm = document.getElementById('save-score-form');
 const scoreModalTitle = document.getElementById('score-modal-title');
 const giftNotice = document.getElementById('gift-notice');
 const cancelSaveBtn = document.getElementById('cancel-save-btn');
+const saveBtn = document.getElementById('save-btn');
 
 const inputPseudo = document.getElementById('player-pseudo');
 const inputEmail = document.getElementById('player-email');
@@ -622,6 +623,21 @@ let rightSideIdx = 0;
 
 const gameOverButtons = [restartBtn, homeGameOverBtn];
 let gameOverSelectedIdx = 0;
+
+const formNavElements = [inputPseudo, inputEmail, cancelSaveBtn, saveBtn];
+let formNavIdx = 0;
+
+function updateFormNavSelection() {
+  formNavElements.forEach((el, idx) => {
+    if (idx === formNavIdx) {
+      el.classList.add('nav-selected');
+      if (el.tagName === 'INPUT') el.focus();
+    } else {
+      el.classList.remove('nav-selected');
+      if (el.tagName === 'INPUT') el.blur();
+    }
+  });
+}
 
 function updateMenuSelection() {
   startMainBtn.classList.remove('nav-selected');
@@ -754,14 +770,6 @@ inputs.forEach(input => {
       if (giftNotice) giftNotice.style.display = 'block';
     }
   });
-});
-
-inputPseudo.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    inputEmail.focus();
-    focusAndScroll(inputEmail);
-  }
 });
 
 function unlockAudio() {
@@ -1010,6 +1018,8 @@ let completedWordsCount = 0;
 
 let nextSpawnLetterIndex = 0;
 let lastLetterX = -1000;
+let lastLetterHeightLevel = -1;
+let heightLevelRepeatCount = 0;
 
 let invulnerableTimer = 0;
 let fallingLetters = [];
@@ -1219,7 +1229,23 @@ function handleObstacleSpawned(obsX, obsY, obsW) {
         ENTITY_GROUND_Y - 180,
         ENTITY_GROUND_Y - 250
       ];
-      letterY = heights[Math.floor(Math.random() * heights.length)];
+
+      let selectedLevelIdx = Math.floor(Math.random() * heights.length);
+
+      if (selectedLevelIdx === lastLetterHeightLevel) {
+        heightLevelRepeatCount++;
+        if (heightLevelRepeatCount >= 2) {
+          const alternativeLevels = [0, 1, 2].filter(idx => idx !== lastLetterHeightLevel);
+          selectedLevelIdx = alternativeLevels[Math.floor(Math.random() * alternativeLevels.length)];
+          heightLevelRepeatCount = 1;
+        }
+      } else {
+        heightLevelRepeatCount = 1;
+      }
+
+      lastLetterHeightLevel = selectedLevelIdx;
+      letterY = heights[selectedLevelIdx];
+
       const matchingPlat = platforms.find(p => letterX + 65 > p.x && letterX < p.x + p.w);
       if (matchingPlat) {
         letterY = matchingPlat.y - 75;
@@ -1259,6 +1285,20 @@ window.addEventListener('keydown', (e) => {
   }
 
   unlockAudio();
+
+  if (saveScoreModal.style.display === 'block') {
+    if (e.code === 'ArrowDown') {
+      formNavIdx = (formNavIdx + 1) % formNavElements.length;
+      updateFormNavSelection();
+    } else if (e.code === 'ArrowUp') {
+      formNavIdx = (formNavIdx - 1 + formNavElements.length) % formNavElements.length;
+      updateFormNavSelection();
+    } else if (e.code === 'Enter') {
+      if (formNavIdx === 2) cancelSaveBtn.click();
+      else if (formNavIdx === 3) saveScoreForm.requestSubmit();
+    }
+    return;
+  }
 
   if (!gameStarted && gameOverStack.style.display !== 'flex' && scorePromptBox.style.display !== 'block' && saveScoreModal.style.display !== 'block') {
     if (menuFocusArea === 'START') {
@@ -1584,6 +1624,8 @@ promptYesBtn.addEventListener('click', () => {
   scorePromptBox.style.display = 'none';
   scoreModalTitle.textContent = `ENREGISTRE TON SCORE DE ${score} POINTS !`;
   saveScoreModal.style.display = 'block';
+  formNavIdx = 0;
+  updateFormNavSelection();
 });
 
 promptNoBtn.addEventListener('click', () => {
@@ -1630,7 +1672,6 @@ saveScoreForm.addEventListener('submit', (e) => {
 
   if (!pseudo || !email) return;
 
-  const saveBtn = document.getElementById('save-btn');
   saveBtn.disabled = true;
   saveBtn.textContent = 'ENVOI...';
 
@@ -1695,6 +1736,8 @@ function resetGame() {
   bonusEffectTimer = 0;
   lastObstacleX = -1000;
   lastLetterX = -1000;
+  lastLetterHeightLevel = -1;
+  heightLevelRepeatCount = 0;
   obstacleCounter = 0;
   completedWordsCount = 0;
   nextSpawnLetterIndex = 0;
@@ -1838,7 +1881,7 @@ function update() {
         cat.vy = 0;
         superSayen.active = false;
         superSayen.state = 'NONE';
-        
+
         obstacles.forEach(o => {
           if (o.type !== 'air') {
             const extraOffset = (o.configIdx === 0 || o.configIdx === 1) ? 5 : 0;
@@ -1850,6 +1893,15 @@ function update() {
               o.y = ENTITY_GROUND_Y - o.h + extraOffset;
             }
           }
+        });
+
+        obstacles = obstacles.filter((o, idx) => {
+          for (let j = idx + 1; j < obstacles.length; j++) {
+            if (Math.abs(o.x - obstacles[j].x) < 250) {
+              return false;
+            }
+          }
+          return true;
         });
 
         lastObstacleX = cat.x + 400;
