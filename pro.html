@@ -156,26 +156,6 @@ input[type="password"] {
 }
 .btn-pro:hover { background: #fff; transform: scale(1.1); }
 
-.btn-launch-game {
-    background: #FFD700;
-    color: #1a1a24;
-    font-family: 'Bebas Neue', cursive;
-    font-size: 2rem;
-    padding: 18px 36px;
-    border: 3px solid #ffffff;
-    border-radius: 10px;
-    cursor: pointer;
-    box-shadow: 0 6px 0px #b29320, 0 10px 20px rgba(0,0,0,0.8);
-    transition: all 0.2s ease;
-    margin-top: 20px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-.btn-launch-game:hover {
-    background: #ffe082;
-    transform: scale(1.05);
-}
-
 #error-msg { color: #ff4d4d; font-weight: bold; margin-top: 20px; display: none; }
 
 /* 4. STYLE DU BLOC CONTACT */
@@ -222,7 +202,6 @@ html {
     input[type="password"] { width: 100%; }
     .btn-pro { width: 100%; margin-top: 10px; }
     .contact-title-cyan { font-size: 1.8rem; }
-    .btn-launch-game { font-size: 1.5rem; padding: 14px 24px; }
 }
     </style>
 </head>
@@ -257,19 +236,6 @@ html {
             <button class="btn-pro" onclick="verify()">VALIDER</button>
         </div>
         <p id="error-msg">Oups, c'est pas le bon code !</p>
-    </div>
-
-    <!-- PAGE INTERMÉDIAIRE D'ACCUEIL DU JEU -->
-    <div id="game-welcome-container" class="pro-container" style="display: none;">
-        <h2 style="font-family: 'Bebas Neue', sans-serif; color: #12C3FF; font-size: 2.8rem; margin-bottom: 10px;">
-            SECRET UNLOCKED: SKATE CAT RUNNER 🛹🐱
-        </h2>
-        <p style="font-size: 1.2rem; color: #e0e0e0; margin-bottom: 20px;">
-            Prêt à aider Roger à faire le meilleur score en skate ?
-        </p>
-        <button class="btn-launch-game" onclick="launchGame()">
-            JOUER à Good Morning Roger Sk8in' Cat
-        </button>
     </div>
 
     <div class="pro-container">
@@ -316,15 +282,11 @@ html {
         function verify() {
             const inputVal = document.getElementById('passInput').value.trim();
             const error = document.getElementById('error-msg');
-            const loginContainer = document.getElementById('pro-login-container');
-            const welcomeContainer = document.getElementById('game-welcome-container');
 
-            // 1. VÉRIFICATION CODE SECRET JEU VIDEO ("sk8")
+            // 1. REDIRECTION VERS LA PAGE DÉDIÉE AU JEU ("sk8")
             if (inputVal.toLowerCase() === "sk8") {
                 error.style.display = "none";
-                loginContainer.style.display = "none";
-                welcomeContainer.style.display = "block";
-                welcomeContainer.scrollIntoView({ behavior: 'smooth' });
+                window.location.href = "skate-cat.html";
                 return;
             }
 
@@ -335,25 +297,6 @@ html {
             } else {
                 error.style.display = "block";
                 document.getElementById('passInput').value = "";
-            }
-        }
-
-        // REDIRECTION ET DEMANDE DU PLEIN ÉCRAN DÈS LE CLIC
-        function launchGame() {
-            const elem = document.documentElement;
-
-            // Tentative de passer en plein écran immédiatement sur smartphone
-            const requestFS = elem.requestFullscreen || elem.webkitRequestFullscreen || elem.msRequestFullscreen;
-            if (requestFS) {
-                requestFS.call(elem).then(() => {
-                    if (screen.orientation && screen.orientation.lock) {
-                        screen.orientation.lock('landscape').catch(() => {});
-                    }
-                }).catch(() => {}).finally(() => {
-                    window.location.href = "jeu.html";
-                });
-            } else {
-                window.location.href = "jeu.html";
             }
         }
 
