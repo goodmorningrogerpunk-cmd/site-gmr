@@ -1222,7 +1222,12 @@ function handleObstacleSpawned(obsX, obsY, obsW) {
     let letterY;
 
     if (superSayen.active && superSayen.state === 'FLY') {
-      letterY = 40 + Math.random() * 320;
+      const flyZones = [
+        30 + Math.random() * 90,   
+        140 + Math.random() * 100, 
+        260 + Math.random() * 120  
+      ];
+      letterY = flyZones[Math.floor(Math.random() * flyZones.length)];
     } else {
       const heights = [
         ENTITY_GROUND_Y - 75,
@@ -1864,10 +1869,11 @@ function update() {
 
       if (superSayen.timer >= 450) {
         superSayen.state = 'LANDING';
-        obstacles = obstacles.filter(o => o.x < cat.x - 100 || o.x > cat.x + 800);
-        platforms = platforms.filter(p => p.x < cat.x - 100 || p.x > cat.x + 800);
-        lastObstacleX = canvas.width + 500;
-        lastLetterX = canvas.width + 500;
+        obstacles = [];
+        items = [];
+        platforms = [];
+        lastObstacleX = canvas.width + 400;
+        lastLetterX = canvas.width + 400;
         transitionSuperSayanToNormal();
       }
     } else if (superSayen.state === 'LANDING') {
@@ -1882,30 +1888,8 @@ function update() {
         superSayen.active = false;
         superSayen.state = 'NONE';
 
-        obstacles.forEach(o => {
-          if (o.type !== 'air') {
-            const extraOffset = (o.configIdx === 0 || o.configIdx === 1) ? 5 : 0;
-            let matchingPlat = platforms.find(p => o.x + o.w > p.x && o.x < p.x + p.w);
-            if (matchingPlat) {
-              const depthAdjustment = (o.configIdx === 3) ? 33 : 25;
-              o.y = matchingPlat.y - o.h + depthAdjustment;
-            } else {
-              o.y = ENTITY_GROUND_Y - o.h + extraOffset;
-            }
-          }
-        });
-
-        obstacles = obstacles.filter((o, idx) => {
-          for (let j = idx + 1; j < obstacles.length; j++) {
-            if (Math.abs(o.x - obstacles[j].x) < 250) {
-              return false;
-            }
-          }
-          return true;
-        });
-
-        lastObstacleX = cat.x + 400;
-        lastLetterX = cat.x + 400;
+        lastObstacleX = cat.x + 300;
+        lastLetterX = cat.x + 300;
       }
     }
   } else {
