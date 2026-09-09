@@ -616,17 +616,22 @@ const inputEmail = document.getElementById('player-email');
 
 let promptSelectedOption = 'YES'; 
 
-const mainMenuButtons = [startMainBtn, rulesBtn, leaderboardBtn, aboutBtn, quitBtn];
-let mainMenuSelectedIdx = 0;
+const rightSideButtons = [rulesBtn, leaderboardBtn, aboutBtn, quitBtn];
+let menuFocusArea = 'START'; 
+let rightSideIdx = 0;
 
 const gameOverButtons = [restartBtn, homeGameOverBtn];
 let gameOverSelectedIdx = 0;
 
 function updateMenuSelection() {
-  mainMenuButtons.forEach((btn, idx) => {
-    if (idx === mainMenuSelectedIdx) btn.classList.add('nav-selected');
-    else btn.classList.remove('nav-selected');
-  });
+  startMainBtn.classList.remove('nav-selected');
+  rightSideButtons.forEach(btn => btn.classList.remove('nav-selected'));
+
+  if (menuFocusArea === 'START') {
+    startMainBtn.classList.add('nav-selected');
+  } else {
+    rightSideButtons[rightSideIdx].classList.add('nav-selected');
+  }
 }
 
 function updateGameOverSelection() {
@@ -865,6 +870,8 @@ function returnToHome() {
   
   stopAllSounds();
   playIntroMusic();
+  menuFocusArea = 'START';
+  rightSideIdx = 0;
   updateMenuSelection();
 }
 
@@ -1254,14 +1261,27 @@ window.addEventListener('keydown', (e) => {
   unlockAudio();
 
   if (!gameStarted && gameOverStack.style.display !== 'flex' && scorePromptBox.style.display !== 'block' && saveScoreModal.style.display !== 'block') {
-    if (e.code === 'ArrowUp') {
-      mainMenuSelectedIdx = (mainMenuSelectedIdx - 1 + mainMenuButtons.length) % mainMenuButtons.length;
-      updateMenuSelection();
-    } else if (e.code === 'ArrowDown') {
-      mainMenuSelectedIdx = (mainMenuSelectedIdx + 1) % mainMenuButtons.length;
-      updateMenuSelection();
-    } else if (e.code === 'Enter' || e.code === 'Space') {
-      mainMenuButtons[mainMenuSelectedIdx].click();
+    if (menuFocusArea === 'START') {
+      if (e.code === 'ArrowRight') {
+        menuFocusArea = 'RIGHT';
+        rightSideIdx = 0; 
+        updateMenuSelection();
+      } else if (e.code === 'Enter' || e.code === 'Space') {
+        startMainBtn.click();
+      }
+    } else if (menuFocusArea === 'RIGHT') {
+      if (e.code === 'ArrowUp') {
+        rightSideIdx = (rightSideIdx - 1 + rightSideButtons.length) % rightSideButtons.length;
+        updateMenuSelection();
+      } else if (e.code === 'ArrowDown') {
+        rightSideIdx = (rightSideIdx + 1) % rightSideButtons.length;
+        updateMenuSelection();
+      } else if (e.code === 'ArrowLeft') {
+        menuFocusArea = 'START';
+        updateMenuSelection();
+      } else if (e.code === 'Enter' || e.code === 'Space') {
+        rightSideButtons[rightSideIdx].click();
+      }
     }
     return;
   }
@@ -1576,9 +1596,15 @@ promptNoBtn.addEventListener('click', () => {
 promptYesBtn.addEventListener('mouseenter', () => updatePromptSelection('YES'));
 promptNoBtn.addEventListener('mouseenter', () => updatePromptSelection('NO'));
 
-mainMenuButtons.forEach((btn, idx) => {
+startMainBtn.addEventListener('mouseenter', () => {
+  menuFocusArea = 'START';
+  updateMenuSelection();
+});
+
+rightSideButtons.forEach((btn, idx) => {
   btn.addEventListener('mouseenter', () => {
-    mainMenuSelectedIdx = idx;
+    menuFocusArea = 'RIGHT';
+    rightSideIdx = idx;
     updateMenuSelection();
   });
 });
@@ -1881,7 +1907,7 @@ function update() {
     const speedBuffer = currentGameSpeed * 2.0;
     catBoxX = cat.x + (cat.width / 2) - 45 - speedBuffer;
     catBoxWidth = 90 + (speedBuffer * 2);
-    catBoxY = cat.y + (cat.height / 2) - (hitBoxHeight / 2);
+    catBoxY = cat.y + (cat.height / 2) - (hitBoxHeight / 2) - 30;
     catBoxHeight = hitBoxHeight;
   }
 
