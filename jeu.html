@@ -33,21 +33,22 @@
       position: relative;
       width: 100%;
       max-width: 960px;
-      aspect-ratio: 16 / 9;
+      height: 100%;
+      max-height: 540px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
       border-radius: 12px;
       overflow: hidden;
       border: 4px solid #2e2e40;
       background: #000;
-      transition: all 0.2s ease;
-      touch-action: none !important;
     }
 
     #game-container.mobile-fullscreen {
       position: fixed !important;
       top: 0 !important;
       left: 0 !important;
-      transform: none !important;
       width: 100vw !important;
       height: 100vh !important;
       max-width: 100vw !important;
@@ -60,9 +61,14 @@
     canvas {
       width: 100%;
       height: 100%;
+      object-fit: contain;
       display: block;
-      image-rendering: pixelated;
+      image-rendering: -webkit-optimize-contrast;
       image-rendering: crisp-edges;
+      image-rendering: pixelated;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      transform: translateZ(0);
       touch-action: none !important;
     }
 
@@ -575,6 +581,9 @@ document.addEventListener('contextmenu', e => e.preventDefault());
 const gameContainer = document.getElementById('game-container');
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+
+canvas.width = 960;
+canvas.height = 540;
 
 const startMainBtn = document.getElementById('start-main-btn');
 const rightStack = document.getElementById('right-stack');
@@ -1134,11 +1143,10 @@ function spawnWorldElements() {
   const lastX = lastPlat ? lastPlat.x + lastPlat.w : 350;
 
   if (lastX < canvas.width + 300) {
-    // Distribution équitable sur 3 tranches de hauteur (Haut, Milieu, Bas)
     const heightZones = [
-      ENTITY_GROUND_Y - 230 + Math.random() * 50, // Zone haute
-      ENTITY_GROUND_Y - 160 + Math.random() * 40, // Zone milieu
-      ENTITY_GROUND_Y - 100 + Math.random() * 30  // Zone basse
+      ENTITY_GROUND_Y - 230 + Math.random() * 50,
+      ENTITY_GROUND_Y - 160 + Math.random() * 40,
+      ENTITY_GROUND_Y - 100 + Math.random() * 30 
     ];
 
     const prevY = lastPlat ? lastPlat.y : ENTITY_GROUND_Y - 100;
@@ -2548,14 +2556,24 @@ function drawGameOverOverlay() {
   ctx.textAlign = 'left';
 }
 
-function gameLoop() {
-  update();
-  draw();
+let lastTime = performance.now();
+const TARGET_FPS = 60;
+const OPTIMAL_TIME = 1000 / TARGET_FPS;
+
+function gameLoop(currentTime) {
   requestAnimationFrame(gameLoop);
+
+  const elapsed = currentTime - lastTime;
+
+  if (elapsed >= OPTIMAL_TIME - 1) {
+    lastTime = currentTime - (elapsed % OPTIMAL_TIME);
+    update();
+    draw();
+  }
 }
 
 spawnWorldElements();
-gameLoop();
+requestAnimationFrame(gameLoop);
 </script>
 </body>
 </html>
