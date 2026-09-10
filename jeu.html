@@ -916,7 +916,7 @@ function transitionSuperSayanToNormal() {
   }, 50);
 }
 
-const ASSET_VERSION = 'v4'; 
+const ASSET_VERSION = 'v5'; 
 
 function loadSmartImage(baseName) {
   const img = new Image();
@@ -2357,14 +2357,12 @@ function draw() {
           const spriteRatio = catSprite.naturalWidth / catSprite.naturalHeight;
 
           if (cat.isCrouching) {
-            // Réduction de 15 % de la taille globale (0.85)
             const crouchScale = 0.85;
             
             drawWidth = cat.width * 1.3 * crouchScale;
             drawHeight = drawWidth / spriteRatio;
             
-            // Repositionne le chat pour qu'il reste bien calé au sol
-            drawY = ENTITY_GROUND_Y - drawHeight;
+            drawY = cat.y + (cat.height - drawHeight);
           }
 
           ctx.drawImage(catSprite, drawX, drawY, drawWidth, drawHeight);
