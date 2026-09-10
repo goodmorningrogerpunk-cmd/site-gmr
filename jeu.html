@@ -916,7 +916,7 @@ function transitionSuperSayanToNormal() {
   }, 50);
 }
 
-const ASSET_VERSION = 'v5'; 
+const ASSET_VERSION = 'v6'; 
 
 function loadSmartImage(baseName) {
   const img = new Image();
@@ -949,6 +949,7 @@ const assets = {
       loadSmartImage('chat_reception2-1'),
       loadSmartImage('chat_reception2-2')
     ],
+    crouchAir: loadSmartImage('chat_reception2 - Copie'),
     fail: loadSmartImage('chat_fail'),
     transform: [
       loadSmartImage('chat_transform1'),
@@ -2337,6 +2338,8 @@ function draw() {
     } else {
       if (cat.state === 'FAIL') {
         catSprite = assets.cat.fail;
+      } else if (cat.isCrouching && !cat.isGrounded) {
+        catSprite = assets.cat.crouchAir;
       } else if (!cat.isGrounded) {
         catSprite = assets.cat.jump[Math.min(1, cat.animFrame % 3)];
       } else if (cat.isCrouching) {
