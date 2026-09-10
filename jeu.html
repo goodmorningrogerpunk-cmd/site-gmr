@@ -2348,8 +2348,20 @@ function draw() {
       }
 
       if (cat.state !== 'FAIL') {
+        let drawWidth = cat.width;
+        let drawHeight = cat.height;
+        let drawY = cat.y;
+
         if (catSprite && catSprite.complete && catSprite.naturalWidth > 0) {
-          ctx.drawImage(catSprite, cat.x, cat.y, cat.width, cat.height);
+          const spriteRatio = catSprite.naturalWidth / catSprite.naturalHeight;
+
+          if (cat.isCrouching) {
+            drawHeight = 80;
+            drawWidth = drawHeight * spriteRatio;
+            drawY = cat.y + (cat.height - drawHeight);
+          }
+
+          ctx.drawImage(catSprite, cat.x, drawY, drawWidth, drawHeight);
         } else {
           ctx.fillStyle = '#ab47bc';
           ctx.fillRect(cat.x, cat.y, cat.width, cat.height);
