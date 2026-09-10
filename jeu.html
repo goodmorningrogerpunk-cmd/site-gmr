@@ -2350,18 +2350,20 @@ function draw() {
       if (cat.state !== 'FAIL') {
         let drawWidth = cat.width;
         let drawHeight = cat.height;
+        let drawX = cat.x;
         let drawY = cat.y;
 
         if (catSprite && catSprite.complete && catSprite.naturalWidth > 0) {
           const spriteRatio = catSprite.naturalWidth / catSprite.naturalHeight;
 
           if (cat.isCrouching) {
-            drawHeight = 80;
-            drawWidth = drawHeight * spriteRatio;
+            // Calcule la taille basée sur la largeur naturelle de l'image pour éviter l'écrasement horizontal
+            drawWidth = cat.width * 1.3;
+            drawHeight = drawWidth / spriteRatio;
             drawY = cat.y + (cat.height - drawHeight);
           }
 
-          ctx.drawImage(catSprite, cat.x, drawY, drawWidth, drawHeight);
+          ctx.drawImage(catSprite, drawX, drawY, drawWidth, drawHeight);
         } else {
           ctx.fillStyle = '#ab47bc';
           ctx.fillRect(cat.x, cat.y, cat.width, cat.height);
