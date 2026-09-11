@@ -580,7 +580,7 @@ document.addEventListener('contextmenu', e => e.preventDefault());
 
 const gameContainer = document.getElementById('game-container');
 const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+const ctx = canvas.getContext('2d', { alpha: false });
 
 canvas.width = 960;
 canvas.height = 540;
@@ -916,7 +916,7 @@ function transitionSuperSayanToNormal() {
   }, 50);
 }
 
-const ASSET_VERSION = 'v9'; 
+const ASSET_VERSION = 'v10'; 
 
 function loadSmartImage(baseName) {
   const img = new Image();
@@ -1023,7 +1023,7 @@ const MAX_JUMP_TIME = 15;
 
 let bgX = 0;
 let score = 0;
-let lastScoreTime = Date.now();
+let scoreAcc = 0;
 let gameOver = false;
 let gameStarted = false;
 let bonusEffectTimer = 0;
@@ -1224,6 +1224,9 @@ function spawnWorldElements() {
 }
 
 function handleObstacleSpawned(obsX, obsY, obsW) {
+  // 1. NE PAS GÉNÉRER DE LETTRES EN PHASE D'ATTERRISSAGE SUPER SAYEN
+  if (superSayen.state === 'LANDING') return;
+
   obstacleCounter++;
   if (obstacleCounter % 2 === 0) {
     let letterX = obsX + obsW + 180 + (Math.random() * 60);
@@ -1752,7 +1755,7 @@ document.addEventListener('click', () => {
 
 function resetGame() {
   score = 0;
-  lastScoreTime = Date.now();
+  scoreAcc = 0;
   gameOver = false;
   gameStarted = true;
   isPaused = false;
@@ -1796,30 +1799,31 @@ function resetGame() {
   updatePromptSelection('YES');
 }
 
-function update() {
+// 2. CORRECTION FLUIDITÉ IOS (Calcul fluide sur delta de temps)
+function update(dt = 1) {
   if (!gameStarted || gameOver || isPaused) {
     stopRunSound();
     return;
   }
 
-  bounceTimer += 0.08;
+  bounceTimer += 0.08 * dt;
 
   if (invulnerableTimer > 0) {
-    invulnerableTimer--;
+    invulnerableTimer -= dt;
   }
 
   fallingLetters.forEach(fl => {
-    fl.y += fl.vy;
-    fl.x += fl.vx;
-    fl.vy += 0.4;
-    fl.angle += fl.vAngle;
-    fl.alpha -= 0.02;
+    fl.y += fl.vy * dt;
+    fl.x += fl.vx * dt;
+    fl.vy += 0.4 * dt;
+    fl.angle += fl.vAngle * dt;
+    fl.alpha -= 0.02 * dt;
   });
   fallingLetters = fallingLetters.filter(fl => fl.alpha > 0);
 
   if (freezeForSequence) {
     stopRunSound();
-    sequenceAngle += 0.12; 
+    sequenceAngle += 0.12 * dt; 
     
     if (sequenceAngle >= Math.PI * 2) {
       sequenceAngle = 0;
@@ -1834,10 +1838,11 @@ function update() {
     return; 
   }
 
-  const now = Date.now();
-  if (now - lastScoreTime >= 1000) {
-    score += superSayen.active ? 500 : 50;
-    lastScoreTime = now;
+  scoreAcc += (superSayen.active ? 500 : 50) * (dt / 60);
+  if (scoreAcc >= 1) {
+    const pts = Math.floor(scoreAcc);
+    score += pts;
+    scoreAcc -= pts;
   }
 
   const speedLevel = Math.floor(score / 20000);
@@ -1849,18 +1854,18 @@ function update() {
   const downPressed = !!(keys['ArrowDown'] || keys['KeyS']);
 
   if (superSayen.active) {
-    superSayen.animTimer++;
+    superSayen.animTimer += dt;
 
     if (superSayen.state === 'TRANSFORM') {
       currentGameSpeed = effectiveBaseSpeed * 0.5;
       
       if (cat.y > superSayen.targetY) {
-        cat.y -= 3;
+        cat.y -= 3 * dt;
       }
 
       const frameInterval = (superSayen.transformFrame === 5) ? 4 : 14;
 
-      if (superSayen.animTimer % frameInterval === 0) {
+      if (Math.floor(superSayen.animTimer) % frameInterval === 0) {
         if (superSayen.transformFrame < 5) {
           superSayen.transformFrame++;
         } else {
@@ -1870,10 +1875,10 @@ function update() {
       }
     } else if (superSayen.state === 'FLY') {
       currentGameSpeed = effectiveBaseSpeed * 3.5;
-      superSayen.timer++;
-      score += 15;
+      superSayen.timer += dt;
+      score += Math.round(15 * (dt / 60));
 
-      const flySpeed = 7;
+      const flySpeed = 7 * dt;
       const maxFlyY = ENTITY_GROUND_Y - cat.height + 65; 
       
       if (flyUpPressed) {
@@ -1883,7 +1888,7 @@ function update() {
         cat.y = Math.min(maxFlyY, cat.y + flySpeed);
       }
 
-      if (superSayen.animTimer % 4 === 0) {
+      if (Math.floor(superSayen.animTimer) % 4 === 0) {
         superSayen.flyFrame = (superSayen.flyFrame + 1) % 6;
       }
 
@@ -1900,7 +1905,7 @@ function update() {
       currentGameSpeed = effectiveBaseSpeed;
 
       if (cat.y < ENTITY_GROUND_Y - cat.height) {
-        cat.y += 6;
+        cat.y += 6 * dt;
       } else {
         cat.y = ENTITY_GROUND_Y - cat.height;
         cat.isGrounded = true;
@@ -1916,13 +1921,13 @@ function update() {
     currentGameSpeed = effectiveBaseSpeed;
   }
 
-  bgX -= currentGameSpeed * 0.4;
-  lastObstacleX -= currentGameSpeed;
-  lastLetterX -= currentGameSpeed;
+  bgX -= currentGameSpeed * 0.4 * dt;
+  lastObstacleX -= currentGameSpeed * dt;
+  lastLetterX -= currentGameSpeed * dt;
 
   if (!superSayen.active) {
     if (downPressed && cat.isPlatformGrounded) {
-      cat.y += 12;
+      cat.y += 12 * dt;
       cat.isGrounded = false;
       cat.isPlatformGrounded = false;
       stopRunSound();
@@ -1943,15 +1948,15 @@ function update() {
 
     if (jumpPressed && cat.isJumping) {
       if (cat.jumpTimer < MAX_JUMP_TIME) {
-        cat.vy += JUMP_HOLD_FORCE;
-        cat.jumpTimer++;
+        cat.vy += JUMP_HOLD_FORCE * dt;
+        cat.jumpTimer += dt;
       }
     }
 
     cat.isCrouching = downPressed;
     if (cat.isCrouching) {
-      cat.crouchTimer++;
-      if (cat.crouchTimer % 6 === 0) {
+      cat.crouchTimer += dt;
+      if (Math.floor(cat.crouchTimer) % 6 === 0) {
         cat.crouchFrame = (cat.crouchFrame + 1) % 3;
       }
     } else {
@@ -1959,8 +1964,8 @@ function update() {
       cat.crouchTimer = 0;
     }
 
-    cat.vy += GRAVITY;
-    cat.y += cat.vy;
+    cat.vy += GRAVITY * dt;
+    cat.y += cat.vy * dt;
   }
 
   let catBoxX = cat.x + 25;
@@ -2011,7 +2016,7 @@ function update() {
     }
   }
 
-  platforms.forEach(p => p.x -= currentGameSpeed);
+  platforms.forEach(p => p.x -= currentGameSpeed * dt);
 
   if (!superSayen.active) {
     if (!cat.wasGrounded && cat.isGrounded) {
@@ -2027,14 +2032,14 @@ function update() {
   platforms = platforms.filter(p => p.x + p.w > -100);
 
   obstacles.forEach(o => {
-    o.x -= currentGameSpeed;
+    o.x -= currentGameSpeed * dt;
 
     if (o.type === 'air') {
-      o.floatPhase += 0.05;
+      o.floatPhase += 0.05 * dt;
       o.y = o.baseY + Math.sin(o.floatPhase) * 12;
     } else {
-      o.animTimer++;
-      if (o.animTimer % 10 === 0) {
+      o.animTimer += dt;
+      if (Math.floor(o.animTimer) % 10 === 0) {
         o.frame = (o.frame + 1) % 3;
       }
     }
@@ -2076,9 +2081,9 @@ function update() {
   obstacles = obstacles.filter(o => o.x + o.w > -100);
 
   items.forEach(it => {
-    it.x -= currentGameSpeed;
-    it.animTimer++;
-    if (it.animTimer % 6 === 0) {
+    it.x -= currentGameSpeed * dt;
+    it.animTimer += dt;
+    if (Math.floor(it.animTimer) % 6 === 0) {
       it.frame = (it.frame + 1) % 8;
     }
 
@@ -2137,13 +2142,13 @@ function update() {
   items = items.filter(it => !it.collected && it.x + it.w > -100);
 
   if (bonusEffectTimer > 0) {
-    bonusEffectTimer--;
+    bonusEffectTimer -= dt;
   }
 
   spawnWorldElements();
 
-  cat.animTimer++;
-  if (cat.animTimer % 14 === 0) {
+  cat.animTimer += dt;
+  if (Math.floor(cat.animTimer) % 14 === 0) {
     cat.animFrame = (cat.animFrame + 1) % 4;
   }
 }
@@ -2341,13 +2346,13 @@ function draw() {
       } else if (cat.isCrouching && !cat.isGrounded) {
         catSprite = assets.cat.crouchAir;
       } else if (!cat.isGrounded) {
-        catSprite = assets.cat.jump[Math.min(1, cat.animFrame % 3)];
+        catSprite = assets.cat.jump[Math.min(1, Math.floor(cat.animFrame) % 3)];
       } else if (cat.isCrouching) {
         catSprite = assets.cat.crouchSequence[cat.crouchFrame % 3];
       } else if (cat.isRun4Pose) {
         catSprite = assets.cat.run4;
       } else {
-        catSprite = assets.cat.runSequence[cat.animFrame % 4];
+        catSprite = assets.cat.runSequence[Math.floor(cat.animFrame) % 4];
       }
 
       if (cat.state !== 'FAIL') {
@@ -2579,20 +2584,21 @@ function drawGameOverOverlay() {
   ctx.textAlign = 'left';
 }
 
-let lastTime = performance.now();
-const TARGET_FPS = 60;
-const OPTIMAL_TIME = 1000 / TARGET_FPS;
+// 2. CORRECTION BOUCLE RENDER SANS BRIDER L'ÉCRAN
+let lastFrameTime = performance.now();
 
 function gameLoop(currentTime) {
   requestAnimationFrame(gameLoop);
 
-  const elapsed = currentTime - lastTime;
+  let deltaMs = currentTime - lastFrameTime;
+  lastFrameTime = currentTime;
 
-  if (elapsed >= OPTIMAL_TIME - 1) {
-    lastTime = currentTime - (elapsed % OPTIMAL_TIME);
-    update();
-    draw();
-  }
+  if (deltaMs > 100) deltaMs = 100;
+
+  const dt = deltaMs / (1000 / 60);
+
+  update(dt);
+  draw();
 }
 
 spawnWorldElements();
