@@ -685,7 +685,7 @@ bgMusic.volume = 0.8;
 
 const marioInvMusic = new Audio('marioinv.mp3');
 marioInvMusic.loop = true;
-marioInvMusic.volume = 0.85;
+marioInvMusic.volume = 1.0;
 
 const superSayanTheme = new Audio('supersayantheme.mp3');
 superSayanTheme.volume = 1.0;
@@ -701,7 +701,9 @@ const sounds = {
   punkbonus: new Audio('punkbonus.mp3'),
   degom: new Audio('degom.mp3'),
   debonus: new Audio('debonus.mp3'),
-  debonusend: new Audio('debonusend.mp3')
+  debonusend: new Audio('debonusend.mp3'),
+  wilhem: new Audio('wilhem.wav'),
+  cri: new Audio('cri.mp3')
 };
 
 sounds.run.loop = true;
@@ -716,6 +718,8 @@ sounds.punkbonus.volume = 0.85;
 sounds.degom.volume = 0.85;
 sounds.debonus.volume = 0.85;
 sounds.debonusend.volume = 0.85;
+sounds.wilhem.volume = 0.85;
+sounds.cri.volume = 0.85;
 
 let audioUnlocked = false;
 let fadeInterval = null;
@@ -944,7 +948,7 @@ function transitionSuperSayanToNormal() {
   }, 50);
 }
 
-const ASSET_VERSION = 'v15'; 
+const ASSET_VERSION = 'v16'; 
 
 function loadSmartImage(baseName) {
   const img = new Image();
@@ -2223,7 +2227,14 @@ function update() {
 
     if (isHit) {
       if (invincibleTimer > 0) {
-        playSoundEffect(sounds.degom);
+        // Sons spécifiques selon l'obstacle dégommé
+        if (o.configIdx === 0 || o.configIdx === 1) { // 0: JL, 1: Marc
+          const randomSound = Math.random() < 0.5 ? sounds.wilhem : sounds.cri;
+          playSoundEffect(randomSound);
+        } else {
+          playSoundEffect(sounds.degom);
+        }
+
         score += 100;
 
         let vx = 8 + Math.random() * 6;
@@ -2806,20 +2817,20 @@ function draw() {
     ctx.restore();
   });
 
+  // Affichage discret des +1 000 PTS sans aucun filtre d'écran
   if (bonusEffectTimer > 0) {
     ctx.save();
-    const alpha = Math.min(1, bonusEffectTimer / 30);
-    ctx.fillStyle = `rgba(255, 215, 0, ${alpha * 0.25})`;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = `rgba(255, 215, 0, ${alpha})`;
+    const alpha = Math.min(1, bonusEffectTimer / 25);
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = '#ffd54f';
     ctx.textAlign = 'center';
-    ctx.font = 'bold 46px Courier New';
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 5;
-    const textY = Math.round(canvas.height / 2 - (90 - bonusEffectTimer));
-    ctx.strokeText('★ BONUS ROGER ! +1000 PT ★', canvas.width / 2, textY);
-    ctx.fillText('★ BONUS ROGER ! +1000 PT ★', canvas.width / 2, textY);
+    ctx.font = 'bold 32px Courier New';
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 4;
+
+    const popupY = Math.round(130 - (90 - bonusEffectTimer) * 0.4);
+    ctx.strokeText('+1 000 PTS !', canvas.width / 2, popupY);
+    ctx.fillText('+1 000 PTS !', canvas.width / 2, popupY);
     ctx.restore();
   }
 
