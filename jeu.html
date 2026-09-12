@@ -685,7 +685,7 @@ bgMusic.volume = 0.8;
 
 const marioInvMusic = new Audio('marioinv.mp3');
 marioInvMusic.loop = true;
-marioInvMusic.volume = 1.0;
+marioInvMusic.volume = 1.0; // Booster le volume de marioinv.mp3 à 1.5
 
 const superSayanTheme = new Audio('supersayantheme.mp3');
 superSayanTheme.volume = 1.0;
@@ -720,6 +720,8 @@ sounds.debonus.volume = 0.85;
 sounds.debonusend.volume = 0.85;
 sounds.wilhem.volume = 0.85;
 sounds.cri.volume = 0.85;
+
+let lastSpecialSoundIsWilhem = false; // Bascule 1 fois sur 2 pour l'alternance Wilhelm / Cri
 
 let audioUnlocked = false;
 let fadeInterval = null;
@@ -948,7 +950,7 @@ function transitionSuperSayanToNormal() {
   }, 50);
 }
 
-const ASSET_VERSION = 'v16'; 
+const ASSET_VERSION = 'v18'; 
 
 function loadSmartImage(baseName) {
   const img = new Image();
@@ -1821,6 +1823,7 @@ function resetGame() {
   baseSpeedMultiplier = 1.0;
   currentGameSpeed = BASE_GAME_SPEED;
   jumpKeyReleased = true;
+  lastSpecialSoundIsWilhem = false;
   
   invincibleTimer = 0;
   debonusPlayed = false;
@@ -1988,6 +1991,7 @@ function update() {
     lastScoreTime = now;
   }
 
+  // ACCÉLÉRATION : Tous les 10 000 points
   const speedLevel = Math.floor(score / 10000);
   baseSpeedMultiplier = Math.pow(1.05, speedLevel);
   let effectiveBaseSpeed = BASE_GAME_SPEED * baseSpeedMultiplier;
@@ -2115,10 +2119,11 @@ function update() {
     cat.y += cat.vy;
   }
 
+  // HITBOX DU CHAT : Réduction de la hauteur quand il est baissé (32 px au ras du sol)
   let catBoxX = cat.x + 25;
   let catBoxWidth = cat.width - 50;
-  let catBoxY = cat.isCrouching ? cat.y + 60 : cat.y + 12;
-  let catBoxHeight = cat.isCrouching ? 45 : cat.height - 24;
+  let catBoxY = cat.isCrouching ? cat.y + 70 : cat.y + 12;
+  let catBoxHeight = cat.isCrouching ? 32 : cat.height - 24;
 
   if (superSayen.active && superSayen.state === 'FLY') {
     const hitBoxHeight = 110;
@@ -2213,10 +2218,15 @@ function update() {
       }
     }
 
-    const obsBoxX = o.x + 10;
-    const obsBoxWidth = Math.max(10, o.w - 20);
-    const obsBoxY = o.type === 'air' ? o.y + 4 : o.y + 10;
-    const obsBoxHeight = o.type === 'air' ? Math.max(10, o.h - 8) : Math.max(10, o.h - 20);
+    // HITBOX DES OBSTACLES : Ajustement spécifique pour obstacle1.png (configIdx === 3)
+    let obsBoxX = o.x + 10;
+    let obsBoxWidth = Math.max(10, o.w - 20);
+    let obsBoxY = o.type === 'air' ? o.y + 4 : o.y + 10;
+    let obsBoxHeight = o.type === 'air' ? Math.max(10, o.h - 8) : Math.max(10, o.h - 20);
+
+    if (o.configIdx === 3) {
+      obsBoxHeight = Math.max(10, o.h - 38); 
+    }
 
     const isHit = (
       catBoxX < obsBoxX + obsBoxWidth &&
@@ -2227,10 +2237,11 @@ function update() {
 
     if (isHit) {
       if (invincibleTimer > 0) {
-        // Sons spécifiques selon l'obstacle dégommé
+        // Alternance stricte 1 fois sur 2 entre wilhem.wav et cri.mp3 pour Marc et JL
         if (o.configIdx === 0 || o.configIdx === 1) { // 0: JL, 1: Marc
-          const randomSound = Math.random() < 0.5 ? sounds.wilhem : sounds.cri;
-          playSoundEffect(randomSound);
+          const soundToPlay = lastSpecialSoundIsWilhem ? sounds.cri : sounds.wilhem;
+          playSoundEffect(soundToPlay);
+          lastSpecialSoundIsWilhem = !lastSpecialSoundIsWilhem;
         } else {
           playSoundEffect(sounds.degom);
         }
