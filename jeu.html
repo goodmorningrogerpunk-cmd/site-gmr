@@ -1988,7 +1988,7 @@ function update() {
     lastScoreTime = now;
   }
 
-  const speedLevel = Math.floor(score / 20000);
+  const speedLevel = Math.floor(score / 10000);
   baseSpeedMultiplier = Math.pow(1.05, speedLevel);
   let effectiveBaseSpeed = BASE_GAME_SPEED * baseSpeedMultiplier;
 
