@@ -683,6 +683,10 @@ const bgMusic = new Audio('roger_8bitok.mp3');
 bgMusic.loop = true;
 bgMusic.volume = 0.8; 
 
+const marioInvMusic = new Audio('marioinv.mp3');
+marioInvMusic.loop = true;
+marioInvMusic.volume = 0.85;
+
 const superSayanTheme = new Audio('supersayantheme.mp3');
 superSayanTheme.volume = 1.0;
 
@@ -816,6 +820,8 @@ function stopIntroMusic() {
 function startBgMusic() {
   unlockAudio();
   stopIntroMusic();
+  marioInvMusic.pause();
+  marioInvMusic.currentTime = 0;
   bgMusic.muted = false;
   bgMusic.volume = 0.8;
   if (bgMusic.paused) {
@@ -829,6 +835,9 @@ function stopAllSounds() {
   bgMusic.pause();
   bgMusic.currentTime = 0;
   bgMusic.muted = false;
+
+  marioInvMusic.pause();
+  marioInvMusic.currentTime = 0;
 
   superSayanTheme.pause();
   superSayanTheme.currentTime = 0;
@@ -867,10 +876,13 @@ function togglePause() {
   if (isPaused) {
     stopRunSound();
     if (!bgMusic.paused) bgMusic.pause();
+    if (!marioInvMusic.paused) marioInvMusic.pause();
     if (!superSayanTheme.paused) superSayanTheme.pause();
   } else {
     if (superSayen.active) {
       superSayanTheme.play().catch(() => {});
+    } else if (invincibleTimer > 0) {
+      marioInvMusic.play().catch(() => {});
     } else {
       bgMusic.play().catch(() => {});
     }
@@ -885,6 +897,7 @@ function returnToHome() {
   freezeForSequence = false;
   invincibleTimer = 0;
   debonusPlayed = false;
+  debonusEndPlayed = false;
   punkBonus = null;
   ejectedObstacles = [];
   startMainBtn.style.display = 'block';
@@ -931,7 +944,7 @@ function transitionSuperSayanToNormal() {
   }, 50);
 }
 
-const ASSET_VERSION = 'v14'; 
+const ASSET_VERSION = 'v15'; 
 
 function loadSmartImage(baseName) {
   const img = new Image();
@@ -1065,6 +1078,7 @@ let jumpKeyReleased = true;
 // Bonus & Invincibilité
 let invincibleTimer = 0;
 let debonusPlayed = false;
+let debonusEndPlayed = false;
 let punkBonusTimer = 0;
 let punkBonus = null;
 let ejectedObstacles = [];
@@ -1120,6 +1134,7 @@ function triggerSuperSayen() {
   cat.isPlatformGrounded = false;
   stopRunSound();
 
+  marioInvMusic.pause();
   bgMusic.muted = true;
   superSayanTheme.currentTime = 0;
   superSayanTheme.volume = 1.0;
@@ -1805,9 +1820,13 @@ function resetGame() {
   
   invincibleTimer = 0;
   debonusPlayed = false;
+  debonusEndPlayed = false;
   punkBonusTimer = 0;
   punkBonus = null;
   ejectedObstacles = [];
+
+  marioInvMusic.pause();
+  marioInvMusic.currentTime = 0;
 
   cat.y = ENTITY_GROUND_Y - cat.height;
   cat.vy = 0;
@@ -1842,20 +1861,32 @@ function update() {
     invulnerableTimer--;
   }
 
-  // Gestion des sons de fin d'invincibilité
+  // Gestion de la musique et des sons de l'invincibilité
   if (invincibleTimer > 0) {
     invincibleTimer--;
     
-    // Déclenchement de debonus.mp3 à 2s de la fin (120 frames restantes)
+    // 13e seconde (120 frames restantes) : debonus.mp3
     if (invincibleTimer === 120 && !debonusPlayed) {
       playSoundEffect(sounds.debonus);
       debonusPlayed = true;
     }
 
-    // Déclenchement de debonusend.mp3 à l'expiration totale
-    if (invincibleTimer === 0) {
+    // 14e seconde (60 frames restantes) : debonusend.mp3
+    if (invincibleTimer === 60 && !debonusEndPlayed) {
       playSoundEffect(sounds.debonusend);
+      debonusEndPlayed = true;
+    }
+
+    // Expiration de l'invincibilité
+    if (invincibleTimer === 0) {
+      marioInvMusic.pause();
+      marioInvMusic.currentTime = 0;
+      if (!superSayen.active) {
+        bgMusic.muted = false;
+        if (bgMusic.paused) bgMusic.play().catch(() => {});
+      }
       debonusPlayed = false;
+      debonusEndPlayed = false;
     }
   }
 
@@ -1889,11 +1920,10 @@ function update() {
     punkBonus.y = punkBonus.baseY + Math.sin(punkBonus.time * 1.5) * 25;
     punkBonus.angle = Math.sin(punkBonus.time * 3) * 0.15;
 
-    // Ajout de particules pour la traînée dorée
     punkBonus.trail.push({
-      x: punkBonus.x + punkBonus.w / 2 + (Math.random() * 10 - 5),
-      y: punkBonus.y + punkBonus.h / 2 + (Math.random() * 10 - 5),
-      size: Math.random() * 6 + 3,
+      x: punkBonus.x + punkBonus.w / 2 + (Math.random() * 14 - 7),
+      y: punkBonus.y + punkBonus.h / 2 + (Math.random() * 14 - 7),
+      size: Math.random() * 8 + 4,
       alpha: 1.0,
       color: Math.random() < 0.6 ? '#ffd54f' : '#ffffff'
     });
@@ -1903,12 +1933,11 @@ function update() {
     }
   }
 
-  // Mettre à jour la traînée dorée
   if (punkBonus) {
     punkBonus.trail.forEach(pt => {
-      pt.x -= currentGameSpeed * 0.5; // Dérive vers la gauche
+      pt.x -= currentGameSpeed * 0.5;
       pt.alpha -= 0.04;
-      pt.size *= 0.95;
+      pt.size *= 0.94;
     });
     punkBonus.trail = punkBonus.trail.filter(pt => pt.alpha > 0);
   }
@@ -1959,7 +1988,6 @@ function update() {
   baseSpeedMultiplier = Math.pow(1.05, speedLevel);
   let effectiveBaseSpeed = BASE_GAME_SPEED * baseSpeedMultiplier;
 
-  // Accélération de 25% quand le chat est invincible
   if (invincibleTimer > 0) {
     effectiveBaseSpeed *= 1.25;
   }
@@ -2097,7 +2125,7 @@ function update() {
     catBoxHeight = hitBoxHeight;
   }
 
-  // Collision Punk Bonus
+  // Collision Punk Bonus -> Lancement Musique Mario Invincible
   if (punkBonus) {
     if (
       catBoxX < punkBonus.x + punkBonus.w &&
@@ -2108,7 +2136,14 @@ function update() {
       playSoundEffect(sounds.punkbonus);
       invincibleTimer = 900; // 15s (900 frames à 60 FPS)
       debonusPlayed = false;
+      debonusEndPlayed = false;
       punkBonus = null;
+
+      if (!superSayen.active) {
+        bgMusic.pause();
+        marioInvMusic.currentTime = 0;
+        marioInvMusic.play().catch(() => {});
+      }
     }
   }
 
@@ -2232,8 +2267,16 @@ function update() {
           cat.state = 'FAIL';
           stopRunSound();
           stopAllSounds();
-          updatePromptSelection('YES');
-          scorePromptBox.style.display = 'block';
+          
+          // Vérification du score >= 3000 points
+          if (score >= 3000) {
+            updatePromptSelection('YES');
+            scorePromptBox.style.display = 'block';
+          } else {
+            gameOverStack.style.display = 'flex';
+            gameOverSelectedIdx = 0;
+            updateGameOverSelection();
+          }
         }
       }
     }
@@ -2463,11 +2506,13 @@ function draw() {
     ctx.restore();
   });
 
-  // Rendu de la traînée dorée du Punk Bonus
+  // Rendu de la traînée dorée ultra lumineuse du Punk Bonus
   if (punkBonus) {
     ctx.save();
     punkBonus.trail.forEach(pt => {
       ctx.fillStyle = pt.color;
+      ctx.shadowColor = pt.color;
+      ctx.shadowBlur = 12;
       ctx.globalAlpha = Math.max(0, pt.alpha);
       ctx.beginPath();
       ctx.arc(Math.round(pt.x), Math.round(pt.y), Math.round(pt.size), 0, Math.PI * 2);
@@ -2476,7 +2521,7 @@ function draw() {
     ctx.restore();
   }
 
-  // Rendu du Punk Bonus avec surbrillance dorée
+  // Rendu du Punk Bonus ultra scintillant
   if (punkBonus) {
     ctx.save();
     const px = Math.round(punkBonus.x);
@@ -2484,11 +2529,16 @@ function draw() {
     const pw = Math.round(punkBonus.w);
     const ph = Math.round(punkBonus.h);
 
-    ctx.shadowColor = '#ffd54f';
-    ctx.shadowBlur = 20;
+    const pulse = 1 + Math.sin(Date.now() / 120) * 0.08;
+    const flashColor = Math.floor(Date.now() / 60) % 2 === 0 ? '#ffffff' : '#ffd54f';
+    
+    ctx.shadowColor = flashColor;
+    ctx.shadowBlur = 35;
 
     ctx.translate(px + pw / 2, py + ph / 2);
+    ctx.scale(pulse, pulse);
     ctx.rotate(punkBonus.angle);
+
     if (assets.punkBonus.complete && assets.punkBonus.naturalWidth > 0) {
       ctx.drawImage(assets.punkBonus, -pw / 2, -ph / 2, pw, ph);
     } else {
@@ -2596,10 +2646,12 @@ function draw() {
           }
 
           ctx.save();
+          // Rayonnement hyper intense pour le mode Invincible
           if (invincibleTimer > 0) {
-            const flashColor = Math.floor(Date.now() / 80) % 2 === 0 ? '#ffd54f' : '#ffffff';
+            const flashTick = Math.floor(Date.now() / 50) % 3;
+            const flashColor = flashTick === 0 ? '#ffffff' : flashTick === 1 ? '#ffd54f' : '#ffeb3b';
             ctx.shadowColor = flashColor;
-            ctx.shadowBlur = 25;
+            ctx.shadowBlur = 40;
           }
 
           ctx.drawImage(catSprite, Math.round(drawX), Math.round(drawY), Math.round(drawWidth), Math.round(drawHeight));
