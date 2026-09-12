@@ -692,7 +692,9 @@ const sounds = {
   coin: new Audio('coin_receive.mp3'),
   damage: new Audio('damage.mp3'),
   sayan: new Audio('sayan.mp3'),
-  speedFly: new Audio('speed_fly.mp3')
+  speedFly: new Audio('speed_fly.mp3'),
+  punkbonus: new Audio('punkbonus.mp3'),
+  degom: new Audio('degom.mp3')
 };
 
 sounds.run.loop = true;
@@ -702,7 +704,9 @@ sounds.reception.volume = 0.7;
 sounds.coin.volume = 0.8;
 sounds.damage.volume = 0.85;
 sounds.sayan.volume = 0.15;    
-sounds.speedFly.volume = 0.15; 
+sounds.speedFly.volume = 0.15;
+sounds.punkbonus.volume = 0.85;
+sounds.degom.volume = 0.85;
 
 let audioUnlocked = false;
 let fadeInterval = null;
@@ -874,6 +878,9 @@ function returnToHome() {
   isPaused = false;
   superSayen.active = false;
   freezeForSequence = false;
+  invincibleTimer = 0;
+  punkBonus = null;
+  ejectedObstacles = [];
   startMainBtn.style.display = 'block';
   rightStack.style.display = 'flex';
   mobileHudControls.style.display = 'none';
@@ -918,7 +925,7 @@ function transitionSuperSayanToNormal() {
   }, 50);
 }
 
-const ASSET_VERSION = 'v11'; 
+const ASSET_VERSION = 'v12'; 
 
 function loadSmartImage(baseName) {
   const img = new Image();
@@ -990,7 +997,8 @@ const assets = {
     O: Array.from({length: 8}, (_, i) => loadSmartImage(`O${i+1}`)),
     G: Array.from({length: 8}, (_, i) => loadSmartImage(`G${i+1}`)),
     E: Array.from({length: 8}, (_, i) => loadSmartImage(`E${i+1}`))
-  }
+  },
+  punkBonus: loadSmartImage('punkbonus')
 };
 
 function getObstacleDimensions(conf) {
@@ -1047,6 +1055,12 @@ let sequenceCurrentLetterIndex = 0;
 let sequenceAngle = 0;
 let bounceTimer = 0;
 let jumpKeyReleased = true;
+
+// Bonus & Invincibilité
+let invincibleTimer = 0;
+let punkBonusTimer = 0;
+let punkBonus = null;
+let ejectedObstacles = [];
 
 const superSayen = {
   active: false,
@@ -1226,7 +1240,6 @@ function spawnWorldElements() {
 }
 
 function handleObstacleSpawned(obsX, obsY, obsW) {
-  // 1. Bloque l'apparition des lettres pendant la descente
   if (superSayen.state === 'LANDING') return;
 
   obstacleCounter++;
@@ -1501,6 +1514,7 @@ function updateRulesText() {
       <li>🎮 <b>Tap gauche</b> : Se baisser</li>
       <li><img src="R1.png" alt="R" class="rule-icon"> <b>Lettres ROGER</b> : Collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
       <li>❤️ <b>Système de vies</b> : Chaque GROSSE lettre te protège contre un choc. Une surprise t'attend si tu obtiens 5 GROSSES lettres R O G E R.</li>
+      <li>⚡ <b>Punk Bonus</b> : Attrape l'objet volant pour être invincible et dégommer les obstacles pendant 15s !</li>
       <li>⏸️ <b>Bouton P</b> : Mettre le jeu en pause / Reprendre le jeu</li>
       <li>🏠 <b>Bouton R</b> : Revenir à l'écran d'accueil</li>
     `;
@@ -1510,6 +1524,7 @@ function updateRulesText() {
       <li>🎮 <b>Flèche du bas</b> : Se baisser</li>
       <li><img src="R1.png" alt="R" class="rule-icon"> <b>Lettres ROGER</b> : Collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
       <li>❤️ <b>Système de vies</b> : Chaque GROSSE lettre te protège contre un choc. Une surprise t'attend si tu obtiens 5 GROSSES lettres R O G E R.</li>
+      <li>⚡ <b>Punk Bonus</b> : Attrape l'objet volant pour être invincible et dégommer les obstacles pendant 15s !</li>
       <li>⏸️ <b>Entrée</b> : Mettre le jeu en pause / Reprendre le jeu</li>
       <li>🏠 <b>Echap</b> : Revenir à l'écran d'accueil</li>
     `;
@@ -1780,6 +1795,11 @@ function resetGame() {
   currentGameSpeed = BASE_GAME_SPEED;
   jumpKeyReleased = true;
   
+  invincibleTimer = 0;
+  punkBonusTimer = 0;
+  punkBonus = null;
+  ejectedObstacles = [];
+
   cat.y = ENTITY_GROUND_Y - cat.height;
   cat.vy = 0;
   cat.isGrounded = true;
@@ -1812,6 +1832,45 @@ function update() {
   if (invulnerableTimer > 0) {
     invulnerableTimer--;
   }
+  if (invincibleTimer > 0) {
+    invincibleTimer--;
+  }
+
+  // Gestion du Punk Bonus (toutes les 30s = 1800 frames à 60 FPS)
+  punkBonusTimer++;
+  if (punkBonusTimer >= 1800 && !punkBonus && !superSayen.active) {
+    punkBonusTimer = 0;
+    punkBonus = {
+      x: canvas.width + 50,
+      y: 100 + Math.random() * 200,
+      w: 60,
+      h: 60,
+      time: 0,
+      baseY: 150 + Math.random() * 150,
+      vx: -(3 + Math.random() * 2),
+      angle: 0
+    };
+  }
+
+  if (punkBonus) {
+    punkBonus.time += 0.05;
+    punkBonus.x += punkBonus.vx + Math.sin(punkBonus.time * 2) * 1.5;
+    punkBonus.y = punkBonus.baseY + Math.sin(punkBonus.time * 3) * 80 + Math.cos(punkBonus.time * 1.5) * 30;
+    punkBonus.angle += 0.05;
+
+    if (punkBonus.x + punkBonus.w < -100) {
+      punkBonus = null;
+    }
+  }
+
+  // Animation des obstacles dégommés
+  ejectedObstacles.forEach(eo => {
+    eo.x += eo.vx;
+    eo.y += eo.vy;
+    eo.vy += 0.5; // gravité
+    eo.angle += eo.vRot;
+  });
+  ejectedObstacles = ejectedObstacles.filter(eo => eo.y < canvas.height + 200 && eo.x < canvas.width + 200 && eo.x > -200);
 
   fallingLetters.forEach(fl => {
     fl.y += fl.vy;
@@ -1833,6 +1892,7 @@ function update() {
       if (sequenceCurrentLetterIndex >= 5) {
         freezeForSequence = false;
         completedWordsCount = 0; 
+        score += 10000; // Ajout des 10 000 points du Super Saiyan
         triggerSuperSayen();
       }
     }
@@ -1982,6 +2042,20 @@ function update() {
     catBoxHeight = hitBoxHeight;
   }
 
+  // Collision avec le Punk Bonus
+  if (punkBonus) {
+    if (
+      catBoxX < punkBonus.x + punkBonus.w &&
+      catBoxX + catBoxWidth > punkBonus.x &&
+      catBoxY < punkBonus.y + punkBonus.h &&
+      catBoxY + catBoxHeight > punkBonus.y
+    ) {
+      playSoundEffect(sounds.punkbonus);
+      invincibleTimer = 900; // 15s à 60fps
+      punkBonus = null;
+    }
+  }
+
   if (!superSayen.active) {
     cat.wasGrounded = cat.isGrounded;
     cat.isGrounded = false;
@@ -2031,7 +2105,7 @@ function update() {
 
   platforms = platforms.filter(p => p.x + p.w > -100);
 
-  obstacles.forEach(o => {
+  obstacles.forEach((o, index) => {
     o.x -= currentGameSpeed;
 
     if (o.type === 'air') {
@@ -2049,13 +2123,43 @@ function update() {
     const obsBoxY = o.type === 'air' ? o.y + 4 : o.y + 10;
     const obsBoxHeight = o.type === 'air' ? Math.max(10, o.h - 8) : Math.max(10, o.h - 20);
 
-    if (!superSayen.active && invulnerableTimer <= 0) {
-      if (
-        catBoxX < obsBoxX + obsBoxWidth &&
-        catBoxX + catBoxWidth > obsBoxX &&
-        catBoxY < obsBoxY + obsBoxHeight &&
-        catBoxY + catBoxHeight > obsBoxY
-      ) {
+    const isHit = (
+      catBoxX < obsBoxX + obsBoxWidth &&
+      catBoxX + catBoxWidth > obsBoxX &&
+      catBoxY < obsBoxY + obsBoxHeight &&
+      catBoxY + catBoxHeight > obsBoxY
+    );
+
+    if (isHit) {
+      if (invincibleTimer > 0) {
+        // Dégommer l'obstacle
+        playSoundEffect(sounds.degom);
+        let vx = 8 + Math.random() * 6;
+        let vy = -8 - Math.random() * 6;
+
+        // Si le chat saute dessus
+        if (cat.vy > 0 && catBoxY + catBoxHeight - cat.vy <= obsBoxY + 20) {
+          vy = 6 + Math.random() * 6; // Projeter vers le bas
+        }
+
+        const conf = assets.obstaclesConfig[o.configIdx];
+        let imgToDraw = (conf.type === 'anim') ? conf.frames[o.frame] : conf.img;
+
+        ejectedObstacles.push({
+          x: o.x,
+          y: o.y,
+          w: o.w,
+          h: o.h,
+          img: imgToDraw,
+          vx: vx,
+          vy: vy,
+          angle: 0,
+          vRot: (Math.random() - 0.5) * 0.4,
+          flipX: o.flipX
+        });
+
+        o.ejected = true;
+      } else if (!superSayen.active && invulnerableTimer <= 0) {
         playSoundEffect(sounds.damage);
 
         if (completedWordsCount > 0) {
@@ -2078,7 +2182,7 @@ function update() {
       }
     }
   });
-  obstacles = obstacles.filter(o => o.x + o.w > -100);
+  obstacles = obstacles.filter(o => !o.ejected && o.x + o.w > -100);
 
   items.forEach(it => {
     it.x -= currentGameSpeed;
@@ -2288,6 +2392,39 @@ function draw() {
     }
   });
 
+  // Dessin des obstacles dégommés
+  ejectedObstacles.forEach(eo => {
+    ctx.save();
+    ctx.translate(Math.round(eo.x + eo.w / 2), Math.round(eo.y + eo.h / 2));
+    ctx.rotate(eo.angle);
+    if (eo.flipX) ctx.scale(-1, 1);
+    if (eo.img && eo.img.complete && eo.img.naturalWidth > 0) {
+      ctx.drawImage(eo.img, -eo.w / 2, -eo.h / 2, eo.w, eo.h);
+    } else {
+      ctx.fillStyle = '#ff9800';
+      ctx.fillRect(-eo.w / 2, -eo.h / 2, eo.w, eo.h);
+    }
+    ctx.restore();
+  });
+
+  // Dessin du Punk Bonus
+  if (punkBonus) {
+    ctx.save();
+    const px = Math.round(punkBonus.x);
+    const py = Math.round(punkBonus.y);
+    ctx.translate(px + 30, py + 30);
+    ctx.rotate(punkBonus.angle);
+    if (assets.punkBonus.complete && assets.punkBonus.naturalWidth > 0) {
+      ctx.drawImage(assets.punkBonus, -30, -30, 60, 60);
+    } else {
+      ctx.fillStyle = '#ff00ff';
+      ctx.beginPath();
+      ctx.arc(0, 0, 30, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
   if (superSayen.active && superSayen.state === 'FLY') {
     ctx.save();
     ctx.shadowBlur = 0;
@@ -2376,18 +2513,23 @@ function draw() {
 
           if (cat.isCrouching) {
             let crouchScale = 0.85;
-            
-            if (!cat.isGrounded) {
-              crouchScale = 0.70;
-            }
+            if (!cat.isGrounded) crouchScale = 0.70;
             
             drawWidth = cat.width * 1.3 * crouchScale;
             drawHeight = drawWidth / spriteRatio;
-            
             drawY = cat.y + (cat.height - drawHeight);
           }
 
+          ctx.save();
+          // Effet de rayonnement si Invincible
+          if (invincibleTimer > 0) {
+            const flashColor = Math.floor(Date.now() / 80) % 2 === 0 ? '#ffd54f' : '#ffffff';
+            ctx.shadowColor = flashColor;
+            ctx.shadowBlur = 25;
+          }
+
           ctx.drawImage(catSprite, Math.round(drawX), Math.round(drawY), Math.round(drawWidth), Math.round(drawHeight));
+          ctx.restore();
         } else {
           ctx.fillStyle = '#ab47bc';
           ctx.fillRect(Math.round(cat.x), Math.round(cat.y), Math.round(cat.width), Math.round(cat.height));
@@ -2506,6 +2648,21 @@ function draw() {
       ctx.restore();
     }
   });
+
+  // Affichage du texte + 10 000 POINTS pendant la séquence de transformation
+  if (freezeForSequence) {
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.font = '900 48px Courier New';
+    ctx.fillStyle = '#ffd54f';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 4;
+    ctx.shadowColor = '#ffd54f';
+    ctx.shadowBlur = 20;
+    ctx.strokeText('+ 10 000 POINTS !', canvas.width / 2, 140);
+    ctx.fillText('+ 10 000 POINTS !', canvas.width / 2, 140);
+    ctx.restore();
+  }
 
   fallingLetters.forEach(fl => {
     const hudImg = assets.letters[fl.char] ? assets.letters[fl.char][0] : null;
