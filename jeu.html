@@ -695,7 +695,9 @@ const sounds = {
   sayan: new Audio('sayan.mp3'),
   speedFly: new Audio('speed_fly.mp3'),
   punkbonus: new Audio('punkbonus.mp3'),
-  degom: new Audio('degom.mp3')
+  degom: new Audio('degom.mp3'),
+  debonus: new Audio('debonus.mp3'),
+  debonusend: new Audio('debonusend.mp3')
 };
 
 sounds.run.loop = true;
@@ -708,6 +710,8 @@ sounds.sayan.volume = 0.15;
 sounds.speedFly.volume = 0.15;
 sounds.punkbonus.volume = 0.85;
 sounds.degom.volume = 0.85;
+sounds.debonus.volume = 0.85;
+sounds.debonusend.volume = 0.85;
 
 let audioUnlocked = false;
 let fadeInterval = null;
@@ -880,6 +884,7 @@ function returnToHome() {
   superSayen.active = false;
   freezeForSequence = false;
   invincibleTimer = 0;
+  debonusPlayed = false;
   punkBonus = null;
   ejectedObstacles = [];
   startMainBtn.style.display = 'block';
@@ -926,7 +931,7 @@ function transitionSuperSayanToNormal() {
   }, 50);
 }
 
-const ASSET_VERSION = 'v13'; 
+const ASSET_VERSION = 'v14'; 
 
 function loadSmartImage(baseName) {
   const img = new Image();
@@ -1059,6 +1064,7 @@ let jumpKeyReleased = true;
 
 // Bonus & Invincibilité
 let invincibleTimer = 0;
+let debonusPlayed = false;
 let punkBonusTimer = 0;
 let punkBonus = null;
 let ejectedObstacles = [];
@@ -1773,7 +1779,7 @@ document.addEventListener('click', () => {
 
 function resetGame() {
   score = 0;
-  bgX = 0; // Toujours démarrer le background au tout début à gauche
+  bgX = 0;
   lastScoreTime = Date.now();
   gameOver = false;
   gameStarted = true;
@@ -1798,6 +1804,7 @@ function resetGame() {
   jumpKeyReleased = true;
   
   invincibleTimer = 0;
+  debonusPlayed = false;
   punkBonusTimer = 0;
   punkBonus = null;
   ejectedObstacles = [];
@@ -1834,8 +1841,22 @@ function update() {
   if (invulnerableTimer > 0) {
     invulnerableTimer--;
   }
+
+  // Gestion des sons de fin d'invincibilité
   if (invincibleTimer > 0) {
     invincibleTimer--;
+    
+    // Déclenchement de debonus.mp3 à 2s de la fin (120 frames restantes)
+    if (invincibleTimer === 120 && !debonusPlayed) {
+      playSoundEffect(sounds.debonus);
+      debonusPlayed = true;
+    }
+
+    // Déclenchement de debonusend.mp3 à l'expiration totale
+    if (invincibleTimer === 0) {
+      playSoundEffect(sounds.debonusend);
+      debonusPlayed = false;
+    }
   }
 
   // Apparition du Punk Bonus (toutes les 30s)
@@ -1843,7 +1864,6 @@ function update() {
   if (punkBonusTimer >= 1800 && !punkBonus && !superSayen.active) {
     punkBonusTimer = 0;
     
-    // Calcul des proportions du sprite
     let targetH = 65;
     let targetW = 65;
     if (assets.punkBonus.complete && assets.punkBonus.naturalWidth > 0) {
@@ -1858,21 +1878,39 @@ function update() {
       w: targetW,
       h: targetH,
       time: 0,
-      angle: 0
+      angle: 0,
+      trail: []
     };
   }
 
   if (punkBonus) {
     punkBonus.time += 0.04;
-    // Trajectoire horizontale oscillante (avance globale vers la gauche avec aller-retour)
     punkBonus.x -= 2.2 + Math.sin(punkBonus.time * 2.5) * 1.8;
-    // Légère ondulation verticale
     punkBonus.y = punkBonus.baseY + Math.sin(punkBonus.time * 1.5) * 25;
-    punkBonus.angle = Math.sin(punkBonus.time * 3) * 0.15; // légère inclinaison au vol
+    punkBonus.angle = Math.sin(punkBonus.time * 3) * 0.15;
+
+    // Ajout de particules pour la traînée dorée
+    punkBonus.trail.push({
+      x: punkBonus.x + punkBonus.w / 2 + (Math.random() * 10 - 5),
+      y: punkBonus.y + punkBonus.h / 2 + (Math.random() * 10 - 5),
+      size: Math.random() * 6 + 3,
+      alpha: 1.0,
+      color: Math.random() < 0.6 ? '#ffd54f' : '#ffffff'
+    });
 
     if (punkBonus.x + punkBonus.w < -100) {
       punkBonus = null;
     }
+  }
+
+  // Mettre à jour la traînée dorée
+  if (punkBonus) {
+    punkBonus.trail.forEach(pt => {
+      pt.x -= currentGameSpeed * 0.5; // Dérive vers la gauche
+      pt.alpha -= 0.04;
+      pt.size *= 0.95;
+    });
+    punkBonus.trail = punkBonus.trail.filter(pt => pt.alpha > 0);
   }
 
   // Obstacles expulsés
@@ -1921,9 +1959,9 @@ function update() {
   baseSpeedMultiplier = Math.pow(1.05, speedLevel);
   let effectiveBaseSpeed = BASE_GAME_SPEED * baseSpeedMultiplier;
 
-  // Accélération de 15% quand le chat est invincible
+  // Accélération de 25% quand le chat est invincible
   if (invincibleTimer > 0) {
-    effectiveBaseSpeed *= 1.15;
+    effectiveBaseSpeed *= 1.25;
   }
 
   const jumpPressed = !!(keys['Space'] || keys['ArrowUp']);
@@ -2069,6 +2107,7 @@ function update() {
     ) {
       playSoundEffect(sounds.punkbonus);
       invincibleTimer = 900; // 15s (900 frames à 60 FPS)
+      debonusPlayed = false;
       punkBonus = null;
     }
   }
@@ -2149,9 +2188,8 @@ function update() {
 
     if (isHit) {
       if (invincibleTimer > 0) {
-        // Impact et éjection de l'obstacle
         playSoundEffect(sounds.degom);
-        score += 100; // Gagne 100 points par obstacle dégommé
+        score += 100;
 
         let vx = 8 + Math.random() * 6;
         let vy = -8 - Math.random() * 6;
@@ -2410,7 +2448,7 @@ function draw() {
     }
   });
 
-  // Rendu des obstacles expulsés en rotation
+  // Obstacles dégommés
   ejectedObstacles.forEach(eo => {
     ctx.save();
     ctx.translate(Math.round(eo.x + eo.w / 2), Math.round(eo.y + eo.h / 2));
@@ -2425,13 +2463,29 @@ function draw() {
     ctx.restore();
   });
 
-  // Rendu du Punk Bonus (Conserve ses proportions d'origine)
+  // Rendu de la traînée dorée du Punk Bonus
+  if (punkBonus) {
+    ctx.save();
+    punkBonus.trail.forEach(pt => {
+      ctx.fillStyle = pt.color;
+      ctx.globalAlpha = Math.max(0, pt.alpha);
+      ctx.beginPath();
+      ctx.arc(Math.round(pt.x), Math.round(pt.y), Math.round(pt.size), 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.restore();
+  }
+
+  // Rendu du Punk Bonus avec surbrillance dorée
   if (punkBonus) {
     ctx.save();
     const px = Math.round(punkBonus.x);
     const py = Math.round(punkBonus.y);
     const pw = Math.round(punkBonus.w);
     const ph = Math.round(punkBonus.h);
+
+    ctx.shadowColor = '#ffd54f';
+    ctx.shadowBlur = 20;
 
     ctx.translate(px + pw / 2, py + ph / 2);
     ctx.rotate(punkBonus.angle);
@@ -2775,7 +2829,6 @@ function drawGameOverOverlay() {
   ctx.textAlign = 'left';
 }
 
-// Boucle de rendu fluide natif 60Hz/120Hz
 function gameLoop() {
   requestAnimationFrame(gameLoop);
   update();
