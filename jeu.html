@@ -685,7 +685,7 @@ bgMusic.volume = 0.8;
 
 const marioInvMusic = new Audio('marioinv.mp3');
 marioInvMusic.loop = true;
-marioInvMusic.volume = 1.0; // Booster le volume de marioinv.mp3 à 1.5
+marioInvMusic.volume = 1.0;
 
 const superSayanTheme = new Audio('supersayantheme.mp3');
 superSayanTheme.volume = 1.0;
@@ -721,7 +721,7 @@ sounds.debonusend.volume = 0.85;
 sounds.wilhem.volume = 0.85;
 sounds.cri.volume = 0.85;
 
-let lastSpecialSoundIsWilhem = false; // Bascule 1 fois sur 2 pour l'alternance Wilhelm / Cri
+let lastSpecialSoundIsWilhem = false;
 
 let audioUnlocked = false;
 let fadeInterval = null;
@@ -2828,20 +2828,21 @@ function draw() {
     ctx.restore();
   });
 
-  // Affichage discret des +1 000 PTS sans aucun filtre d'écran
+  // Affichage discret des +1 000 PTS au-dessus de l'encart ROGER en bas à droite
   if (bonusEffectTimer > 0) {
     ctx.save();
     const alpha = Math.min(1, bonusEffectTimer / 25);
     ctx.globalAlpha = alpha;
     ctx.fillStyle = '#ffd54f';
     ctx.textAlign = 'center';
-    ctx.font = 'bold 32px Courier New';
+    ctx.font = 'bold 26px Courier New';
     ctx.strokeStyle = '#000000';
     ctx.lineWidth = 4;
 
-    const popupY = Math.round(130 - (90 - bonusEffectTimer) * 0.4);
-    ctx.strokeText('+1 000 PTS !', canvas.width / 2, popupY);
-    ctx.fillText('+1 000 PTS !', canvas.width / 2, popupY);
+    const popupX = hudX + 157; // Alignement au centre du cadre HUD de droite
+    const popupY = Math.round((hudY - 20) - (90 - bonusEffectTimer) * 0.3);
+    ctx.strokeText('+1 000 PTS !', popupX, popupY);
+    ctx.fillText('+1 000 PTS !', popupX, popupY);
     ctx.restore();
   }
 
