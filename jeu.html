@@ -43,6 +43,8 @@
       overflow: hidden;
       border: 4px solid #2e2e40;
       background: #000;
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
     }
 
     #game-container.mobile-fullscreen {
@@ -606,6 +608,9 @@ document.addEventListener('contextmenu', e => e.preventDefault());
 const gameContainer = document.getElementById('game-container');
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d', { alpha: false });
+
+ctx.imageSmoothingEnabled = false;
+ctx.webkitImageSmoothingEnabled = false;
 
 canvas.width = 960;
 canvas.height = 540;
@@ -1303,7 +1308,11 @@ function spawnWorldElements() {
       let obsY;
 
       if (conf.type === 'air') {
-        obsY = ENTITY_GROUND_Y - (140 + Math.random() * 60);
+        if (configIdx === 7) {
+          obsY = ENTITY_GROUND_Y - 175 - (Math.random() * 25);
+        } else {
+          obsY = ENTITY_GROUND_Y - (140 + Math.random() * 60);
+        }
         obstacles.push({
           x: obsX, baseY: obsY, y: obsY, w: dim.w, h: dim.h,
           configIdx, type: 'air', floatPhase: Math.random() * Math.PI * 2, flipX
@@ -2281,7 +2290,8 @@ function update() {
 
     if (o.type === 'air') {
       o.floatPhase += 0.05;
-      o.y = o.baseY + Math.sin(o.floatPhase) * 12;
+      const amp = (o.configIdx === 7) ? 8 : 12;
+      o.y = o.baseY + Math.sin(o.floatPhase) * amp;
     } else {
       o.animTimer++;
       if (o.animTimer % 10 === 0) {
@@ -2975,8 +2985,16 @@ function drawGameOverOverlay() {
   ctx.textAlign = 'left';
 }
 
-function gameLoop() {
+let lastFrameTime = performance.now();
+
+function gameLoop(currentTime) {
   requestAnimationFrame(gameLoop);
+
+  // Garantir une cadence constante sur iOS (delta de temps fixé au rafraîchissement)
+  const deltaTime = currentTime - lastFrameTime;
+  if (deltaTime < 10) return; // Limiteur de sur-fréquence
+  lastFrameTime = currentTime;
+
   update();
   draw();
 }
