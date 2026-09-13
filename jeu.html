@@ -223,6 +223,12 @@
       object-fit: contain;
       image-rendering: pixelated;
     }
+    .rule-icon-large {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
 
     .modal-close-btn {
       display: block;
@@ -534,7 +540,8 @@
     <div class="modal-content-scroll">
       <div class="goal-text">
         <b>But du jeu</b><br>
-        Obtiens le plus grand score. Tu gagnes des points :<br>
+        OBTIENS LE PLUS GRAND SCORE !<br>
+        Tu gagnes des points :<br>
         - En avançant dans le parcours (50 pts par seconde)<br>
         - En collectant des lettres dorées (100 pts)<br>
         - En formant le mot ROGER avec les lettres dorées (1000 pts)<br>
@@ -1602,7 +1609,7 @@ function updateRulesText() {
       <li>🎮 <b>Tap gauche</b> : Se baisser</li>
       <li><img src="R1.png" alt="R" class="rule-icon"> <b>Lettres ROGER</b> : Collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
       <li>❤️ <b>Système de vies</b> : Chaque GROSSE lettre te protège contre un choc. Une surprise t'attend si tu obtiens 5 GROSSES lettres R O G E R.</li>
-      <li><img src="${punkBonusSrc}" alt="Bonus Punk" class="rule-icon"> <b>Bonus Punk</b> : Attrape cet item et devient invincible pendant 15 secondes. Tu peux dégommer tous les obstacles sur ton passage.</li>
+      <li><img src="${punkBonusSrc}" alt="Bonus Punk" class="rule-icon-large"> <b>Bonus Punk</b> : Attrape cet item et devient invincible pendant 15 secondes. Tu peux dégommer tous les obstacles sur ton passage.</li>
       <li>⏸️ <b>Bouton P</b> : Mettre le jeu en pause / Reprendre le jeu</li>
       <li>🏠 <b>Bouton R</b> : Revenir à l'écran d'accueil</li>
     `;
@@ -1612,7 +1619,7 @@ function updateRulesText() {
       <li>🎮 <b>Flèche du bas</b> : Se baisser</li>
       <li><img src="R1.png" alt="R" class="rule-icon"> <b>Lettres ROGER</b> : Collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
       <li>❤️ <b>Système de vies</b> : Chaque GROSSE lettre te protège contre un choc. Une surprise t'attend si tu obtiens 5 GROSSES lettres R O G E R.</li>
-      <li><img src="${punkBonusSrc}" alt="Bonus Punk" class="rule-icon"> <b>Bonus Punk</b> : Attrape cet item et devient invincible pendant 15 secondes. Tu peux dégommer tous les obstacles sur ton passage.</li>
+      <li><img src="${punkBonusSrc}" alt="Bonus Punk" class="rule-icon-large"> <b>Bonus Punk</b> : Attrape cet item et devient invincible pendant 15 secondes. Tu peux dégommer tous les obstacles sur ton passage.</li>
       <li>⏸️ <b>Entrée</b> : Mettre le jeu en pause / Reprendre le jeu</li>
       <li>🏠 <b>Echap</b> : Revenir à l'écran d'accueil</li>
     `;
