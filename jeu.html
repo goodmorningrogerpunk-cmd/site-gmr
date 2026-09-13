@@ -473,6 +473,9 @@
 </div>
 
 <div id="game-container">
+  <!-- CORRECTION 1: Balise vidéo HTML intégrée au lieu d'un js createDocumentElement -->
+  <video id="intro-video" src="video_intro_gmr_skate.mp4" loop muted playsinline hidden></video>
+
   <canvas id="gameCanvas" width="960" height="540"></canvas>
   
   <button id="start-main-btn" class="pixel-btn">LANCER LA PARTIE</button>
@@ -669,11 +672,8 @@ function updateGameOverSelection() {
   });
 }
 
-const introVideo = document.createElement('video');
-introVideo.src = 'video_intro_gmr_skate.mp4';
-introVideo.loop = true;
-introVideo.muted = true;
-introVideo.playsInline = true;
+// CORRECTION 1: Récupération propre du nœud vidéo HTML
+const introVideo = document.getElementById('intro-video');
 
 const introMusic = new Audio('ecranintro.mp3');
 introMusic.loop = true;
@@ -820,14 +820,15 @@ function playIntroMusic() {
 
 function stopIntroMusic() {
   introMusic.pause();
-  introMusic.currentTime = 0;
+  // CORRECTION 3: Rewind sécurisé sur mobile
+  if (introMusic.readyState >= 2) introMusic.currentTime = 0;
 }
 
 function startBgMusic() {
   unlockAudio();
   stopIntroMusic();
   marioInvMusic.pause();
-  marioInvMusic.currentTime = 0;
+  if (marioInvMusic.readyState >= 2) marioInvMusic.currentTime = 0;
   bgMusic.muted = false;
   bgMusic.volume = 0.8;
   if (bgMusic.paused) {
@@ -839,25 +840,25 @@ function stopAllSounds() {
   if (fadeInterval) clearInterval(fadeInterval);
   stopIntroMusic();
   bgMusic.pause();
-  bgMusic.currentTime = 0;
+  if (bgMusic.readyState >= 2) bgMusic.currentTime = 0;
   bgMusic.muted = false;
 
   marioInvMusic.pause();
-  marioInvMusic.currentTime = 0;
+  if (marioInvMusic.readyState >= 2) marioInvMusic.currentTime = 0;
 
   superSayanTheme.pause();
-  superSayanTheme.currentTime = 0;
+  if (superSayanTheme.readyState >= 2) superSayanTheme.currentTime = 0;
 
   Object.values(sounds).forEach(sound => {
     sound.pause();
-    sound.currentTime = 0;
+    if (sound.readyState >= 2) sound.currentTime = 0;
   });
 }
 
 function playRunSound() {
   if (audioUnlocked && gameStarted && !gameOver && !isPaused && cat.isGrounded && !superSayen.active && !freezeForSequence) {
     if (sounds.run.paused) {
-      sounds.run.currentTime = 0;
+      if (sounds.run.readyState >= 2) sounds.run.currentTime = 0;
       sounds.run.play().catch(() => {});
     }
   }
@@ -869,10 +870,15 @@ function stopRunSound() {
   }
 }
 
+// CORRECTION 3: Jouer un effet son de façon sécurisée (iOS / Safari)
 function playSoundEffect(sound) {
   if (audioUnlocked && !isPaused) {
-    sound.currentTime = 0;
-    sound.play().catch(() => {});
+    try {
+      if (sound.readyState >= 2) {
+        sound.currentTime = 0;
+      }
+      sound.play().catch(() => {});
+    } catch(e) {}
   }
 }
 
@@ -933,7 +939,7 @@ function transitionSuperSayanToNormal() {
   let step = 0;
   
   if (invincibleTimer > 0) {
-    marioInvMusic.currentTime = 0;
+    if (marioInvMusic.readyState >= 2) marioInvMusic.currentTime = 0;
     marioInvMusic.play().catch(() => {});
     
     fadeInterval = setInterval(() => {
@@ -943,7 +949,7 @@ function transitionSuperSayanToNormal() {
       if (step >= fadeSteps) {
         clearInterval(fadeInterval);
         superSayanTheme.pause();
-        superSayanTheme.currentTime = 0;
+        if (superSayanTheme.readyState >= 2) superSayanTheme.currentTime = 0;
         superSayanTheme.volume = 1.0;
       }
     }, 50);
@@ -961,7 +967,7 @@ function transitionSuperSayanToNormal() {
       if (step >= fadeSteps) {
         clearInterval(fadeInterval);
         superSayanTheme.pause();
-        superSayanTheme.currentTime = 0;
+        if (superSayanTheme.readyState >= 2) superSayanTheme.currentTime = 0;
         superSayanTheme.volume = 1.0;
         bgMusic.volume = 0.8;
       }
@@ -1045,11 +1051,12 @@ const assets = {
   punkBonus: loadSmartImage('punkbonus')
 };
 
+// CORRECTION 2: Calcul sécurisé des dimensions d'obstacles
 function getObstacleDimensions(conf) {
   const sampleImg = (conf.type === 'anim') ? conf.frames[0] : conf.img;
-  let w = 80, h = 80;
+  let w = conf.targetW || 100, h = conf.targetH || 100;
 
-  if (sampleImg && sampleImg.complete && sampleImg.naturalWidth > 0) {
+  if (sampleImg && sampleImg.complete && sampleImg.naturalWidth > 0 && sampleImg.naturalHeight > 0) {
     const ratio = sampleImg.naturalWidth / sampleImg.naturalHeight;
     if (conf.targetH) {
       h = conf.targetH;
@@ -1058,9 +1065,6 @@ function getObstacleDimensions(conf) {
       w = conf.targetW;
       h = w / ratio;
     }
-  } else {
-    w = conf.targetW || 100;
-    h = conf.targetH || 100;
   }
   return { w, h };
 }
@@ -1100,7 +1104,6 @@ let sequenceAngle = 0;
 let bounceTimer = 0;
 let jumpKeyReleased = true;
 
-// Bonus & Invincibilité
 let invincibleTimer = 0;
 let debonusPlayed = false;
 let debonusEndPlayed = false;
@@ -1161,7 +1164,7 @@ function triggerSuperSayen() {
 
   marioInvMusic.pause();
   bgMusic.muted = true;
-  superSayanTheme.currentTime = 0;
+  if (superSayanTheme.readyState >= 2) superSayanTheme.currentTime = 0;
   superSayanTheme.volume = 1.0;
   superSayanTheme.play().catch(() => {});
 
@@ -1294,8 +1297,6 @@ function handleObstacleSpawned(obsX, obsY, obsW) {
   if (superSayen.state === 'LANDING' || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
 
   obstacleCounter++;
-  
-  // MODIFICATION FRÉQUENCE : Désormais tous les 2 à 4 obstacles
   const spawnFrequency = 3 + (Math.floor(Math.random() * 3) - 1); 
   
   if (obstacleCounter % Math.max(2, spawnFrequency) === 0) {
@@ -1666,9 +1667,13 @@ function fetchLeaderboard() {
     });
 }
 
+// CORRECTION 1: Arrêt propre de la vidéo lors du lancement du jeu
 startMainBtn.addEventListener('click', () => {
   requestGameFullscreen();
-  if (introVideo) introVideo.pause();
+  if (introVideo) {
+    introVideo.pause();
+    introVideo.currentTime = 0;
+  }
   startMainBtn.style.display = 'none';
   rightStack.style.display = 'none';
   if (isMobileDevice) mobileHudControls.style.display = 'flex';
@@ -1763,6 +1768,7 @@ cancelSaveBtn.addEventListener('click', () => {
   updateGameOverSelection();
 });
 
+// CORRECTION 4: Soumission avec timeout de sécurité pour Google Forms
 saveScoreForm.addEventListener('submit', (e) => {
   e.preventDefault();
   const pseudo = inputPseudo.value.trim();
@@ -1778,26 +1784,29 @@ saveScoreForm.addEventListener('submit', (e) => {
   formData.append(ENTRY_EMAIL, email);
   formData.append(ENTRY_SCORE, score);
 
+  const finalizeSubmit = () => {
+    saveScoreModal.style.display = 'none';
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'SAVE';
+    gameOverStack.style.display = 'flex';
+    gameOverSelectedIdx = 0;
+    updateGameOverSelection();
+  };
+
+  const timeoutId = setTimeout(finalizeSubmit, 2500);
+
   fetch(GOOGLE_FORM_URL, {
     method: 'POST',
     mode: 'no-cors',
     body: formData
   })
   .then(() => {
-    saveScoreModal.style.display = 'none';
-    saveBtn.disabled = false;
-    saveBtn.textContent = 'SAVE';
-    gameOverStack.style.display = 'flex';
-    gameOverSelectedIdx = 0;
-    updateGameOverSelection();
+    clearTimeout(timeoutId);
+    finalizeSubmit();
   })
   .catch(() => {
-    saveScoreModal.style.display = 'none';
-    saveBtn.disabled = false;
-    saveBtn.textContent = 'SAVE';
-    gameOverStack.style.display = 'flex';
-    gameOverSelectedIdx = 0;
-    updateGameOverSelection();
+    clearTimeout(timeoutId);
+    finalizeSubmit();
   });
 });
 
@@ -1860,7 +1869,7 @@ function resetGame() {
   ejectedObstacles = [];
 
   marioInvMusic.pause();
-  marioInvMusic.currentTime = 0;
+  if (marioInvMusic.readyState >= 2) marioInvMusic.currentTime = 0;
 
   cat.y = ENTITY_GROUND_Y - cat.height;
   cat.vy = 0;
@@ -1910,7 +1919,7 @@ function update() {
 
     if (invincibleTimer === 0) {
       marioInvMusic.pause();
-      marioInvMusic.currentTime = 0;
+      if (marioInvMusic.readyState >= 2) marioInvMusic.currentTime = 0;
       if (!superSayen.active) {
         bgMusic.muted = false;
         if (bgMusic.paused) bgMusic.play().catch(() => {});
@@ -1926,7 +1935,7 @@ function update() {
     
     let targetH = 65;
     let targetW = 65;
-    if (assets.punkBonus.complete && assets.punkBonus.naturalWidth > 0) {
+    if (assets.punkBonus.complete && assets.punkBonus.naturalWidth > 0 && assets.punkBonus.naturalHeight > 0) {
       const ratio = assets.punkBonus.naturalWidth / assets.punkBonus.naturalHeight;
       targetW = targetH * ratio;
     }
@@ -2168,7 +2177,7 @@ function update() {
 
       if (!superSayen.active) {
         bgMusic.pause();
-        marioInvMusic.currentTime = 0;
+        if (marioInvMusic.readyState >= 2) marioInvMusic.currentTime = 0;
         marioInvMusic.play().catch(() => {});
       }
     }
@@ -2393,6 +2402,7 @@ function update() {
   }
 }
 
+// CORRECTION 1: Rendu vidéo fluide sur Canvas depuis la balise DOM HTML
 function drawHomeScreen() {
   if (introVideo.paused) {
     introVideo.play().catch(() => {});
