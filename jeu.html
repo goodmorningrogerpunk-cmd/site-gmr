@@ -473,7 +473,6 @@
 </div>
 
 <div id="game-container">
-  <!-- CORRECTION 1: Balise vidéo HTML intégrée au lieu d'un js createDocumentElement -->
   <video id="intro-video" src="video_intro_gmr_skate.mp4" loop muted playsinline hidden></video>
 
   <canvas id="gameCanvas" width="960" height="540"></canvas>
@@ -672,7 +671,6 @@ function updateGameOverSelection() {
   });
 }
 
-// CORRECTION 1: Récupération propre du nœud vidéo HTML
 const introVideo = document.getElementById('intro-video');
 
 const introMusic = new Audio('ecranintro.mp3');
@@ -820,7 +818,6 @@ function playIntroMusic() {
 
 function stopIntroMusic() {
   introMusic.pause();
-  // CORRECTION 3: Rewind sécurisé sur mobile
   if (introMusic.readyState >= 2) introMusic.currentTime = 0;
 }
 
@@ -856,21 +853,24 @@ function stopAllSounds() {
 }
 
 function playRunSound() {
-  if (audioUnlocked && gameStarted && !gameOver && !isPaused && cat.isGrounded && !superSayen.active && !freezeForSequence) {
-    if (sounds.run.paused) {
-      if (sounds.run.readyState >= 2) sounds.run.currentTime = 0;
-      sounds.run.play().catch(() => {});
-    }
+  if (!audioUnlocked || !gameStarted || gameOver || isPaused || !cat.isGrounded || superSayen.active || freezeForSequence) {
+    stopRunSound();
+    return;
+  }
+  if (sounds.run.paused) {
+    sounds.run.play().catch(() => {});
   }
 }
 
 function stopRunSound() {
   if (!sounds.run.paused) {
     sounds.run.pause();
+    if (sounds.run.readyState >= 2) {
+      sounds.run.currentTime = 0;
+    }
   }
 }
 
-// CORRECTION 3: Jouer un effet son de façon sécurisée (iOS / Safari)
 function playSoundEffect(sound) {
   if (audioUnlocked && !isPaused) {
     try {
@@ -1051,7 +1051,6 @@ const assets = {
   punkBonus: loadSmartImage('punkbonus')
 };
 
-// CORRECTION 2: Calcul sécurisé des dimensions d'obstacles
 function getObstacleDimensions(conf) {
   const sampleImg = (conf.type === 'anim') ? conf.frames[0] : conf.img;
   let w = conf.targetW || 100, h = conf.targetH || 100;
@@ -1667,7 +1666,6 @@ function fetchLeaderboard() {
     });
 }
 
-// CORRECTION 1: Arrêt propre de la vidéo lors du lancement du jeu
 startMainBtn.addEventListener('click', () => {
   requestGameFullscreen();
   if (introVideo) {
@@ -1768,7 +1766,6 @@ cancelSaveBtn.addEventListener('click', () => {
   updateGameOverSelection();
 });
 
-// CORRECTION 4: Soumission avec timeout de sécurité pour Google Forms
 saveScoreForm.addEventListener('submit', (e) => {
   e.preventDefault();
   const pseudo = inputPseudo.value.trim();
@@ -2402,7 +2399,6 @@ function update() {
   }
 }
 
-// CORRECTION 1: Rendu vidéo fluide sur Canvas depuis la balise DOM HTML
 function drawHomeScreen() {
   if (introVideo.paused) {
     introVideo.play().catch(() => {});
