@@ -218,8 +218,8 @@
       gap: 10px;
     }
     .rule-icon {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       object-fit: contain;
       image-rendering: pixelated;
     }
@@ -538,7 +538,8 @@
         - En avançant dans le parcours (50 pts par seconde)<br>
         - En collectant des lettres dorées (100 pts)<br>
         - En formant le mot ROGER avec les lettres dorées (1000 pts)<br>
-        - En dégommant des obstacles pendant l'invincibilité (100 pts)
+        - En dégommant des obstacles pendant l'invincibilité (100 pts)<br>
+        - En formant le mot ROGER avec les GROSSES lettres dorées (10 000 pts)
       </div>
       <ul id="rules-list"></ul>
     </div>
@@ -570,6 +571,17 @@
       <p style="text-align: center; margin-bottom: 24px; font-size: 18px;">texte à créer</p>
     </div>
     <button id="close-about-btn" class="pixel-btn modal-close-btn">FERMER</button>
+  </div>
+
+  <!-- MODALE CODE KONAMI -->
+  <div id="konami-modal" class="game-modal">
+    <h2>SECRET DÉBLOQUÉ !</h2>
+    <div class="modal-content-scroll">
+      <p style="text-align: center; margin: 30px 0; font-size: 20px; color: #ffd54f; font-weight: bold;">
+        Bravo tu as fait le code Konami
+      </p>
+    </div>
+    <button id="close-konami-btn" class="pixel-btn modal-close-btn">FERMER</button>
   </div>
 </div>
 
@@ -616,6 +628,9 @@ const closeLeaderboardBtn = document.getElementById('close-leaderboard-btn');
 const aboutModal = document.getElementById('about-modal');
 const closeAboutBtn = document.getElementById('close-about-btn');
 
+const konamiModal = document.getElementById('konami-modal');
+const closeKonamiBtn = document.getElementById('close-konami-btn');
+
 const scorePromptBox = document.getElementById('score-prompt-box');
 const promptYesBtn = document.getElementById('prompt-yes-btn');
 const promptNoBtn = document.getElementById('prompt-no-btn');
@@ -640,6 +655,10 @@ let gameOverSelectedIdx = 0;
 
 const formNavElements = [inputPseudo, inputEmail, cancelSaveBtn, saveBtn];
 let formNavIdx = 0;
+
+// GESTION DU CODE KONAMI
+const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
+let konamiIndex = 0;
 
 function updateFormNavSelection() {
   formNavElements.forEach((el, idx) => {
@@ -918,6 +937,7 @@ function returnToHome() {
   gameOverStack.style.display = 'none';
   scorePromptBox.style.display = 'none';
   saveScoreModal.style.display = 'none';
+  konamiModal.style.display = 'none';
   
   if (isMobileDevice) {
     gameContainer.classList.add('mobile-fullscreen');
@@ -1382,6 +1402,20 @@ window.addEventListener('keydown', (e) => {
 
   unlockAudio();
 
+  // DÉTECTION CODE KONAMI SUR L'ÉCRAN D'ACCUEIL
+  if (!gameStarted && !isMobileDevice && rulesModal.style.display !== 'flex' && leaderboardModal.style.display !== 'flex' && aboutModal.style.display !== 'flex') {
+    if (e.code === konamiCode[konamiIndex]) {
+      konamiIndex++;
+      if (konamiIndex === konamiCode.length) {
+        konamiIndex = 0;
+        konamiModal.style.display = 'flex';
+      }
+    } else {
+      konamiIndex = 0;
+      if (e.code === konamiCode[0]) konamiIndex = 1;
+    }
+  }
+
   if (saveScoreModal.style.display === 'block') {
     if (e.code === 'ArrowDown') {
       formNavIdx = (formNavIdx + 1) % formNavElements.length;
@@ -1396,7 +1430,7 @@ window.addEventListener('keydown', (e) => {
     return;
   }
 
-  if (!gameStarted && gameOverStack.style.display !== 'flex' && scorePromptBox.style.display !== 'block' && saveScoreModal.style.display !== 'block') {
+  if (!gameStarted && gameOverStack.style.display !== 'flex' && scorePromptBox.style.display !== 'block' && saveScoreModal.style.display !== 'block' && konamiModal.style.display !== 'flex') {
     if (menuFocusArea === 'START') {
       if (e.code === 'ArrowRight') {
         menuFocusArea = 'RIGHT';
@@ -1461,6 +1495,7 @@ window.addEventListener('keydown', (e) => {
     if (rulesModal.style.display === 'flex') rulesModal.style.display = 'none';
     else if (leaderboardModal.style.display === 'flex') leaderboardModal.style.display = 'none';
     else if (aboutModal.style.display === 'flex') aboutModal.style.display = 'none';
+    else if (konamiModal.style.display === 'flex') konamiModal.style.display = 'none';
     else returnToHome();
     return;
   }
@@ -1469,10 +1504,6 @@ window.addEventListener('keydown', (e) => {
 
   if (!e.repeat) {
     keys[e.code] = true;
-  }
-
-  if (e.key === 'm' || e.key === 'M' || e.code === 'KeyM') {
-    triggerSuperSayen();
   }
 
   if (e.key === 'r' || e.key === 'R' || e.code === 'KeyR') {
@@ -1495,7 +1526,7 @@ window.addEventListener('keyup', (e) => {
 });
 
 function handleTouchAction(e, isTouchStart) {
-  if (!gameStarted || rulesModal.style.display === 'flex' || leaderboardModal.style.display === 'flex' || aboutModal.style.display === 'flex' || scorePromptBox.style.display === 'block' || saveScoreModal.style.display === 'block') return;
+  if (!gameStarted || rulesModal.style.display === 'flex' || leaderboardModal.style.display === 'flex' || aboutModal.style.display === 'flex' || scorePromptBox.style.display === 'block' || saveScoreModal.style.display === 'block' || konamiModal.style.display === 'flex') return;
 
   if (isPaused) {
     if (isTouchStart) togglePause();
@@ -1563,13 +1594,15 @@ document.addEventListener('touchend', (e) => {
 }, { passive: false });
 
 function updateRulesText() {
+  const punkBonusSrc = assets.punkBonus.src || 'punkbonus.png';
+
   if (isMobileDevice) {
     rulesList.innerHTML = `
-      <li>🎮 <b>Espace / Tap droite</b> : (Appui court ou long pour ajuster le niveau du saut)</li>
+      <li>🎮 <b>Tap droite</b> : Sauter (Appui court ou long pour ajuster le niveau du saut)</li>
       <li>🎮 <b>Tap gauche</b> : Se baisser</li>
       <li><img src="R1.png" alt="R" class="rule-icon"> <b>Lettres ROGER</b> : Collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
       <li>❤️ <b>Système de vies</b> : Chaque GROSSE lettre te protège contre un choc. Une surprise t'attend si tu obtiens 5 GROSSES lettres R O G E R.</li>
-      <li>⚡ <b>Punk Bonus</b> : Attrape l'objet volant pour être invincible et dégommer les obstacles pendant 15s (+100pts / obstacle) !</li>
+      <li><img src="${punkBonusSrc}" alt="Bonus Punk" class="rule-icon"> <b>Bonus Punk</b> : Attrape cet item et devient invincible pendant 15 secondes. Tu peux dégommer tous les obstacles sur ton passage.</li>
       <li>⏸️ <b>Bouton P</b> : Mettre le jeu en pause / Reprendre le jeu</li>
       <li>🏠 <b>Bouton R</b> : Revenir à l'écran d'accueil</li>
     `;
@@ -1579,7 +1612,7 @@ function updateRulesText() {
       <li>🎮 <b>Flèche du bas</b> : Se baisser</li>
       <li><img src="R1.png" alt="R" class="rule-icon"> <b>Lettres ROGER</b> : Collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
       <li>❤️ <b>Système de vies</b> : Chaque GROSSE lettre te protège contre un choc. Une surprise t'attend si tu obtiens 5 GROSSES lettres R O G E R.</li>
-      <li>⚡ <b>Punk Bonus</b> : Attrape l'objet volant pour être invincible et dégommer les obstacles pendant 15s (+100pts / obstacle) !</li>
+      <li><img src="${punkBonusSrc}" alt="Bonus Punk" class="rule-icon"> <b>Bonus Punk</b> : Attrape cet item et devient invincible pendant 15 secondes. Tu peux dégommer tous les obstacles sur ton passage.</li>
       <li>⏸️ <b>Entrée</b> : Mettre le jeu en pause / Reprendre le jeu</li>
       <li>🏠 <b>Echap</b> : Revenir à l'écran d'accueil</li>
     `;
@@ -1687,6 +1720,10 @@ rulesBtn.addEventListener('click', () => {
 
 closeRulesBtn.addEventListener('click', () => {
   rulesModal.style.display = 'none';
+});
+
+closeKonamiBtn.addEventListener('click', () => {
+  konamiModal.style.display = 'none';
 });
 
 leaderboardBtn.addEventListener('click', () => {
@@ -1886,6 +1923,7 @@ function resetGame() {
   gameOverStack.style.display = 'none';
   scorePromptBox.style.display = 'none';
   saveScoreModal.style.display = 'none';
+  konamiModal.style.display = 'none';
   updatePromptSelection('YES');
 }
 
@@ -1893,6 +1931,25 @@ function update() {
   if (!gameStarted || gameOver || isPaused) {
     stopRunSound();
     return;
+  }
+
+  // GEL TOTAL DU MONDE DE JEU SI SEQUENCE DES 5 GROSSES LETTRES ACTIVÉE
+  if (freezeForSequence) {
+    stopRunSound();
+    sequenceAngle += 0.12; 
+    
+    if (sequenceAngle >= Math.PI * 2) {
+      sequenceAngle = 0;
+      sequenceCurrentLetterIndex++;
+      
+      if (sequenceCurrentLetterIndex >= 5) {
+        freezeForSequence = false;
+        completedWordsCount = 0; 
+        score += 10000;
+        triggerSuperSayen();
+      }
+    }
+    return; // Arrêt complet de la logique de jeu (Bonus punk, obstacles, décors tout reste figé)
   }
 
   bounceTimer += 0.08;
@@ -1993,24 +2050,6 @@ function update() {
     fl.alpha -= 0.02;
   });
   fallingLetters = fallingLetters.filter(fl => fl.alpha > 0);
-
-  if (freezeForSequence) {
-    stopRunSound();
-    sequenceAngle += 0.12; 
-    
-    if (sequenceAngle >= Math.PI * 2) {
-      sequenceAngle = 0;
-      sequenceCurrentLetterIndex++;
-      
-      if (sequenceCurrentLetterIndex >= 5) {
-        freezeForSequence = false;
-        completedWordsCount = 0; 
-        score += 10000;
-        triggerSuperSayen();
-      }
-    }
-    return; 
-  }
 
   const now = Date.now();
   if (now - lastScoreTime >= 1000) {
@@ -2729,6 +2768,14 @@ function draw() {
     }
   });
   ctx.restore();
+
+  // APPLICATION DU FILTRE JAUNE QUAND LES 5 GROSSES LETTRES TOURNENT
+  if (freezeForSequence) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(255, 213, 79, 0.35)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+  }
 
   ctx.fillStyle = 'rgba(0,0,0,0.65)';
   ctx.fillRect(20, 20, 220, 45);
