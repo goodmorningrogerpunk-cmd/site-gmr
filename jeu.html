@@ -700,8 +700,8 @@ let gameOverSelectedIdx = 0;
 const formNavElements = [inputPseudo, inputEmail, cancelSaveBtn, saveBtn];
 let formNavIdx = 0;
 
-// GESTION DU CODE KONAMI
-const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
+// GESTION CORRIGÉE DU CODE KONAMI
+const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 let konamiIndex = 0;
 
 function updateFormNavSelection() {
@@ -1058,7 +1058,7 @@ function transitionSuperSayanToNormal() {
   }
 }
 
-const ASSET_VERSION = 'v19'; 
+const ASSET_VERSION = 'v20'; 
 
 function loadSmartImage(baseName) {
   const img = new Image();
@@ -1469,17 +1469,19 @@ window.addEventListener('keydown', (e) => {
 
   unlockAudio();
 
-  // DÉTECTION CODE KONAMI SUR L'ÉCRAN D'ACCUEIL
-  if (!gameStarted && !isMobileDevice && rulesModal.style.display !== 'flex' && leaderboardModal.style.display !== 'flex' && aboutModal.style.display !== 'flex') {
-    if (e.code === konamiCode[konamiIndex]) {
+  // DÉTECTION CODE KONAMI CORRIGÉE SUR L'ÉCRAN D'ACCUEIL
+  if (!gameStarted && rulesModal.style.display !== 'flex' && leaderboardModal.style.display !== 'flex' && aboutModal.style.display !== 'flex') {
+    const inputKey = e.key.length === 1 ? e.key.toLowerCase() : e.code;
+    const targetKey = konamiCode[konamiIndex];
+
+    if (inputKey === targetKey || e.code === targetKey) {
       konamiIndex++;
       if (konamiIndex === konamiCode.length) {
         konamiIndex = 0;
         konamiModal.style.display = 'flex';
       }
     } else {
-      konamiIndex = 0;
-      if (e.code === konamiCode[0]) konamiIndex = 1;
+      konamiIndex = (inputKey === konamiCode[0] || e.code === konamiCode[0]) ? 1 : 0;
     }
   }
 
