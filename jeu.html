@@ -96,6 +96,25 @@
       box-shadow: 0 0 15px #ffd54f !important;
     }
 
+    #desktop-fullscreen-btn {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      padding: 6px 12px;
+      font-size: 11px;
+      color: #ffd54f;
+      background-color: rgba(26, 26, 36, 0.7);
+      border: 2px solid rgba(255, 213, 79, 0.5);
+      border-radius: 4px;
+      z-index: 30;
+      display: none;
+    }
+
+    #desktop-fullscreen-btn:hover {
+      background-color: #1a1a24;
+      border-color: #ffd54f;
+    }
+
     #start-main-btn {
       position: absolute;
       top: 75%; 
@@ -486,6 +505,8 @@
 
   <canvas id="gameCanvas" width="960" height="540"></canvas>
   
+  <button id="desktop-fullscreen-btn" class="pixel-btn">⛶ PLEIN ÉCRAN</button>
+
   <button id="start-main-btn" class="pixel-btn">LANCER LA PARTIE</button>
   
   <div class="right-buttons-stack" id="right-stack">
@@ -616,6 +637,7 @@ canvas.width = 960;
 canvas.height = 540;
 
 const startMainBtn = document.getElementById('start-main-btn');
+const desktopFullscreenBtn = document.getElementById('desktop-fullscreen-btn');
 const rightStack = document.getElementById('right-stack');
 const rulesBtn = document.getElementById('rules-btn');
 const leaderboardBtn = document.getElementById('leaderboard-btn');
@@ -796,6 +818,23 @@ function requestGameFullscreen() {
   }
 }
 
+function toggleDesktopFullscreen() {
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen().catch(() => {});
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen().catch(() => {});
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen().catch(() => {});
+    }
+  }
+}
+
 function updatePromptSelection(option) {
   promptSelectedOption = option;
   if (option === 'YES') {
@@ -945,6 +984,7 @@ function returnToHome() {
   punkBonus = null;
   ejectedObstacles = [];
   startMainBtn.style.display = 'block';
+  if (!isMobileDevice) desktopFullscreenBtn.style.display = 'block';
   rightStack.style.display = 'flex';
   mobileHudControls.style.display = 'none';
   gameOverStack.style.display = 'none';
@@ -1073,7 +1113,7 @@ const assets = {
     { type: 'plat', img: loadSmartImage('obstacle2'), targetH: 140 },
     { type: 'ground', img: loadSmartImage('obstacle4'), targetH: 75 },
     { type: 'ground', img: loadSmartImage('obstacle5'), targetH: 80 },
-    { type: 'air', img: loadSmartImage('obstacle6'), targetW: 130 }
+    { type: 'air', img: loadSmartImage('obstacle6') }
   ],
   letters: {
     R: Array.from({length: 8}, (_, i) => loadSmartImage(`R${i+1}`)),
@@ -1096,6 +1136,10 @@ function getObstacleDimensions(conf) {
     } else if (conf.targetW) {
       w = conf.targetW;
       h = w / ratio;
+    } else {
+      // Conservation stricte du ratio d'origine sans imposer de dimension fixe
+      w = sampleImg.naturalWidth;
+      h = sampleImg.naturalHeight;
     }
   }
   return { w, h };
@@ -1309,7 +1353,8 @@ function spawnWorldElements() {
 
       if (conf.type === 'air') {
         if (configIdx === 7) {
-          obsY = ENTITY_GROUND_Y - 175 - (Math.random() * 25);
+          // Ajustement : positionnement permettant au chat d'être baissé en toute sécurité
+          obsY = ENTITY_GROUND_Y - dim.h - 65 - (Math.random() * 20);
         } else {
           obsY = ENTITY_GROUND_Y - (140 + Math.random() * 60);
         }
@@ -1723,10 +1768,15 @@ startMainBtn.addEventListener('click', () => {
     introVideo.currentTime = 0;
   }
   startMainBtn.style.display = 'none';
+  desktopFullscreenBtn.style.display = 'none';
   rightStack.style.display = 'none';
   if (isMobileDevice) mobileHudControls.style.display = 'flex';
   startBgMusic();
   resetGame();
+});
+
+desktopFullscreenBtn.addEventListener('click', () => {
+  toggleDesktopFullscreen();
 });
 
 rulesBtn.addEventListener('click', () => {
@@ -1874,6 +1924,8 @@ mobileHomeBtn.addEventListener('click', (e) => {
 window.addEventListener('load', () => {
   if (isMobileDevice) {
     gameContainer.classList.add('mobile-fullscreen');
+  } else {
+    desktopFullscreenBtn.style.display = 'block';
   }
   playIntroMusic();
   updateRulesText();
@@ -1937,6 +1989,7 @@ function resetGame() {
   obstacles = [];
   items = [];
   rogerCollected = [false, false, false, false, false];
+  desktopFullscreenBtn.style.display = 'none';
   gameOverStack.style.display = 'none';
   scorePromptBox.style.display = 'none';
   saveScoreModal.style.display = 'none';
@@ -2990,9 +3043,8 @@ let lastFrameTime = performance.now();
 function gameLoop(currentTime) {
   requestAnimationFrame(gameLoop);
 
-  // Garantir une cadence constante sur iOS (delta de temps fixé au rafraîchissement)
   const deltaTime = currentTime - lastFrameTime;
-  if (deltaTime < 10) return; // Limiteur de sur-fréquence
+  if (deltaTime < 10) return;
   lastFrameTime = currentTime;
 
   update();
