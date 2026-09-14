@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Skate Cat - Tutoriel Officiel Ultra-Fixé</title>
+  <title>Skate Cat - Tutoriel Définitif</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
     html, body { width: 100%; height: 100%; background-color: #000; font-family: 'Courier New', Courier, monospace; color: #fff; overflow: hidden; touch-action: none !important; }
@@ -31,11 +31,12 @@
       border-radius: 4px; pointer-events: none; z-index: 30;
     }
 
+    /* CORRECTION DU TEXTE COUPÉ EN HAUT : Min-height fixe, flux normal et padding homogène */
     #tuto-dialog-box {
-      display: none; position: absolute; width: 440px; background: #111118; border: 4px solid #ffd54f; border-radius: 8px;
-      padding: 30px 22px 22px 22px; z-index: 65000; text-align: center; box-shadow: 0 0 30px rgba(0,0,0,0.9);
+      display: none; position: absolute; width: 440px; min-height: 180px; background: #111118; border: 4px solid #ffd54f; border-radius: 8px;
+      padding: 32px 24px 24px 24px; z-index: 65000; text-align: center; box-shadow: 0 0 30px rgba(0,0,0,0.9);
     }
-    #tuto-dialog-text { font-size: 13px; line-height: 1.6; color: #ffffff; margin-top: 10px; margin-bottom: 20px; text-align: left; }
+    #tuto-dialog-text { font-size: 14px; line-height: 1.6; color: #ffffff; margin-bottom: 20px; text-align: left; display: block; }
     #tuto-next-btn { padding: 8px 24px; font-size: 15px; color: #1a1a24; background-color: #ffd54f; border: 3px solid #ffffff; cursor: pointer; font-weight: bold; }
   </style>
 </head>
@@ -44,7 +45,7 @@
 <div id="game-container">
   <canvas id="gameCanvas" width="960" height="540"></canvas>
   <button id="tuto-main-btn" class="pixel-btn">LANCER LE TUTORIEL</button>
-  <div id="version-display">v7.7-ULTRAFIX</div>
+  <div id="version-display">v8.0-CLEAN</div>
 
   <div id="tuto-dialog-box">
     <p id="tuto-dialog-text"></p>
@@ -87,7 +88,7 @@ function playRunSound() {
 function stopRunSound() { if (!sounds.run.paused) { sounds.run.pause(); if (sounds.run.readyState >= 2) sounds.run.currentTime = 0; } }
 function playSoundEffect(sound) { if (audioUnlocked) { try { if (sound.readyState >= 2) sound.currentTime = 0; sound.play().catch(() => {}); } catch(e) {} } }
 
-const ASSET_VERSION = 'v7.7';
+const ASSET_VERSION = 'v8.0';
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -171,7 +172,7 @@ function showTutoDialogSide(text, highlightRect, onNext) {
 
   let topPos = highlightRect.y - 10;
   if (topPos < 50) topPos = 50;
-  if (topPos + 260 > canvas.height) topPos = canvas.height - 280;
+  if (topPos + 280 > canvas.height) topPos = canvas.height - 300;
 
   tutoDialogBox.style.left = leftPos + 'px';
   tutoDialogBox.style.top = topPos + 'px';
@@ -246,7 +247,7 @@ function updateTutorialScript() {
   if (tutoHighlightedZone) return;
   tutoTimer++;
 
-  // ÉTAPE 1 : SCORE
+  // ÉTAPE 1 : SCORE (1 seconde / 60 frames)
   if (tutoStep === 1) {
     if (tutoTimer > 60) {
       showTutoDialogSide(
@@ -286,14 +287,8 @@ function updateTutorialScript() {
       }
     }
   }
-  // ÉTAPE 4 : PLATEFORME SCRIPTÉE (Gestion propre sans doublon de spawn)
+  // ÉTAPE 4 : PLATEFORME SCRIPTÉE (Flux continu et indépendant de la validation)
   else if (tutoStep === 4) {
-    if (platforms.length === 0) {
-      let pKey = 'bleu_medium'; let pW = 260;
-      if (tutoSubState === 3) { pKey = 'bleu_long'; pW = 360; }
-      platforms.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 130, w: pW, h: 65, key: pKey, wasOnPlat: false, descendedFromPlat: false });
-    }
-
     const plat = platforms[0];
     if (plat && plat.x <= canvas.width - 350 && tutoSubState === 1 && !plat.shownPopup) {
       plat.shownPopup = true;
@@ -309,7 +304,6 @@ function updateTutorialScript() {
       tutoInstructionMessage = "Vas-y, saute sur une plateforme";
       if (cat.isPlatformGrounded) { 
         tutoSubState = 3; 
-        platforms = [{ x: canvas.width + 50, y: ENTITY_GROUND_Y - 130, w: 360, h: 65, key: 'bleu_long', wasOnPlat: false, descendedFromPlat: false }];
       }
     } 
     // ÉTAPE B : "Maintenant, saute sur une plateforme et descend pendant que tu es dessus avec la FLÈCHE DU BAS"
@@ -323,7 +317,6 @@ function updateTutorialScript() {
         }
         if (pLong.descendedFromPlat && cat.isGrounded) {
           tutoSubState = 4;
-          platforms = [{ x: canvas.width + 50, y: ENTITY_GROUND_Y - 130, w: 260, h: 65, key: 'bleu_medium', touchedPlatform: false }];
         }
       }
     } 
@@ -333,12 +326,9 @@ function updateTutorialScript() {
       const pPass = platforms[0];
       if (pPass) {
         if (cat.isPlatformGrounded) {
-          pPass.touchedPlatform = true; // Si le chat roule dessus, on réinitialise l'instance pour recommencer
+          pPass.touchedPlatform = true; // Si le chat roule dessus, on invalide pour cet essai
         }
-        if (pPass.x + pPass.w < 0 && pPass.touchedPlatform) {
-          platforms = [{ x: canvas.width + 50, y: ENTITY_GROUND_Y - 130, w: 260, h: 65, key: 'bleu_medium', touchedPlatform: false }];
-        }
-        // Validation étape C : Chat accroupi en l'air traversant la zone de la plateforme par le haut sans s'être posé dessus
+        // Validation stricte : passe au travers en l'air sans s'être posé dessus
         const surfaceY = pPass.y + 14;
         if (!pPass.touchedPlatform && cat.isCrouching && cat.vy > 0 && cat.x + cat.width > pPass.x && cat.x < pPass.x + pPass.w && cat.y + cat.height >= surfaceY && cat.y < surfaceY) {
           tutoStep = 5; tutoTimer = 0; tutoSubState = 0; platforms = []; tutoInstructionMessage = "";
@@ -452,7 +442,17 @@ function updateTutorialScript() {
   }
 }
 
-// MOTEUR DE JEU & PHYSIQUE EXACTE ORIGINALE
+// MOTEUR DE JEU & SPAWN CONTINU DES PLATEFORMES DU TUTO
+function updatePlatformStream() {
+  if (!gameStarted || isPaused) return;
+  // Génération en continu de plateformes adaptées à l'étape 4
+  if (tutoStep === 4 && platforms.length === 0) {
+    let pKey = 'bleu_medium'; let pW = 260;
+    if (tutoSubState === 3) { pKey = 'bleu_long'; pW = 360; }
+    platforms.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 130, w: pW, h: 65, key: pKey, wasOnPlat: false, descendedFromPlat: false, touchedPlatform: false });
+  }
+}
+
 function update() {
   if (!gameStarted) { stopRunSound(); return; }
 
@@ -462,6 +462,7 @@ function update() {
     lastScoreTime = now; 
   }
 
+  updatePlatformStream();
   updateTutorialScript();
   if (tutoHighlightedZone) { stopRunSound(); return; }
 
@@ -533,7 +534,7 @@ function update() {
     const itemHit = (catBoxX < it.x + it.w && catBoxX + catBoxWidth > it.x && catBoxY < it.y + it.h && catBoxY + catBoxHeight > it.y);
     if (itemHit) {
       score += 100; it.collected = true; playSoundEffect(sounds.coin);
-      completedWordsCount = 2; // Rétablissement
+      completedWordsCount = 2; 
     }
   });
   items = items.filter(it => !it.collected && it.x + it.w > -100);
