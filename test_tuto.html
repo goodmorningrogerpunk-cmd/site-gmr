@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Skate Cat - Tutoriel Propre</title>
+  <title>Skate Cat - Tutoriel Propre & Dynamique</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
     body { background-color: #000; font-family: 'Courier New', Courier, monospace; color: #fff; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
@@ -28,24 +28,24 @@
     }
 
     #tuto-dialog-box {
-      display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 85%; max-width: 520px; background: #111118; border: 4px solid #ffd54f; border-radius: 8px;
-      padding: 20px; z-index: 50; text-align: center; box-shadow: 0 0 30px rgba(0,0,0,0.9);
+      display: none; position: absolute;
+      width: 340px; background: #111118; border: 4px solid #ffd54f; border-radius: 8px;
+      padding: 16px; z-index: 50; text-align: center; box-shadow: 0 0 30px rgba(0,0,0,0.9);
     }
-    #tuto-dialog-text { font-size: 15px; line-height: 1.5; color: #ffffff; margin-bottom: 16px; }
-    #tuto-next-btn { padding: 8px 24px; font-size: 16px; color: #1a1a24; background-color: #ffd54f; border: 3px solid #ffffff; cursor: pointer; font-weight: bold; }
+    #tuto-dialog-text { font-size: 14px; line-height: 1.4; color: #ffffff; margin-bottom: 14px; }
+    #tuto-next-btn { padding: 8px 20px; font-size: 15px; color: #1a1a24; background-color: #ffd54f; border: 3px solid #ffffff; cursor: pointer; font-weight: bold; }
   </style>
 </head>
 <body>
 
 <div id="game-container">
   <canvas id="gameCanvas" width="960" height="540"></canvas>
-  <button id="tuto-main-btn">LANCER LE TUTORIEL PROPRE</button>
-  <div id="version-display">v4.0-PROPRE</div>
+  <button id="tuto-main-btn">LANCER LE TUTORIEL</button>
+  <div id="version-display">v4.1-DYNAMIC</div>
 
   <div id="tuto-dialog-box">
     <p id="tuto-dialog-text"></p>
-    <button id="tuto-next-btn">SUIVANT</button>
+    <button id="tuto-next-btn">SUIVANT (ESPACE/ENTRÉE)</button>
   </div>
 </div>
 
@@ -60,7 +60,7 @@ const tutoDialogText = document.getElementById('tuto-dialog-text');
 const tutoNextBtn = document.getElementById('tuto-next-btn');
 
 // --- CHARGEMENT DES ASSETS ---
-const ASSET_VERSION = 'v4.0';
+const ASSET_VERSION = 'v4.1';
 function loadImg(name) { const img = new Image(); img.src = name + '.png?v=' + ASSET_VERSION; return img; }
 
 const assets = {
@@ -91,7 +91,6 @@ let keys = {};
 
 let tutoStep = 0;
 let tutoSubState = 0;
-let tutoHighlightedZone = null;
 let tutoNextCallback = null;
 let tutoInstructionMessage = "";
 let tutoObstacleCount = 0;
@@ -104,9 +103,16 @@ let items = [];
 
 // --- ÉCOUTEURS ---
 window.addEventListener('keydown', (e) => {
-  if (['Space', 'ArrowUp', 'ArrowDown'].includes(e.code)) e.preventDefault();
+  if (['Space', 'ArrowUp', 'ArrowDown', 'Enter'].includes(e.code)) e.preventDefault();
+  
+  // Validation de la pop-up avec Espace ou Entrée
+  if (tutoDialogBox.style.display === 'block' && (e.code === 'Space' || e.code === 'Enter')) {
+    tutoNextBtn.click();
+    return;
+  }
   keys[e.code] = true;
 });
+
 window.addEventListener('keyup', (e) => {
   keys[e.code] = false;
   if (e.code === 'Space' || e.code === 'ArrowUp') cat.isJumping = false;
@@ -120,7 +126,6 @@ tutoMainBtn.addEventListener('click', () => {
 
 tutoNextBtn.addEventListener('click', () => {
   tutoDialogBox.style.display = 'none';
-  tutoHighlightedZone = null;
   if (tutoNextCallback) {
     const cb = tutoNextCallback;
     tutoNextCallback = null;
@@ -128,28 +133,39 @@ tutoNextBtn.addEventListener('click', () => {
   }
 });
 
-function showDialog(text, highlightRect, onNext) {
+function showDialogNear(text, targetX, targetY, onNext) {
   tutoDialogText.innerHTML = text;
-  tutoHighlightedZone = highlightRect;
   tutoNextCallback = onNext;
+  
+  // Positionnement dynamique près de l'élément ciblé
   tutoDialogBox.style.display = 'block';
+  let leftPos = targetX;
+  let topPos = targetY + 20;
+  
+  // Eviter de sortir de l'écran
+  if (leftPos > 600) leftPos = 580;
+  if (topPos > 350) topPos = targetY - 180;
+
+  tutoDialogBox.style.left = leftPos + 'px';
+  tutoDialogBox.style.top = topPos + 'px';
+  tutoDialogBox.style.transform = 'none';
 }
 
 // --- ÉTAPES DU TUTO ---
 function startStep1() {
   tutoStep = 1;
-  showDialog(
-    "Ceci est ton score, le but est d'avoir le maximum de points. Plus tu avances loin, plus ton score augmente.",
-    { x: 15, y: 15, w: 220, h: 45 },
+  showDialogNear(
+    "Ceci est ton score, le but est d'avoir un max de points.",
+    20, 70,
     () => { startStep2(); }
   );
 }
 
 function startStep2() {
   tutoStep = 2;
-  showDialog(
-    "En appuyant sur ESPACE, Roger saute (court ou long). En appuyant sur BAS, Roger se baisse.<br><br>ENTRÉE : Pause | ÉCHAP : Accueil",
-    { x: canvas.width - 340, y: 15, w: 320, h: 75 },
+  showDialogNear(
+    "ESPACE : Sauter | BAS : Se baisser<br>ENTRÉE : Pause | ÉCHAP : Accueil",
+    580, 80,
     () => { startStep3(); }
   );
 }
@@ -162,10 +178,10 @@ function startStep3() {
 function startStep4() {
   tutoStep = 4;
   tutoSubState = 1;
-  platforms.push({ x: 700, y: ENTITY_GROUND_Y - 110, w: 260, h: 65 });
-  showDialog(
-    "Ceci est une plateforme. Tu peux sauter dessus, en descendre ou passer au travers en appuyant sur BAS.",
-    { x: 690, y: ENTITY_GROUND_Y - 120, w: 280, h: 85 },
+  platforms.push({ x: 900, y: ENTITY_GROUND_Y - 110, w: 260, h: 65, active: true });
+  showDialogNear(
+    "Ceci est une plateforme. Monte dessus, descends ou traverse-la avec BAS.",
+    600, 250,
     () => { tutoSubState = 2; }
   );
 }
@@ -174,18 +190,18 @@ function startStep5() {
   tutoStep = 5;
   tutoSubState = 1;
   tutoObstacleCount = 0;
-  showDialog(
-    "Ça c'est un obstacle ! Il faut l'éviter en sautant ou en te baissant.",
-    null,
+  showDialogNear(
+    "Évite les obstacles en sautant ou te baissant.",
+    300, 150,
     () => { tutoSubState = 2; }
   );
 }
 
 function startStep6() {
   tutoStep = 6;
-  showDialog(
-    "Ces GROSSES lettres ROGER en bas à gauche te protègent d'un choc. Fais l'expérience en fonçant sur un obstacle !",
-    { x: 15, y: canvas.height - 125, w: 480, h: 110 },
+  showDialogNear(
+    "Ces grosses lettres protègent d'un choc. Fonce sur un obstacle pour tester !",
+    20, 350,
     () => {
       tutoSubState = 1;
       obstacles.push({ x: 800, y: ENTITY_GROUND_Y - 75, w: 70, h: 75 });
@@ -195,9 +211,9 @@ function startStep6() {
 
 function startStep7() {
   tutoStep = 7;
-  showDialog(
-    "Collecte ces lettres pour reformer le mot ROGER en bas à droite !",
-    null,
+  showDialogNear(
+    "Attrape ces lettres pour reformer le mot ROGER !",
+    550, 350,
     () => {
       tutoSubState = 1;
       items.push({ x: 800, y: ENTITY_GROUND_Y - 120, w: 65, h: 75, char: 'R' });
@@ -207,9 +223,9 @@ function startStep7() {
 
 // --- UPDATE ---
 function update() {
-  if (!gameStarted || tutoHighlightedZone) return;
+  if (!gameStarted || tutoDialogBox.style.display === 'block') return;
 
-  bgX -= 3; // Le décor défile pour donner l'impression que le chat avance
+  bgX -= 3;
 
   const jumpPressed = !!(keys['Space'] || keys['ArrowUp']);
   const downPressed = !!keys['ArrowDown'];
@@ -246,8 +262,9 @@ function update() {
       tutoInstructionMessage = "Exercice 2/3 : Baisse toi (Flèche du bas)";
       if (cat.isCrouching) tutoSubState = 3;
     } else if (tutoSubState === 3) {
-      tutoInstructionMessage = "Exercice 3/3 : Fais un petit saut (Appui court)";
-      if (cat.vy < 0 && cat.jumpTimer < 5) {
+      tutoInstructionMessage = "Exercice 3/3 : Fais un petit saut (Appui court & retombe au sol)";
+      // Validation stricte : appui court ET chat bien retombé au sol
+      if (cat.isGrounded && cat.vy === 0 && cat.jumpTimer > 0 && cat.jumpTimer < 8) {
         tutoInstructionMessage = "";
         startStep4();
       }
@@ -255,6 +272,10 @@ function update() {
   } 
   else if (tutoStep === 4) {
     const plat = platforms[0];
+    if (plat) {
+      if (plat.x > 350) plat.x -= 3; // La plateforme avance puis se stabilise
+    }
+
     if (tutoSubState === 2) {
       tutoInstructionMessage = "Saute sur la plateforme";
       if (plat && cat.x + cat.width > plat.x && cat.x < plat.x + plat.w && cat.y + cat.height <= plat.y + 15 && cat.vy >= 0) {
@@ -291,7 +312,7 @@ function update() {
     }
   }
   else if (tutoStep === 6 && tutoSubState === 1) {
-    tutoInstructionMessage = "Fonce dans l'obstacle pour tester la protection !";
+    tutoInstructionMessage = "Fonce dans l'obstacle !";
     obstacles.forEach(o => o.x -= 4);
     if (obstacles.length > 0) {
       let o = obstacles[0];
@@ -312,9 +333,9 @@ function update() {
         completedWordsCount = 2; // Rétablissement
         items = [];
         tutoInstructionMessage = "";
-        showDialog(
-          "Tu connais désormais les bases ! Amuse-toi bien sur Skate Cat !",
-          null,
+        showDialogNear(
+          "Tutoriel terminé avec succès ! Amuse-toi bien !",
+          300, 200,
           () => { location.reload(); }
         );
       }
@@ -326,7 +347,6 @@ function update() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Background non déformé (ratio préservé)
   if (assets.bg.complete && assets.bg.naturalWidth > 0) {
     const bgScale = GROUND_Y / assets.bg.naturalHeight;
     const bgW = assets.bg.naturalWidth * bgScale;
@@ -380,14 +400,15 @@ function draw() {
   ctx.fillStyle = 'rgba(0,0,0,0.8)'; ctx.fillRect(20, 20, 220, 45);
   ctx.fillStyle = '#fff'; ctx.font = 'bold 22px Courier New'; ctx.fillText(`SCORE: ${score}`, 32, 50);
 
-  // HUD Contrôles (avec Entrée & Echap)
+  // HUD Contrôles (avec Entrée & Échap empilés)
   ctx.fillStyle = 'rgba(0,0,0,0.8)'; ctx.fillRect(canvas.width - 340, 20, 320, 75);
   ctx.strokeStyle = '#fff'; ctx.strokeRect(canvas.width - 340, 20, 320, 75);
   ctx.fillStyle = '#ffd54f'; ctx.font = 'bold 13px Courier New';
   ctx.fillText("ESPACE : SAUTER | BAS : BAISSER", canvas.width - 335, 42);
-  ctx.fillText("ENTRÉE : PAUSE   | ÉCHAP : ACCUEIL", canvas.width - 335, 65);
+  ctx.fillText("ENTRÉE : PAUSE", canvas.width - 335, 62);
+  ctx.fillText("ÉCHAP  : ACCUEIL", canvas.width - 335, 78);
 
-  // HUD Mot ROGER en bas à droite (les petites lettres)
+  // HUD Petites lettres ROGER en bas à droite
   const hudX = canvas.width - 340; const hudY = canvas.height - 85;
   ctx.fillStyle = '#000000'; ctx.fillRect(hudX - 10, hudY - 10, 335, 80);
   ctx.strokeStyle = '#ffd54f'; ctx.lineWidth = 2; ctx.strokeRect(hudX - 10, hudY - 10, 335, 80);
@@ -397,7 +418,7 @@ function draw() {
     ctx.fillText(char, slotX + 14, hudY + 44);
   });
 
-  // HUD GROSSES lettres ROGER (en bas à gauche - Vies/Protection)
+  // HUD GROSSES lettres ROGER (avec VRAIS sprites)
   const masterHudX = 20; const masterHudY = canvas.height - 115;
   rogerLetters.forEach((char, idx) => {
     const slotX = masterHudX + (idx * 95);
@@ -412,26 +433,12 @@ function draw() {
     }
   });
 
-  // Message d'instruction
-  if (tutoInstructionMessage && !tutoHighlightedZone) {
+  // Message d'instruction central en haut
+  if (tutoInstructionMessage && tutoDialogBox.style.display !== 'block') {
     ctx.fillStyle = 'rgba(0, 0, 0, 0.85)'; ctx.fillRect(canvas.width / 2 - 340, 85, 680, 45);
     ctx.strokeStyle = '#ffd54f'; ctx.lineWidth = 2; ctx.strokeRect(canvas.width / 2 - 340, 85, 680, 45);
     ctx.fillStyle = '#ffd54f'; ctx.font = 'bold 15px Courier New'; ctx.textAlign = 'center';
     ctx.fillText(tutoInstructionMessage, canvas.width / 2, 113); ctx.textAlign = 'left';
-  }
-
-  // Masque de surbrillance
-  if (tutoHighlightedZone) {
-    ctx.save();
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-    const z = tutoHighlightedZone;
-    ctx.fillRect(0, 0, canvas.width, z.y);
-    ctx.fillRect(0, z.y, z.x, z.h);
-    ctx.fillRect(z.x + z.w, z.y, canvas.width - (z.x + z.w), z.h);
-    ctx.fillRect(0, z.y + z.h, canvas.width, canvas.height - (z.y + z.h));
-
-    ctx.strokeStyle = '#ffd54f'; ctx.lineWidth = 3; ctx.strokeRect(z.x, z.y, z.w, z.h);
-    ctx.restore();
   }
 }
 
