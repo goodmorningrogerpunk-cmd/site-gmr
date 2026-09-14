@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Skate Cat - Tutoriel Plateforme Complet</title>
+  <title>Skate Cat - Tutoriel Finalisé</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
     body { background-color: #000; font-family: 'Courier New', Courier, monospace; color: #fff; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
@@ -41,7 +41,7 @@
 <div id="game-container">
   <canvas id="gameCanvas" width="960" height="540"></canvas>
   <button id="tuto-main-btn">LANCER LE TUTORIEL</button>
-  <div id="version-display">v6.1-PLATFORM</div>
+  <div id="version-display">v7.0-FINAL</div>
 
   <div id="tuto-dialog-box">
     <p id="tuto-dialog-text"></p>
@@ -65,7 +65,7 @@ const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera
 const bgMusic = new Audio('roger_8bitok.mp3'); bgMusic.loop = true; bgMusic.volume = 0.6;
 const sounds = { jump: new Audio('skate_jump.mp3'), reception: new Audio('skate_reception.mp3'), coin: new Audio('coin_receive.mp3'), damage: new Audio('damage.mp3') };
 
-const ASSET_VERSION = 'v6.1';
+const ASSET_VERSION = 'v7.0';
 function loadImg(name) { const img = new Image(); img.src = name + '.png?v=' + ASSET_VERSION; return img; }
 
 const assets = {
@@ -74,10 +74,8 @@ const assets = {
   catJump: [loadImg('chat_jump1'), loadImg('chat_jump2')],
   catCrouch: [loadImg('chat_reception2'), loadImg('chat_reception2-1')],
   platMedium: loadImg('bleu_medium'),
-  obstaclesConfig: [
-    { img: loadImg('obstacle4'), targetH: 75 },
-    { img: loadImg('obstacle6'), targetH: 85 }
-  ],
+  platLong: loadImg('bleu_long'),
+  obstacle: loadImg('obstacle4'), // Image corrigée pour les obstacles
   letters: {
     R: Array.from({length: 8}, (_, i) => loadImg(`R${i+1}`)),
     O: Array.from({length: 8}, (_, i) => loadImg(`O${i+1}`)),
@@ -195,7 +193,7 @@ function startStep3() {
 function startStep4() {
   tutoStep = 4;
   tutoSubState = 1;
-  platforms.push({ x: 900, y: ENTITY_GROUND_Y - 140, w: 260, h: 65, shownPopup: false });
+  platforms.push({ x: 900, y: ENTITY_GROUND_Y - 140, w: 260, h: 65, shownPopup: false, type: 'medium' });
 }
 
 function startStep5() {
@@ -203,11 +201,14 @@ function startStep5() {
   tutoSubState = 1;
   tutoObstacleCount = 0;
   
-  showDialogSide(
-    "Ça c'est un obstacle, il faut l'éviter, en sautant par dessus ou en passant en dessous.",
-    { x: 450, y: ENTITY_GROUND_Y - 85, w: 90, h: 85 },
-    () => { tutoSubState = 2; }
-  );
+  // Attente de 2 secondes avant l'affichage de l'obstacle
+  setTimeout(() => {
+    showDialogSide(
+      "Ça c'est un obstacle, il faut l'éviter, en sautant par dessus ou en passant en dessous.",
+      { x: 450, y: ENTITY_GROUND_Y - 85, w: 70, h: 75 },
+      () => { tutoSubState = 2; }
+    );
+  }, 2000);
 }
 
 function startStep6() {
@@ -260,21 +261,24 @@ function update() {
   cat.vy += GRAVITY;
   cat.y += cat.vy;
 
-  // Gestion des collisions avec le sol
+  // Gestion des collisions avec le sol et les plateformes (chat légèrement "enfoncé")
   let landedOnPlatform = false;
   if (platforms.length > 0) {
     platforms.forEach(plat => {
-      // Test si le chat retombe sur le dessus de la plateforme
-      if (cat.vy >= 0 && cat.x + cat.width > plat.x && cat.x < plat.x + plat.w &&
-          cat.y + cat.height >= plat.y && cat.y + cat.height <= plat.y + 20) {
-        // S'il ne demande pas à traverser en appuyant sur bas
-        if (!cat.isCrouching || tutoSubState !== 4) {
-          cat.y = plat.y - cat.height;
-          cat.vy = 0;
-          cat.isGrounded = true;
-          cat.isJumping = false;
-          landedOnPlatform = true;
+      // Ajustement de la détection pour que le chat soit bien calé (enfoncé)
+      if (cat.vy >= 0 && cat.x + cat.width > plat.x + 10 && cat.x < plat.x + plat.w - 10 &&
+          cat.y + cat.height >= plat.y && cat.y + cat.height <= plat.y + 25) {
+        
+        // Si on est à l'étape du traversée et qu'on appuie sur bas en l'air, on traverse
+        if (tutoSubState === 4 && cat.isCrouching) {
+          return; // Laisse passer à travers
         }
+
+        cat.y = plat.y - cat.height + 8; // Légèrement enfoncé
+        cat.vy = 0;
+        cat.isGrounded = true;
+        cat.isJumping = false;
+        landedOnPlatform = true;
       }
     });
   }
@@ -306,16 +310,17 @@ function update() {
     }
   } 
   else if (tutoStep === 4) {
-    // Si la plateforme sort de l'écran sans succès, on en recrée une en boucle
+    // Si la plateforme sort de l'écran sans succès, on en recrée une en boucle selon l'étape en cours
     if (platforms.length > 0 && platforms[0].x + platforms[0].w < 0) {
-      platforms = [{ x: 960, y: ENTITY_GROUND_Y - 140, w: 260, h: 65, shownPopup: true }];
+      let pType = (tutoSubState === 3) ? 'long' : 'medium';
+      platforms = [{ x: 960, y: ENTITY_GROUND_Y - 140, w: (pType === 'long' ? 380 : 260), h: 65, shownPopup: true, type: pType }];
     }
 
     const plat = platforms[0];
     if (plat && !plat.shownPopup) {
       if (plat.x <= 500) {
         plat.shownPopup = true;
-        const actionText = isMobileDevice ? "Ceci est une plateforme, il en existe de différentes tailles et de différentes hauteurs. Tu peux sauter dessus mais aussi en descendre ou passer au travers en appuyant sur le CÔTÉ GAUCHE." : "Ceci est une plateforme, il en existe de différentes tailles et de différentes hauteurs. Tu peux sauter dessus mais aussi en descendre ou passer au travers en appuyant sur FLÈCHE DU BAS.";
+        const actionText = isMobileDevice ? "Ceci est une plateforme. Tu peux sauter dessus, en descendre ou passer au travers en appuyant sur le CÔTÉ GAUCHE." : "Ceci est une plateforme, il en existe de différentes tailles et hauteurs. Tu peux sauter dessus mais aussi en descendre ou passer au travers en appuyant sur FLÈCHE DU BAS.";
         
         showDialogSide(
           actionText,
@@ -326,22 +331,23 @@ function update() {
     }
 
     if (tutoSubState === 2) {
-      tutoInstructionMessage = "Saute sur la plateforme";
-      if (cat.isGrounded && platforms.some(p => cat.y + cat.height === p.y && cat.x + cat.width > p.x && cat.x < p.x + p.w)) {
+      tutoInstructionMessage = "Vas-y saute sur la plateforme";
+      if (cat.isGrounded && platforms.some(p => cat.y + cat.height <= p.y + 15 && cat.x + cat.width > p.x && cat.x < p.x + p.w)) {
         tutoSubState = 3;
+        // Passage direct à la plateforme longue pour la sous-étape suivante
+        platforms = [{ x: 960, y: ENTITY_GROUND_Y - 140, w: 380, h: 65, shownPopup: true, type: 'long' }];
       }
     } else if (tutoSubState === 3) {
-      tutoInstructionMessage = "Saute sur la plateforme puis descends de la plateforme (Flèche Bas)";
+      tutoInstructionMessage = "Maintenant, saute sur la plateforme et une fois dessus, descends avec la FLÈCHE DU BAS";
+      // Vérifie que le chat est monté sur la plateforme puis redescendu au sol
       if (cat.y + cat.height >= ENTITY_GROUND_Y) {
+        // On vérifie s'il était bien sur la plateforme avant
         tutoSubState = 4;
-        // Génère une nouvelle plateforme pour l'exercice suivant si besoin
-        if (platforms.length === 0 || platforms[0].x < 200) {
-          platforms = [{ x: 960, y: ENTITY_GROUND_Y - 140, w: 260, h: 65, shownPopup: true }];
-        }
+        platforms = [{ x: 960, y: ENTITY_GROUND_Y - 140, w: 260, h: 65, shownPopup: true, type: 'medium' }];
       }
     } else if (tutoSubState === 4) {
-      tutoInstructionMessage = "Maintenant, passe au travers de la plateforme";
-      // Si le chat traverse la plateforme par le haut en s'accroupissant
+      tutoInstructionMessage = "Et enfin saute et passe au travers de la plateforme en appuyant sur espace et tout de suite après FLÈCHE DU BAS";
+      // Si le chat est passé à travers par le haut
       if (platforms.some(p => cat.y < p.y && cat.y + cat.height > p.y && cat.isCrouching)) {
         tutoInstructionMessage = "";
         platforms = [];
@@ -418,16 +424,17 @@ function draw() {
   if (!gameStarted) return;
 
   platforms.forEach(p => {
-    if (assets.platMedium.complete && assets.platMedium.naturalWidth > 0) {
-      ctx.drawImage(assets.platMedium, p.x, p.y, p.w, p.h);
+    let platImg = (p.type === 'long') ? assets.platLong : assets.platMedium;
+    if (platImg && platImg.complete && platImg.naturalWidth > 0) {
+      ctx.drawImage(platImg, p.x, p.y, p.w, p.h);
     } else {
       ctx.fillStyle = '#4fc3f7'; ctx.fillRect(p.x, p.y, p.w, p.h);
     }
   });
 
   obstacles.forEach(o => {
-    if (assets.obstaclesConfig[0].img.complete && assets.obstaclesConfig[0].img.naturalWidth > 0) {
-      ctx.drawImage(assets.obstaclesConfig[0].img, o.x, o.y, o.w, o.h);
+    if (assets.obstacle && assets.obstacle.complete && assets.obstacle.naturalWidth > 0) {
+      ctx.drawImage(assets.obstacle, o.x, o.y, o.w, o.h);
     } else {
       ctx.fillStyle = '#ff5252'; ctx.fillRect(o.x, o.y, o.w, o.h);
     }
