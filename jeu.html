@@ -39,7 +39,6 @@
     .modal-content-scroll { flex: 1; overflow-y: auto; padding-right: 6px; margin-bottom: 12px; }
     .modal-close-btn { display: block; margin: 0 auto; padding: 10px 24px; background: #ffd54f; color: #1a1a24; border: 3px solid #ffffff; font-size: 15px; font-weight: bold; cursor: pointer; }
 
-    /* FENÊTRES DE FREEZE HTML : Taille de texte doublée et boîte élargie */
     #tuto-dialog-box {
       display: none; position: absolute; width: 560px; min-height: 240px; background: #111118; border: 4px solid #ffd54f; border-radius: 8px;
       padding: 38px 28px 28px 28px; z-index: 65000; text-align: center; box-shadow: 0 0 35px rgba(0,0,0,0.95);
@@ -88,7 +87,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v12.0-ULTIMATE</div>
+  <div id="version-display">v13.0-MOBILE-TUTO</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -406,7 +405,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v12.0'; 
+const ASSET_VERSION = 'v13.0'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -530,7 +529,7 @@ function startTutorial() {
   cat.y = ENTITY_GROUND_Y - cat.height; cat.vy = 0; cat.isGrounded = true;
 }
 
-// LOGIQUE EXCLUSIVE DU TUTORIEL INTÉGRÉE PROPREMENT
+// LOGIQUE EXCLUSIVE DU TUTORIEL ADAPTÉE PC / MOBILE
 function updateTutorialScript() {
   if (!isTutoMode || tutoHighlightedZone) return;
   tutoTimer++;
@@ -547,8 +546,8 @@ function updateTutorialScript() {
   else if (tutoStep === 2) {
     if (tutoTimer > 30) {
       const controlsText = isMobileDevice ?
-        "En appuyant sur le CÔTÉ DROIT DE L'ÉCRAN, Roger fait un saut. En appuyant sur le CÔTÉ GAUCHE, Roger se baisse." :
-        "En appuyant sur ESPACE, Roger fait un saut. En appuyant sur la FLÈCHE DU BAS, Roger se baisse. Pour mettre le jeu en pause, appuie sur ENTRÉE.";
+        "En appuyant sur le <b>CÔTÉ DROIT DE L'ÉCRAN</b>, Roger fait un saut. En appuyant sur le <b>CÔTÉ GAUCHE</b>, Roger se baisse." :
+        "En appuyant sur <b>ESPACE</b>, Roger fait un saut. En appuyant sur la <b>FLÈCHE DU BAS</b>, Roger se baisse. Pour mettre le jeu en pause, appuie sur <b>ENTRÉE</b>.";
 
       const hudX = isMobileDevice ? canvas.width - 370 : canvas.width - 340;
       showTutoDialogSide(
@@ -560,13 +559,13 @@ function updateTutorialScript() {
   }
   else if (tutoStep === 3) {
     if (tutoSubState === 1) {
-      tutoInstructionMessage = "Fais un long saut (appui long sur ESPACE)";
+      tutoInstructionMessage = isMobileDevice ? "Fais un long saut (maintiens le CÔTÉ DROIT)" : "Fais un long saut (appui long sur ESPACE)";
       if (!cat.isGrounded && cat.jumpTimer >= 10) { tutoSubState = 2; tutoTimer = 0; }
     } else if (tutoSubState === 2) {
-      tutoInstructionMessage = "Maintenant, baisse-toi (FLÈCHE DU BAS)";
+      tutoInstructionMessage = isMobileDevice ? "Maintenant, baisse-toi (touche le CÔTÉ GAUCHE)" : "Maintenant, baisse-toi (FLÈCHE DU BAS)";
       if (cat.isCrouching) { tutoSubState = 3; tutoTimer = 0; }
     } else if (tutoSubState === 3) {
-      tutoInstructionMessage = "Fais un petit saut (appui court sur ESPACE)";
+      tutoInstructionMessage = isMobileDevice ? "Fais un petit saut (tap court sur le CÔTÉ DROIT)" : "Fais un petit saut (appui court sur ESPACE)";
       if (cat.vy < 0 && cat.jumpTimer < 5 && !keys['Space'] && !keys['ArrowUp']) {
         tutoStep = 4; tutoTimer = 0; tutoSubState = 1; tutoInstructionMessage = "";
       }
@@ -576,8 +575,11 @@ function updateTutorialScript() {
     const plat = platforms[0];
     if (plat && plat.x <= canvas.width - 350 && tutoSubState === 1 && !plat.shownPopup) {
       plat.shownPopup = true;
+      const passText = isMobileDevice ? 
+        "Voici une plateforme. Tu peux sauter dessus ou la traverser en touchant le CÔTÉ GAUCHE." :
+        "Voici une plateforme. Tu peux sauter dessus ou la traverser en appuyant sur la FLÈCHE DU BAS.";
       showTutoDialogSide(
-        "Voici une plateforme. Tu peux sauter dessus ou la traverser en appuyant sur BAS.",
+        passText,
         { x: plat.x, y: plat.y, w: plat.w, h: plat.h },
         () => { tutoSubState = 2; }
       );
@@ -587,7 +589,7 @@ function updateTutorialScript() {
       tutoInstructionMessage = "Saute sur une plateforme";
       if (cat.isPlatformGrounded) { tutoSubState = 3; }
     } else if (tutoSubState === 3) {
-      tutoInstructionMessage = "Descends de la plateforme (FLÈCHE DU BAS)";
+      tutoInstructionMessage = isMobileDevice ? "Descends de la plateforme (touche le CÔTÉ GAUCHE)" : "Descends de la plateforme (FLÈCHE DU BAS)";
       const pLong = platforms[0];
       if (pLong) {
         if (cat.isPlatformGrounded) pLong.wasOnPlat = true;
@@ -597,7 +599,7 @@ function updateTutorialScript() {
         if (pLong.descendedFromPlat && cat.isGrounded) { tutoSubState = 4; }
       }
     } else if (tutoSubState === 4) {
-      tutoInstructionMessage = "Saute et passe au travers (ESPACE puis BAS)";
+      tutoInstructionMessage = isMobileDevice ? "Saute et passe au travers (DROITE puis GAUCHE)" : "Saute et passe au travers (ESPACE puis BAS)";
       const pPass = platforms[0];
       if (pPass) {
         if (cat.isPlatformGrounded) { pPass.touchedPlatform = true; }
@@ -641,7 +643,8 @@ function updateTutorialScript() {
         if (configIdx === 7) {
           obsY = ENTITY_GROUND_Y - dim.h - 70;
         } else if (configIdx === 3) {
-          obsY = ENTITY_GROUND_Y - 100 - dim.h + 20;
+          // Obstacle 1 sur plateforme enfoncé de 10px supplémentaires pour effet 3D parfait
+          obsY = ENTITY_GROUND_Y - 100 - dim.h + 30;
           platforms.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 100, w: 260, h: 65, key: 'bleu_medium' });
         } else if (configIdx === 4) {
           obsY = ENTITY_GROUND_Y - dim.h + 5;
@@ -714,7 +717,8 @@ function updateTutorialScript() {
         } else if (customLetterSpawnIndex === 1) {
           items.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 120, w: 65, h: 75, char: 'O', letterIdx: 1, frame: 0, animTimer: 0 });
           const conf = assets.obstaclesConfig[3]; const dim = getObstacleDimensions(conf);
-          obstacles.push({ x: canvas.width + 280, y: ENTITY_GROUND_Y - 100 - dim.h + 20, w: dim.w, h: dim.h, configIdx: 3, frame: 0, animTimer: 0 });
+          // Obstacle 1 sur plateforme enfoncé de 30px pour effet 3D parfait
+          obstacles.push({ x: canvas.width + 280, y: ENTITY_GROUND_Y - 100 - dim.h + 30, w: dim.w, h: dim.h, configIdx: 3, frame: 0, animTimer: 0 });
           platforms.push({ x: canvas.width + 230, y: ENTITY_GROUND_Y - 100, w: 260, h: 65, key: 'bleu_medium' });
           customLetterSpawnIndex = 2;
         } else if (customLetterSpawnIndex === 2) {
@@ -1545,7 +1549,7 @@ function draw() {
     ctx.strokeText('+1 000 PTS !', popupX, popupY); ctx.fillText('+1 000 PTS !', popupX, popupY); ctx.restore();
   }
 
-  // BANDEAU CANVAS EN JEU : Taille de texte grossie (22px) et non coupée
+  // BANDEAU CANVAS EN JEU : Taille de texte grossie et adaptée mobile/PC
   if (isTutoMode && tutoInstructionMessage && tutoDialogBox.style.display !== 'block') {
     ctx.save(); 
     ctx.fillStyle = 'rgba(0, 0, 0, 0.9)'; 
@@ -1587,7 +1591,7 @@ function draw() {
     ctx.fillStyle = 'rgba(0, 0, 0, 0.75)'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.textAlign = 'center';
     ctx.fillStyle = '#ffd54f'; ctx.font = '900 48px Courier New'; ctx.fillText("PARTIE EN PAUSE", canvas.width / 2, canvas.height / 2 - 20);
     ctx.fillStyle = '#ffffff'; ctx.font = 'bold 20px Courier New';
-    if (isMobileDevice) ctx.fillText("Appuyer de nouveau l'écran pour reprendre la partie", canvas.width / 2, canvas.height / 2 + 40);
+    if (isMobileDevice) ctx.fillText("Appuyer de nouveau sur l'écran pour reprendre", canvas.width / 2, canvas.height / 2 + 40);
     else ctx.fillText("Appuyer sur Entrée pour reprendre la partie", canvas.width / 2, canvas.height / 2 + 40);
     ctx.textAlign = 'left';
   }
