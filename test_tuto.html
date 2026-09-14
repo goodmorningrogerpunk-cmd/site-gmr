@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Skate Cat - Tutoriel Officiel Définitif</title>
+  <title>Skate Cat - Tutoriel Officiel Géant</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
     html, body { width: 100%; height: 100%; background-color: #000; font-family: 'Courier New', Courier, monospace; color: #fff; overflow: hidden; touch-action: none !important; }
@@ -20,7 +20,7 @@
     
     #tuto-main-btn {
       position: absolute; top: 62%; left: 50%; transform: translate(-50%, -50%);
-      padding: 16px 32px; font-size: 20px; color: #ffffff; background-color: #2e2e40;
+      padding: 16px 32px; font-size: 22px; color: #ffffff; background-color: #2e2e40;
       border: 3px solid #ffd54f; box-shadow: 0 4px 0px #000; z-index: 30;
     }
     #tuto-main-btn:hover { background-color: #ffd54f; color: #1a1a24; }
@@ -31,12 +31,13 @@
       border-radius: 4px; pointer-events: none; z-index: 30;
     }
 
+    /* FENÊTRES DE FREEZE HTML : Taille de texte doublée (26px) et boîte élargie/agrandie */
     #tuto-dialog-box {
-      display: none; position: absolute; width: 440px; min-height: 190px; background: #111118; border: 4px solid #ffd54f; border-radius: 8px;
-      padding: 34px 24px 24px 24px; z-index: 65000; text-align: center; box-shadow: 0 0 35px rgba(0,0,0,0.95);
+      display: none; position: absolute; width: 560px; min-height: 240px; background: #111118; border: 4px solid #ffd54f; border-radius: 8px;
+      padding: 38px 28px 28px 28px; z-index: 65000; text-align: center; box-shadow: 0 0 35px rgba(0,0,0,0.95);
     }
-    #tuto-dialog-text { font-size: 13px; line-height: 2.2; color: #ffffff; margin-top: 10px; margin-bottom: 20px; text-align: left; display: block; }
-    #tuto-next-btn { padding: 8px 24px; font-size: 15px; color: #1a1a24; background-color: #ffd54f; border: 3px solid #ffffff; cursor: pointer; font-weight: bold; }
+    #tuto-dialog-text { font-size: 22px; line-height: 1.5; color: #ffffff; margin-top: 5px; margin-bottom: 24px; text-align: left; display: block; }
+    #tuto-next-btn { padding: 10px 28px; font-size: 18px; color: #1a1a24; background-color: #ffd54f; border: 3px solid #ffffff; cursor: pointer; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -44,7 +45,7 @@
 <div id="game-container">
   <canvas id="gameCanvas" width="960" height="540"></canvas>
   <button id="tuto-main-btn" class="pixel-btn">LANCER LE TUTORIEL</button>
-  <div id="version-display">v11.0-FINAL</div>
+  <div id="version-display">v12.0-BIGTEXT</div>
 
   <div id="tuto-dialog-box">
     <p id="tuto-dialog-text"></p>
@@ -87,7 +88,7 @@ function playRunSound() {
 function stopRunSound() { if (!sounds.run.paused) { sounds.run.pause(); if (sounds.run.readyState >= 2) sounds.run.currentTime = 0; } }
 function playSoundEffect(sound) { if (audioUnlocked) { try { if (sound.readyState >= 2) sound.currentTime = 0; sound.play().catch(() => {}); } catch(e) {} } }
 
-const ASSET_VERSION = 'v11.0';
+const ASSET_VERSION = 'v12.0';
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -167,7 +168,6 @@ function showTutoDialogSide(text, highlightRect, onNext) {
   
   tutoDialogBox.style.display = 'block';
 
-  // Si highlightRect est null, on centre la fenêtre parfaitement au milieu de l'écran
   if (!highlightRect) {
     tutoDialogBox.style.left = '50%';
     tutoDialogBox.style.top = '50%';
@@ -176,12 +176,12 @@ function showTutoDialogSide(text, highlightRect, onNext) {
   }
 
   let leftPos = highlightRect.x + highlightRect.w + 20;
-  if (leftPos + 440 > canvas.width) leftPos = highlightRect.x - 460;
+  if (leftPos + 560 > canvas.width) leftPos = highlightRect.x - 580;
   if (leftPos < 20) leftPos = 20;
 
   let topPos = highlightRect.y - 10;
   if (topPos < 50) topPos = 50;
-  if (topPos + 280 > canvas.height) topPos = canvas.height - 300;
+  if (topPos + 320 > canvas.height) topPos = canvas.height - 340;
 
   tutoDialogBox.style.left = leftPos + 'px';
   tutoDialogBox.style.top = topPos + 'px';
@@ -251,7 +251,6 @@ function startTutorial() {
   cat.y = ENTITY_GROUND_Y - cat.height; cat.vy = 0; cat.isGrounded = true;
 }
 
-// LOGIQUE DU TUTORIEL SCRIPTÉ
 function updateTutorialScript() {
   if (tutoHighlightedZone) return;
   tutoTimer++;
@@ -259,7 +258,7 @@ function updateTutorialScript() {
   if (tutoStep === 1) {
     if (tutoTimer > 60) {
       showTutoDialogSide(
-        "Ceci est ton score, le but est d'avoir le maximum de points. Plus tu avances loin, plus ton score augmente. Des bonus peuvent aussi te faire gagner des points.",
+        "Ceci est ton score, le but est d'avoir le maximum de points. Plus tu avances loin, plus ton score augmente.",
         { x: 15, y: 15, w: 230, h: 55 },
         () => { tutoStep = 2; tutoTimer = 0; }
       );
@@ -268,8 +267,8 @@ function updateTutorialScript() {
   else if (tutoStep === 2) {
     if (tutoTimer > 30) {
       const controlsText = isMobileDevice ?
-        "En appuyant sur le CÔTÉ DROIT DE L'ÉCRAN, Roger fait un saut. En appuyant sur le CÔTÉ GAUCHE, Roger se baisse." :
-        "En appuyant sur ESPACE, Roger fait un saut. En appuyant sur la FLÈCHE DU BAS, Roger se baisse. Pour mettre le jeu en pause, appuie sur ENTRÉE.";
+        "Tape à droite pour sauter.<br>Tape à gauche pour te baisser." :
+        "Appuie sur ESPACE pour sauter.<br>Appuie sur BAS pour te baisser.";
 
       const hudX = isMobileDevice ? canvas.width - 370 : canvas.width - 340;
       showTutoDialogSide(
@@ -281,13 +280,13 @@ function updateTutorialScript() {
   }
   else if (tutoStep === 3) {
     if (tutoSubState === 1) {
-      tutoInstructionMessage = "Vas-y fais un long saut (appui long sur ESPACE)";
+      tutoInstructionMessage = "Fais un long saut (appui long ESPACE)";
       if (!cat.isGrounded && cat.jumpTimer >= 10) { tutoSubState = 2; tutoTimer = 0; }
     } else if (tutoSubState === 2) {
-      tutoInstructionMessage = "Maintenant, baisse-toi (FLÈCHE DU BAS)";
+      tutoInstructionMessage = "Maintenant, baisse-toi (FLÈCHE BAS)";
       if (cat.isCrouching) { tutoSubState = 3; tutoTimer = 0; }
     } else if (tutoSubState === 3) {
-      tutoInstructionMessage = "Et pour finir, fais un tout petit saut (appui court sur ESPACE)";
+      tutoInstructionMessage = "Fais un petit saut (appui court ESPACE)";
       if (cat.vy < 0 && cat.jumpTimer < 5 && !keys['Space'] && !keys['ArrowUp']) {
         tutoStep = 4; tutoTimer = 0; tutoSubState = 1; tutoInstructionMessage = "";
       }
@@ -298,17 +297,17 @@ function updateTutorialScript() {
     if (plat && plat.x <= canvas.width - 350 && tutoSubState === 1 && !plat.shownPopup) {
       plat.shownPopup = true;
       showTutoDialogSide(
-        "Ceci est une plateforme, il en existe de différentes tailles et hauteurs. Tu peux sauter dessus ou passer au travers.",
+        "Voici une plateforme. Tu peux sauter dessus ou la traverser en appuyant sur BAS.",
         { x: plat.x, y: plat.y, w: plat.w, h: plat.h },
         () => { tutoSubState = 2; }
       );
     }
 
     if (tutoSubState === 2) {
-      tutoInstructionMessage = "Vas-y, saute sur une plateforme";
+      tutoInstructionMessage = "Saute sur une plateforme";
       if (cat.isPlatformGrounded) { tutoSubState = 3; }
     } else if (tutoSubState === 3) {
-      tutoInstructionMessage = "Maintenant, saute sur une plateforme et descends avec la FLÈCHE DU BAS";
+      tutoInstructionMessage = "Descends de la plateforme (FLÈCHE BAS)";
       const pLong = platforms[0];
       if (pLong) {
         if (cat.isPlatformGrounded) pLong.wasOnPlat = true;
@@ -318,7 +317,7 @@ function updateTutorialScript() {
         if (pLong.descendedFromPlat && cat.isGrounded) { tutoSubState = 4; }
       }
     } else if (tutoSubState === 4) {
-      tutoInstructionMessage = "Enfin, saute et passe au travers en appuyant sur ESPACE puis BAS";
+      tutoInstructionMessage = "Saute et passe au travers (ESPACE puis BAS)";
       const pPass = platforms[0];
       if (pPass) {
         if (cat.isPlatformGrounded) { pPass.touchedPlatform = true; }
@@ -341,7 +340,7 @@ function updateTutorialScript() {
           obs.shownPopup = true;
           tutoSubState = 1;
           showTutoDialogSide(
-            "Ça c'est un obstacle, il faut l'éviter en sautant par-dessus ou en passant en dessous.",
+            "Ceci est un obstacle. Évite-le en sautant ou en te baissant.",
             { x: obs.x, y: obs.y, w: obs.w, h: obs.h },
             () => { tutoSubState = 2; tutoObstacleCount = 0; tutoTimer = 0; }
           );
@@ -391,7 +390,7 @@ function updateTutorialScript() {
         () => { tutoSubState = 1; }
       );
     } else if (tutoSubState === 1) {
-      tutoInstructionMessage = "Vas-y fonce sur un obstacle pour tester la protection !";
+      tutoInstructionMessage = "Fonce sur un obstacle pour tester la protection !";
       if (obstacles.length === 0 && tutoTimer > 40) {
         const conf = assets.obstaclesConfig[5]; const dim = getObstacleDimensions(conf);
         obstacles.push({ x: canvas.width + 100, y: ENTITY_GROUND_Y - dim.h + 5, w: dim.w, h: dim.h, configIdx: 5, frame: 0, animTimer: 0 });
@@ -401,7 +400,7 @@ function updateTutorialScript() {
         tutoTimer = 0;
         obstacles = [];
         showTutoDialogSide(
-          "Tu vois, en percutant un obstacle la lettre O t'a protégé. Si tu n'as plus de lettres pour te protéger, c'est le Game Over assuré !",
+          "Tu vois, la lettre O t'a protégé ! S'il n'y a plus de lettres, c'est le Game Over !",
           { x: 15, y: canvas.height - 130, w: 105, h: 110 },
           () => {
             tutoSubState = 3;
@@ -418,12 +417,12 @@ function updateTutorialScript() {
   else if (tutoStep === 7) {
     if (tutoSubState === 0) {
       showTutoDialogSide(
-        "Collecte ces lettres afin de compléter le mot R O G E R en bas à droite, cela te fera gagner une grosse lettre.",
+        "Collecte ces lettres pour reformer R O G E R en bas à droite et gagner une grosse lettre.",
         { x: canvas.width - 340, y: canvas.height - 95, w: 320, h: 85 },
         () => { tutoSubState = 1; tutoTimer = 0; customLetterSpawnIndex = 0; }
       );
     } else if (tutoSubState === 1) {
-      tutoInstructionMessage = "Attrape toutes les lettres pour former R O G E R !";
+      tutoInstructionMessage = "Attrape toutes les lettres de R O G E R !";
       
       if (items.length === 0 && obstacles.length === 0 && platforms.length === 0 && tutoTimer > 40) {
         tutoTimer = 0;
@@ -439,7 +438,6 @@ function updateTutorialScript() {
           platforms.push({ x: canvas.width + 230, y: ENTITY_GROUND_Y - 100, w: 260, h: 65, key: 'bleu_medium' });
           customLetterSpawnIndex = 2;
         } else if (customLetterSpawnIndex === 2) {
-          // Lettre G sur une plateforme BEAUCOUP PLUS HAUTE
           items.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 240, w: 65, h: 75, char: 'G', letterIdx: 2, frame: 0, animTimer: 0 });
           platforms.push({ x: canvas.width + 20, y: ENTITY_GROUND_Y - 200, w: 260, h: 65, key: 'bleu_medium' });
           customLetterSpawnIndex = 3;
@@ -449,7 +447,6 @@ function updateTutorialScript() {
           obstacles.push({ x: canvas.width + 250, y: ENTITY_GROUND_Y - dim.h + 5, w: dim.w, h: dim.h, configIdx: 5, frame: 0, animTimer: 0 });
           customLetterSpawnIndex = 4;
         } else if (customLetterSpawnIndex === 4) {
-          // Dernier obstacle volant AVANT la dernière lettre R
           items.push({ x: canvas.width + 320, y: ENTITY_GROUND_Y - 120, w: 65, h: 75, char: 'R', letterIdx: 4, frame: 0, animTimer: 0 });
           const conf = assets.obstaclesConfig[7]; const dim = getObstacleDimensions(conf);
           obstacles.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - dim.h - 70, w: dim.w, h: dim.h, configIdx: 7, frame: 0, animTimer: 0, baseY: ENTITY_GROUND_Y - dim.h - 70 });
@@ -467,10 +464,9 @@ function updateTutorialScript() {
     } else if (tutoSubState === 2) {
       endSequenceTimer++;
       if (endSequenceTimer > 120) {
-        // Fenêtre finale centrée en plein milieu sans zone de focus
         showTutoDialogSide(
-          "Tu connais désormais les bases pour jouer à Good Morning Roger Sk8in' Cat. Lance-toi, plein d'autres surprises t'attendent dans le jeu !",
-          null, // Pas de focus rectangulaire -> centrage automatique
+          "Tu connais désormais les bases pour jouer à Good Morning Roger Sk8in' Cat. Lance-toi !",
+          null,
           () => { location.reload(); }
         );
         tutoSubState = 3;
@@ -702,30 +698,30 @@ function draw() {
     }
   });
 
-  // MESSAGE D'INSTRUCTION EN JEU (BANDEAU CANVAS CORRIGÉ : CENTRAGE VERTICAL PARFAIT, NON COUPÉ)
+  // BANDEAU CANVAS EN JEU : Taille de texte doublée (26px) et encadré agrandi (hauteur 80px)
   if (tutoInstructionMessage && tutoDialogBox.style.display !== 'block') {
     ctx.save(); 
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.85)'; 
-    ctx.fillRect(canvas.width / 2 - 380, 75, 760, 55);
-    ctx.strokeStyle = '#ffd54f'; ctx.lineWidth = 2; ctx.strokeRect(canvas.width / 2 - 380, 75, 760, 55);
-    ctx.fillStyle = '#ffd54f'; ctx.font = 'bold 13px Courier New'; ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle'; // Fixe définitivement le rendu sans rognage haut
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.9)'; 
+    ctx.fillRect(canvas.width / 2 - 440, 60, 880, 80);
+    ctx.strokeStyle = '#ffd54f'; ctx.lineWidth = 3; ctx.strokeRect(canvas.width / 2 - 440, 60, 880, 80);
+    ctx.fillStyle = '#ffd54f'; ctx.font = 'bold 22px Courier New'; ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
     
-    const maxLineLength = 70;
+    const maxLineLength = 48; // Légèrement réduit pour s'adapter à la plus grande police
     if (tutoInstructionMessage.length > maxLineLength) {
       let spaceIdx = tutoInstructionMessage.lastIndexOf(' ', maxLineLength);
       if (spaceIdx === -1) spaceIdx = maxLineLength;
       const line1 = tutoInstructionMessage.substring(0, spaceIdx);
       const line2 = tutoInstructionMessage.substring(spaceIdx + 1);
-      ctx.fillText(line1, canvas.width / 2, 95);
+      ctx.fillText(line1, canvas.width / 2, 88);
       ctx.fillText(line2, canvas.width / 2, 115);
     } else {
-      ctx.fillText(tutoInstructionMessage, canvas.width / 2, 102);
+      ctx.fillText(tutoInstructionMessage, canvas.width / 2, 100);
     }
     ctx.restore();
   }
 
-  // MASQUE DE FREEZE ET SURBRILLANCE (OU ASSOMBRISSEMENT GLOBAL SI PAS DE FOCUS)
+  // MASQUE DE FREEZE
   if (tutoDialogBox.style.display === 'block') {
     ctx.save(); 
     ctx.fillStyle = 'rgba(0, 0, 0, 0.88)'; 
@@ -737,7 +733,6 @@ function draw() {
       ctx.fillRect(0, z.y + z.h, canvas.width, canvas.height - (z.y + z.h));
       ctx.strokeStyle = '#ffd54f'; ctx.lineWidth = 3; ctx.strokeRect(z.x, z.y, z.w, z.h);
     } else {
-      // Pas de zone ciblée -> Assombrissement global pour la fenêtre centrée finale
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
     ctx.restore();
