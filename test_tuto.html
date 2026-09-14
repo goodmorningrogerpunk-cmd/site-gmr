@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Tutoriel Découplé</title>
+  <style>
+    body { background: #111; color: #fff; font-family: monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+    #container { position: relative; width: 960px; height: 540px; border: 4px solid #2e2e40; background: #000; }
+    canvas { width: 100%; height: 100%; display: block; }
+    #btn-tuto { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 16px 32px; font-size: 20px; background: #ffd54f; color: #000; font-weight: bold; border: 4px solid #fff; cursor: pointer; }
+    #tuto-dialog { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; background: #111118; border: 4px solid #ffd54f; padding: 20px; text-align: center; z-index: 100; }
+    #tuto-next { padding: 8px 20px; font-size: 16px; background: #ffd54f; border: none; font-weight: bold; cursor: pointer; margin-top: 15px; }
+  </style>
+</head>
+<body>
+
+<div id="container">
+  <canvas id="canvas" width="960" height="540"></canvas>
+  <button id="btn-tuto">TESTER LE TUTORIEL</button>
+
+  <div id="tuto-dialog">
+    <p id="tuto-text"></p>
+    <button id="tuto-next">SUIVANT</button>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const btnTuto = document.getElementById('btn-tuto');
+const tutoDialog = document.getElementById('tuto-dialog');
+const tutoText = document.getElementById('tuto-text');
+const tutoNext = document.getElementById('tuto-next');
+
+let state = 'MENU'; // MENU, STEP1_FREEZE, STEP1_WAIT, STEP2_FREEZE, FINISHED
+let highlight = null;
+let nextCallback = null;
+
+btnTuto.addEventListener('click', () => {
+  btnTuto.style.display = 'none';
+  state = 'STEP1_FREEZE';
+  runStep1();
+});
+
+tutoNext.addEventListener('click', () => {
+  tutoDialog.style.display = 'none';
+  highlight = null;
+  if (nextCallback) {
+    const cb = nextCallback;
+    nextCallback = null;
+    cb();
+  }
+});
+
+function showDialog(text, box, onNext) {
+  tutoText.innerHTML = text;
+  highlight = box;
+  nextCallback = onNext;
+  tutoDialog.style.display = 'block';
+}
+
+function runStep1() {
+  setTimeout(() => {
+    showDialog(
+      "ÉTAPE 1 : Voici la zone du score en haut à gauche. Le jeu est gelé !",
+      { x: 15, y: 15, w: 230, h: 55 },
+      () => { runStep2(); }
+    );
+  }, 1000);
+}
+
+function runStep2() {
+  setTimeout(() => {
+    showDialog(
+      "ÉTAPE 2 : Voici la zone des contrôles en haut à droite. Appuie sur SUIVANT pour terminer le test.",
+      { x: canvas.width - 340, y: 15, w: 320, h: 65 },
+      () => {
+        alert("Tutoriel de test terminé avec succès !");
+        location.reload();
+      }
+    );
+  }, 1000);
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (state !== 'MENU') {
+    // 1. Décoration factice
+    ctx.fillStyle = '#222';
+    ctx.fillRect(0, 430, canvas.width, 110);
+
+    // 2. Zone Score (Haut Gauche)
+    ctx.fillStyle = 'rgba(0,0,0,0.65)';
+    ctx.fillRect(20, 20, 220, 45);
+    ctx.fillStyle = '#fff';
+    ctx.font = '20px monospace';
+    ctx.fillText("SCORE: 0", 35, 50);
+
+    // 3. Zone Contrôles (Haut Droite)
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+    ctx.fillRect(canvas.width - 340, 20, 320, 55);
+    ctx.fillStyle = '#ffd54f';
+    ctx.font = '14px monospace';
+    ctx.fillText("ESPACE : SAUTER | BAS : BAISSER", canvas.width - 335, 52);
+
+    // 4. Masque d'assombrissement (si surbrillance active)
+    if (highlight) {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+      const z = highlight;
+      ctx.fillRect(0, 0, canvas.width, z.y);
+      ctx.fillRect(0, z.y, z.x, z.h);
+      ctx.fillRect(z.x + z.w, z.y, canvas.width - (z.x + z.w), z.h);
+      ctx.fillRect(0, z.y + z.h, canvas.width, canvas.height - (z.y + z.h));
+
+      ctx.strokeStyle = '#ffd54f';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(z.x, z.y, z.w, z.h);
+    }
+  }
+
+  requestAnimationFrame(draw);
+}
+
+draw();
+</script>
+</body>
+</html>
