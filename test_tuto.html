@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Skate Cat - Tutoriel Identique Jeu</title>
+  <title>Skate Cat - Tutoriel Plateforme Complet</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
     body { background-color: #000; font-family: 'Courier New', Courier, monospace; color: #fff; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
@@ -41,7 +41,7 @@
 <div id="game-container">
   <canvas id="gameCanvas" width="960" height="540"></canvas>
   <button id="tuto-main-btn">LANCER LE TUTORIEL</button>
-  <div id="version-display">v6.0-EXACT</div>
+  <div id="version-display">v6.1-PLATFORM</div>
 
   <div id="tuto-dialog-box">
     <p id="tuto-dialog-text"></p>
@@ -65,7 +65,7 @@ const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera
 const bgMusic = new Audio('roger_8bitok.mp3'); bgMusic.loop = true; bgMusic.volume = 0.6;
 const sounds = { jump: new Audio('skate_jump.mp3'), reception: new Audio('skate_reception.mp3'), coin: new Audio('coin_receive.mp3'), damage: new Audio('damage.mp3') };
 
-const ASSET_VERSION = 'v6.0';
+const ASSET_VERSION = 'v6.1';
 function loadImg(name) { const img = new Image(); img.src = name + '.png?v=' + ASSET_VERSION; return img; }
 
 const assets = {
@@ -107,7 +107,7 @@ let tutoNextCallback = null;
 let tutoInstructionMessage = "";
 let tutoObstacleCount = 0;
 
-let completedWordsCount = 2; // R et O de base
+let completedWordsCount = 2;
 const rogerLetters = ['R', 'O', 'G', 'E', 'R'];
 let platforms = [];
 let obstacles = [];
@@ -153,11 +153,8 @@ function showDialogSide(text, highlightRect, onNext) {
   tutoNextCallback = onNext;
   
   tutoDialogBox.style.display = 'block';
-  // Positionnement sur le côté pour ne jamais cacher la zone mise en surbrillance
   let leftPos = highlightRect.x + highlightRect.w + 20;
-  if (leftPos + 360 > canvas.width) {
-    leftPos = highlightRect.x - 380;
-  }
+  if (leftPos + 360 > canvas.width) leftPos = highlightRect.x - 380;
   if (leftPos < 20) leftPos = 20;
 
   let topPos = highlightRect.y;
@@ -240,7 +237,6 @@ function startStep7() {
 function update() {
   if (!gameStarted || tutoDialogBox.style.display === 'block') return;
 
-  // Scrolling continu normal
   bgX -= BASE_GAME_SPEED * 0.4;
   platforms.forEach(p => p.x -= BASE_GAME_SPEED);
   obstacles.forEach(o => o.x -= BASE_GAME_SPEED);
@@ -264,7 +260,26 @@ function update() {
   cat.vy += GRAVITY;
   cat.y += cat.vy;
 
-  if (cat.y + cat.height >= ENTITY_GROUND_Y) {
+  // Gestion des collisions avec le sol
+  let landedOnPlatform = false;
+  if (platforms.length > 0) {
+    platforms.forEach(plat => {
+      // Test si le chat retombe sur le dessus de la plateforme
+      if (cat.vy >= 0 && cat.x + cat.width > plat.x && cat.x < plat.x + plat.w &&
+          cat.y + cat.height >= plat.y && cat.y + cat.height <= plat.y + 20) {
+        // S'il ne demande pas à traverser en appuyant sur bas
+        if (!cat.isCrouching || tutoSubState !== 4) {
+          cat.y = plat.y - cat.height;
+          cat.vy = 0;
+          cat.isGrounded = true;
+          cat.isJumping = false;
+          landedOnPlatform = true;
+        }
+      }
+    });
+  }
+
+  if (!landedOnPlatform && cat.y + cat.height >= ENTITY_GROUND_Y) {
     if (!cat.isGrounded) try { sounds.reception.currentTime = 0; sounds.reception.play(); } catch(e){}
     cat.y = ENTITY_GROUND_Y - cat.height;
     cat.vy = 0;
@@ -291,9 +306,13 @@ function update() {
     }
   } 
   else if (tutoStep === 4) {
+    // Si la plateforme sort de l'écran sans succès, on en recrée une en boucle
+    if (platforms.length > 0 && platforms[0].x + platforms[0].w < 0) {
+      platforms = [{ x: 960, y: ENTITY_GROUND_Y - 140, w: 260, h: 65, shownPopup: true }];
+    }
+
     const plat = platforms[0];
     if (plat && !plat.shownPopup) {
-      // Dès que la plateforme arrive à l'écran, on affiche la pop-up à côté sans tout casser
       if (plat.x <= 500) {
         plat.shownPopup = true;
         const actionText = isMobileDevice ? "Ceci est une plateforme, il en existe de différentes tailles et de différentes hauteurs. Tu peux sauter dessus mais aussi en descendre ou passer au travers en appuyant sur le CÔTÉ GAUCHE." : "Ceci est une plateforme, il en existe de différentes tailles et de différentes hauteurs. Tu peux sauter dessus mais aussi en descendre ou passer au travers en appuyant sur FLÈCHE DU BAS.";
@@ -308,18 +327,22 @@ function update() {
 
     if (tutoSubState === 2) {
       tutoInstructionMessage = "Saute sur la plateforme";
-      if (plat && cat.x + cat.width > plat.x && cat.x < plat.x + plat.w && cat.y + cat.height <= plat.y + 15 && cat.vy >= 0) {
-        cat.y = plat.y - cat.height; cat.vy = 0; cat.isGrounded = true;
+      if (cat.isGrounded && platforms.some(p => cat.y + cat.height === p.y && cat.x + cat.width > p.x && cat.x < p.x + p.w)) {
         tutoSubState = 3;
       }
     } else if (tutoSubState === 3) {
-      tutoInstructionMessage = "Saute sur la plateforme puis descends de la plateforme";
-      if (cat.y > plat.y + 20) {
+      tutoInstructionMessage = "Saute sur la plateforme puis descends de la plateforme (Flèche Bas)";
+      if (cat.y + cat.height >= ENTITY_GROUND_Y) {
         tutoSubState = 4;
+        // Génère une nouvelle plateforme pour l'exercice suivant si besoin
+        if (platforms.length === 0 || platforms[0].x < 200) {
+          platforms = [{ x: 960, y: ENTITY_GROUND_Y - 140, w: 260, h: 65, shownPopup: true }];
+        }
       }
     } else if (tutoSubState === 4) {
       tutoInstructionMessage = "Maintenant, passe au travers de la plateforme";
-      if (cat.y < plat.y && cat.isCrouching && cat.vy > 0 && cat.x + cat.width > plat.x && cat.x < plat.x + plat.w) {
+      // Si le chat traverse la plateforme par le haut en s'accroupissant
+      if (platforms.some(p => cat.y < p.y && cat.y + cat.height > p.y && cat.isCrouching)) {
         tutoInstructionMessage = "";
         platforms = [];
         startStep5();
@@ -438,7 +461,7 @@ function draw() {
   ctx.fillText("ENTRÉE : PAUSE", canvas.width - 335, 62);
   ctx.fillText("ÉCHAP  : ACCUEIL", canvas.width - 335, 82);
 
-  // HUD Petites lettres ROGER en bas à droite (identique au jeu original)
+  // HUD Petites lettres ROGER en bas à droite
   const hudX = canvas.width - 340; const hudY = canvas.height - 85;
   ctx.fillStyle = '#000000'; ctx.fillRect(hudX - 10, hudY - 10, 335, 80);
   ctx.strokeStyle = '#ffd54f'; ctx.lineWidth = 2; ctx.strokeRect(hudX - 10, hudY - 10, 335, 80);
