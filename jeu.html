@@ -51,6 +51,12 @@
     #mobile-hud-controls { display: none; position: absolute; top: 15px; right: 15px; gap: 8px; z-index: 40; }
     .hud-touch-btn { width: 42px; height: 42px; background: rgba(0, 0, 0, 0.7); border: 2px solid #ffd54f; color: #ffd54f; font-weight: bold; font-size: 18px; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
 
+    #version-display {
+      position: absolute; bottom: 12px; right: 15px; font-size: 13px; font-weight: bold;
+      color: #ffd54f; background: rgba(0, 0, 0, 0.75); padding: 4px 8px; border: 1px solid #ffd54f;
+      border-radius: 4px; pointer-events: none; z-index: 30;
+    }
+
     #rotate-device-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #111118; z-index: 999999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
     #rotate-device-overlay .rotate-icon { font-size: 60px; margin-bottom: 20px; animation: rotateAnim 2s infinite ease-in-out; }
     #rotate-device-overlay p { color: #ffd54f; font-size: 20px; font-weight: bold; line-height: 1.4; }
@@ -81,6 +87,8 @@
     <button id="about-btn" class="pixel-btn secondary-btn">EN SAVOIR PLUS</button>
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
+
+  <div id="version-display">v2.0-TUTO</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -194,6 +202,7 @@ const startMainBtn = document.getElementById('start-main-btn');
 const tutoMainBtn = document.getElementById('tuto-main-btn');
 const desktopFullscreenBtn = document.getElementById('desktop-fullscreen-btn');
 const rightStack = document.getElementById('right-stack');
+const versionDisplay = document.getElementById('version-display');
 const rulesBtn = document.getElementById('rules-btn');
 const leaderboardBtn = document.getElementById('leaderboard-btn');
 const aboutBtn = document.getElementById('about-btn');
@@ -387,7 +396,7 @@ function returnToHome() {
   debonusPlayed = false; debonusEndPlayed = false; punkBonus = null; ejectedObstacles = [];
   startMainBtn.style.display = 'block'; tutoMainBtn.style.display = 'block';
   if (!isMobileDevice) desktopFullscreenBtn.style.display = 'block';
-  rightStack.style.display = 'flex'; mobileHudControls.style.display = 'none'; gameOverStack.style.display = 'none';
+  rightStack.style.display = 'flex'; versionDisplay.style.display = 'block'; mobileHudControls.style.display = 'none'; gameOverStack.style.display = 'none';
   scorePromptBox.style.display = 'none'; saveScoreModal.style.display = 'none'; konamiModal.style.display = 'none';
   
   if (isMobileDevice) gameContainer.classList.add('mobile-fullscreen');
@@ -396,7 +405,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v27'; 
+const ASSET_VERSION = 'v2.0-TUTO'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -488,7 +497,8 @@ tutoNextBtn.addEventListener('click', () => {
 
 function startTutorial() {
   resetGame();
-  isTutoMode = true; // DÉCLENCHEMENT DU MODE TUTORIEL
+  // S'ASSURER ABSOLUMENT QUE LE MODE TUTORIEL RESTE À TRUE APPRÈS LE RESET !
+  isTutoMode = true; 
   tutoStep = 1;
   tutoTimer = 0;
   tutoSubState = 0;
@@ -508,7 +518,7 @@ function updateTutorialScript() {
 
   // ÉTAPE 1 : SCORE
   if (tutoStep === 1) {
-    if (tutoTimer > 60) {
+    if (tutoTimer > 40) {
       showTutoDialog(
         "Ceci est ton score, le but est d'avoir le maximum de points. Plus tu avances loin, plus ton score augmente. Des bonus peuvent aussi te faire gagner des points.",
         () => { tutoStep = 2; tutoTimer = 0; },
@@ -518,7 +528,7 @@ function updateTutorialScript() {
   }
   // ÉTAPE 2 : CONTRÔLES
   else if (tutoStep === 2) {
-    if (tutoTimer > 60) {
+    if (tutoTimer > 40) {
       const controlsText = isMobileDevice ?
         "En appuyant sur le <b>CÔTÉ DROIT DE L'ÉCRAN</b>, Roger fait un saut avec son skate. Si tu fais un appui court, il fait un petit saut. Si tu fais un appui long il fait un plus grand saut.<br><br>En appuyant sur le <b>CÔTÉ GAUCHE DE L'ÉCRAN</b>, Roger se baisse.<br><br>Pour mettre le jeu en pause, appuie sur <b>P</b> et pour revenir à l'écran principal appuie sur <b>R</b>." :
         "En appuyant sur \"ESPACE\", Roger fait un saut avec son skate. Si tu fais un appui court, il fait un petit saut. Si tu fais un appui long il fait un plus grand saut.<br><br>En appuyant sur la \"FLÈCHE DU BAS\", Roger se baisse.<br><br>Pour mettre le jeu en pause, appuie sur \"ENTRÉE\" et pour revenir à l'écran principal appuie sur \"ÉCHAP\".";
@@ -719,6 +729,7 @@ function isPositionNearLetter(targetX, targetW = 100, safeMargin = 180) {
 }
 
 function spawnWorldElements() {
+  // BLOQUER TOTALEMENT LA GÉNÉRATION SI EN TUTO
   if (isTutoMode || superSayen.state === 'LANDING' || freezeForSequence || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
 
   const lastPlat = platforms[platforms.length - 1]; const lastX = lastPlat ? lastPlat.x + lastPlat.w : 350;
@@ -883,7 +894,7 @@ window.addEventListener('keyup', (e) => {
 });
 
 function handleTouchAction(e, isTouchStart) {
-  if (!gameStarted || rulesModal.style.display === 'flex' || leaderboardModal.style.display === 'flex' || aboutModal.style.display === 'flex' || scorePromptBox.style.display === 'block' || saveScoreModal.style.display === 'block' || konamiModal.style.display === 'flex') return;
+  if (!gameStarted || rulesModal.style.display === 'flex' || leaderboardModal.style.display === 'flex' || aboutModal.style.display === 'flex' || scorePromptBox.style.display === 'block' || saveScoreModal.style.display === 'block' || konamiModal.style.display !== 'flex') return;
   if (isPaused) { if (isTouchStart) togglePause(); return; }
   if (!isTouchStart) { keys['ArrowDown'] = false; keys['Space'] = false; keys['ArrowUp'] = false; cat.isJumping = false; jumpKeyReleased = true; return; }
 
@@ -979,14 +990,14 @@ function fetchLeaderboard() {
 startMainBtn.addEventListener('click', () => {
   requestGameFullscreen(); if (introVideo) { introVideo.pause(); introVideo.currentTime = 0; }
   startMainBtn.style.display = 'none'; tutoMainBtn.style.display = 'none'; desktopFullscreenBtn.style.display = 'none';
-  rightStack.style.display = 'none'; if (isMobileDevice) mobileHudControls.style.display = 'flex';
+  rightStack.style.display = 'none'; versionDisplay.style.display = 'none'; if (isMobileDevice) mobileHudControls.style.display = 'flex';
   startBgMusic(); resetGame();
 });
 
 tutoMainBtn.addEventListener('click', () => {
   requestGameFullscreen(); if (introVideo) { introVideo.pause(); introVideo.currentTime = 0; }
   startMainBtn.style.display = 'none'; tutoMainBtn.style.display = 'none'; desktopFullscreenBtn.style.display = 'none';
-  rightStack.style.display = 'none'; if (isMobileDevice) mobileHudControls.style.display = 'flex';
+  rightStack.style.display = 'none'; versionDisplay.style.display = 'none'; if (isMobileDevice) mobileHudControls.style.display = 'flex';
   startBgMusic(); startTutorial();
 });
 
