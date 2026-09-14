@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Skate Cat - Tutoriel Rigoureux</title>
+  <title>Skate Cat - Tutoriel Parfait</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
     body { background-color: #000; font-family: 'Courier New', Courier, monospace; color: #fff; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
@@ -41,7 +41,7 @@
 <div id="game-container">
   <canvas id="gameCanvas" width="960" height="540"></canvas>
   <button id="tuto-main-btn">LANCER LE TUTORIEL</button>
-  <div id="version-display">v5.1-FIX</div>
+  <div id="version-display">v5.2-PERFECT</div>
 
   <div id="tuto-dialog-box">
     <p id="tuto-dialog-text"></p>
@@ -65,7 +65,7 @@ const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera
 const bgMusic = new Audio('roger_8bitok.mp3'); bgMusic.loop = true; bgMusic.volume = 0.6;
 const sounds = { jump: new Audio('skate_jump.mp3'), reception: new Audio('skate_reception.mp3'), coin: new Audio('coin_receive.mp3'), damage: new Audio('damage.mp3') };
 
-const ASSET_VERSION = 'v5.1';
+const ASSET_VERSION = 'v5.2';
 function loadImg(name) { const img = new Image(); img.src = name + '.png?v=' + ASSET_VERSION; return img; }
 
 const assets = {
@@ -131,7 +131,6 @@ tutoMainBtn.addEventListener('click', () => {
   tutoMainBtn.style.display = 'none';
   gameStarted = true;
   
-  // Délai d'une seconde avant de déclencher la première étape (laisse le chat rouler)
   setTimeout(() => {
     startStep1();
   }, 1000);
@@ -198,65 +197,23 @@ function startStep3() {
 function startStep4() {
   tutoStep = 4;
   tutoSubState = 1;
-  // Plateforme initialisée hors champ qui avance vers x = 450
-  platforms.push({ x: 900, targetX: 450, y: ENTITY_GROUND_Y - 110, w: 260, h: 65, active: false });
-}
-
-function triggerPlatformStep() {
-  const plat = platforms[0];
-  const actionText = isMobileDevice ? "Ceci est une plateforme, il en existe de différentes tailles et de différentes hauteurs. Tu peux sauter dessus mais aussi en descendre ou passer au travers en appuyant sur le CÔTÉ GAUCHE." : "Ceci est une plateforme, il en existe de différentes tailles et de différentes hauteurs. Tu peux sauter dessus mais aussi en descendre ou passer au travers en appuyant sur FLÈCHE DU BAS.";
-  
-  showDialogNear(
-    actionText,
-    plat.x, plat.y,
-    { x: plat.x - 5, y: plat.y - 5, w: plat.w + 10, h: plat.h + 10 },
-    () => { tutoSubState = 2; }
-  );
-}
-
-function startStep5() {
-  tutoStep = 5;
-  tutoSubState = 1;
-  tutoObstacleCount = 0;
-  
-  showDialogNear(
-    "Ça c'est un obstacle, il faut l'éviter, en sautant par dessus ou en passant en dessous.",
-    480, ENTITY_GROUND_Y - 100,
-    { x: 460, y: ENTITY_GROUND_Y - 85, w: 90, h: 85 },
-    () => { tutoSubState = 2; }
-  );
-}
-
-function startStep6() {
-  tutoStep = 6;
-  showDialogNear(
-    "Ces GROSSES lettres R O G E R te protègent d'un choc avec un obstacle.",
-    20, canvas.height - 130,
-    { x: 15, y: canvas.height - 125, w: 480, h: 110 },
-    () => {
-      tutoSubState = 1;
-      obstacles.push({ x: 850, y: ENTITY_GROUND_Y - 75, w: 70, h: 75 });
-    }
-  );
-}
-
-function startStep7() {
-  tutoStep = 7;
-  showDialogNear(
-    "Collecte ces lettres afin de compléter le mot R O G E R en bas à droite, cela te fera gagner une GROSSE lettre.",
-    canvas.width - 340, canvas.height - 100,
-    { x: canvas.width - 340, y: canvas.height - 95, w: 320, h: 85 },
-    () => {
-      tutoSubState = 1;
-      items.push({ x: 850, y: ENTITY_GROUND_Y - 120, w: 65, h: 75, char: 'R' });
-    }
-  );
+  // La plateforme démarre hors champ (x = 800) et avancera avec le scrolling
+  platforms.push({ x: 800, y: ENTITY_GROUND_Y - 140, w: 260, h: 65, triggered: false });
 }
 
 function update() {
   if (!gameStarted || tutoDialogBox.style.display === 'block') return;
 
-  bgX -= 3;
+  // Si on n'est pas à l'étape 4 ou si la plateforme n'est pas figée, le décor défile
+  let scrollingActive = true;
+  if (tutoStep === 4 && platforms.length > 0 && platforms[0].triggered) {
+    scrollingActive = false;
+  }
+
+  if (scrollingActive) {
+    bgX -= 3;
+    platforms.forEach(p => p.x -= 3);
+  }
 
   const jumpPressed = !!(keys['Space'] || keys['ArrowUp']);
   const downPressed = !!keys['ArrowDown'];
@@ -303,12 +260,18 @@ function update() {
   } 
   else if (tutoStep === 4) {
     const plat = platforms[0];
-    if (plat) {
-      if (plat.x > plat.targetX) {
-        plat.x -= 3; // Avance vers sa position fixe
-      } else if (!plat.active) {
-        plat.active = true;
-        triggerPlatformStep(); // Déclenche le pop-up pile au bon endroit statique
+    if (plat && !plat.triggered) {
+      // Dès que la plateforme arrive à portée du chat (ex: x = 350), on fige et on déclenche la pop-up pile au bon endroit
+      if (plat.x <= 350) {
+        plat.triggered = true;
+        const actionText = isMobileDevice ? "Ceci est une plateforme, il en existe de différentes tailles et de différentes hauteurs. Tu peux sauter dessus mais aussi en descendre ou passer au travers en appuyant sur le CÔTÉ GAUCHE." : "Ceci est une plateforme, il en existe de différentes tailles et de différentes hauteurs. Tu peux sauter dessus mais aussi en descendre ou passer au travers en appuyant sur FLÈCHE DU BAS.";
+        
+        showDialogNear(
+          actionText,
+          plat.x, plat.y,
+          { x: plat.x - 5, y: plat.y - 5, w: plat.w + 10, h: plat.h + 10 },
+          () => { tutoSubState = 2; }
+        );
       }
     }
 
@@ -448,24 +411,24 @@ function draw() {
   ctx.fillText("ENTRÉE : PAUSE", canvas.width - 335, 62);
   ctx.fillText("ÉCHAP  : ACCUEIL", canvas.width - 335, 82);
 
-  // HUD Petites lettres ROGER en bas à droite
+  // HUD Petites lettres ROGER en bas à droite (proportion exacte du jeu principal)
   const hudX = canvas.width - 340; const hudY = canvas.height - 85;
   ctx.fillStyle = '#000000'; ctx.fillRect(hudX - 10, hudY - 10, 335, 80);
   ctx.strokeStyle = '#ffd54f'; ctx.lineWidth = 2; ctx.strokeRect(hudX - 10, hudY - 10, 335, 80);
   
   rogerLetters.forEach((char, idx) => {
-    const slotX = hudX + (idx * 64);
+    const slotX = hudX + 12 + (idx * 60);
     const isCollected = (idx < completedWordsCount);
     const letterFrames = assets.letters[char];
     const img = letterFrames ? letterFrames[0] : null;
     
     if (img && img.complete && img.naturalWidth > 0) {
       ctx.globalAlpha = isCollected ? 1.0 : 0.25;
-      ctx.drawImage(img, slotX + 6, hudY + 4, 42, 52);
+      ctx.drawImage(img, slotX, hudY + 8, 40, 48);
       ctx.globalAlpha = 1.0;
     } else {
-      ctx.fillStyle = isCollected ? '#ffd54f' : '#555'; ctx.font = 'bold 36px Courier New';
-      ctx.fillText(char, slotX + 14, hudY + 44);
+      ctx.fillStyle = isCollected ? '#ffd54f' : '#555'; ctx.font = 'bold 32px Courier New';
+      ctx.fillText(char, slotX + 6, hudY + 44);
     }
   });
 
