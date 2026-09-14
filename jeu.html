@@ -15,7 +15,8 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.7); border-radius: 12px; overflow: hidden; border: 4px solid #2e2e40; background: #000;
     }
     #game-container.desktop-fullscreen { width: 100vw !important; height: 100vh !important; max-width: 100vw !important; max-height: 100vh !important; border-radius: 0 !important; border: none !important; }
-    #game-container.mobile-fullscreen { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; max-width: 100vw !important; max-height: 100vh !important; border-radius: 0 !important; border: none !important; z-index: 999999 !important; }
+    /* CORRECTION ICI : On retire les position: fixed / height: 100vh agressive pour laisser le container s'adapter proprement au ratio original du canvas */
+    #game-container.mobile-fullscreen { width: 100vw !important; height: 56.25vw !important; max-width: 100vw !important; max-height: 100vh !important; border-radius: 0 !important; border: none !important; z-index: 999999 !important; }
 
     canvas { width: 100%; height: 100%; object-fit: contain; display: block; image-rendering: pixelated; }
 
@@ -87,7 +88,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.1-MOBILE-FIX</div>
+  <div id="version-display">v13.3-ORIGINAL-RATIO-FIX</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -405,7 +406,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.1'; 
+const ASSET_VERSION = 'v13.3'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -529,7 +530,6 @@ function startTutorial() {
   cat.y = ENTITY_GROUND_Y - cat.height; cat.vy = 0; cat.isGrounded = true;
 }
 
-// LOGIQUE EXCLUSIVE DU TUTORIEL ADAPTÉE PC / MOBILE
 function updateTutorialScript() {
   if (!isTutoMode || tutoHighlightedZone) return;
   tutoTimer++;
@@ -958,10 +958,15 @@ window.addEventListener('keyup', (e) => {
   if (e.code === 'Space' || e.code === 'ArrowUp') { cat.isJumping = false; jumpKeyReleased = true; }
 });
 
-function handleTouchAction(e, isTouchStart) {
+// ÉCOUTEURS TACTILES SÉCURISÉS (Taps gauche / droit)
+function handleTouchAction(e, isTouchActive) {
   if (!gameStarted || rulesModal.style.display === 'flex' || leaderboardModal.style.display === 'flex' || aboutModal.style.display === 'flex' || scorePromptBox.style.display === 'block' || saveScoreModal.style.display === 'block') return;
-  if (isPaused) { if (isTouchStart) togglePause(); return; }
-  if (!isTouchStart) { keys['ArrowDown'] = false; keys['Space'] = false; keys['ArrowUp'] = false; cat.isJumping = false; jumpKeyReleased = true; return; }
+  if (isPaused) { if (isTouchActive) togglePause(); return; }
+  
+  if (!isTouchActive || e.touches.length === 0) {
+    keys['ArrowDown'] = false; keys['Space'] = false; keys['ArrowUp'] = false; cat.isJumping = false; jumpKeyReleased = true;
+    return;
+  }
 
   const viewportWidth = window.innerWidth; let wantDown = false; let wantJump = false;
   for (let i = 0; i < e.touches.length; i++) {
@@ -974,18 +979,18 @@ function handleTouchAction(e, isTouchStart) {
 
 document.addEventListener('touchstart', (e) => {
   requestGameFullscreen();
-  if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn') || e.target.closest('#score-prompt-box') || e.target.closest('#save-score-modal') || tutoHighlightedZone) return;
+  if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn') || e.target.closest('#score-prompt-box') || e.target.closest('#save-score-modal')) return;
   e.preventDefault(); unlockAudio(); handleTouchAction(e, true);
 }, { passive: false });
 
 document.addEventListener('touchmove', (e) => {
-  if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn') || e.target.closest('#score-prompt-box') || e.target.closest('#save-score-modal') || tutoHighlightedZone) return;
-  e.preventDefault(); if (e.touches.length > 0) handleTouchAction(e, true);
+  if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn') || e.target.closest('#score-prompt-box') || e.target.closest('#save-score-modal')) return;
+  e.preventDefault(); handleTouchAction(e, true);
 }, { passive: false });
 
 document.addEventListener('touchend', (e) => {
-  if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn') || e.target.closest('#score-prompt-box') || e.target.closest('#save-score-modal') || tutoHighlightedZone) return;
-  e.preventDefault(); if (e.touches.length === 0) handleTouchAction(e, false); else handleTouchAction(e, true);
+  if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn') || e.target.closest('#score-prompt-box') || e.target.closest('#save-score-modal')) return;
+  e.preventDefault(); handleTouchAction(e, e.touches.length > 0);
 }, { passive: false });
 
 function updateRulesText() {
@@ -1207,7 +1212,7 @@ function update() {
       currentGameSpeed = effectiveBaseSpeed * 3.5; superSayen.timer++; score += 15; const flySpeed = 7; const maxFlyY = ENTITY_GROUND_Y - cat.height + 65; 
       if (flyUpPressed) cat.y = Math.max(30, cat.y - flySpeed); if (downPressed) cat.y = Math.min(maxFlyY, cat.y + flySpeed);
       if (superSayen.animTimer % 4 === 0) superSayen.flyFrame = (superSayen.flyFrame + 1) % 6;
-      if (superSayen.timer >= 450) { superSayen.state = 'LANDING'; obstacles = []; items = []; platforms = []; lastObstacleX = canvas.width + 400; lastLetterX = canvas.width + 400; transitionSuperSayanToNormal(); }
+      if (superSayen.timer >= 450) { superSayen.state = 'LANDING'; obstacles = []; items = []; platforms = []; lastObstacleX = cat.x + 300; lastLetterX = cat.x + 300; transitionSuperSayanToNormal(); }
     } else if (superSayen.state === 'LANDING') {
       currentGameSpeed = effectiveBaseSpeed;
       if (cat.y < ENTITY_GROUND_Y - cat.height) cat.y += 6; else { cat.y = ENTITY_GROUND_Y - cat.height; cat.isGrounded = true; cat.vy = 0; superSayen.active = false; superSayen.state = 'NONE'; lastObstacleX = cat.x + 300; lastLetterX = cat.x + 300; }
