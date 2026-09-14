@@ -124,17 +124,31 @@
       color: #1a1a24;
     }
 
+    /* POSITIONNEMENT DU BOUTON TUTO ET DÉMARRER */
     #start-main-btn {
       position: absolute;
-      top: 75%; 
+      top: 78%; 
       left: 5%;
       transform: translateY(-50%);
-      padding: 18px 32px;
-      font-size: 22px;
+      padding: 16px 28px;
+      font-size: 20px;
       color: #1a1a24;
       background-color: #ffd54f;
       border: 4px solid #ffffff;
       box-shadow: 0 6px 0px #b29320, 0 10px 20px rgba(0,0,0,0.8);
+    }
+
+    #tuto-main-btn {
+      position: absolute;
+      top: 60%; 
+      left: 5%;
+      transform: translateY(-50%);
+      padding: 12px 24px;
+      font-size: 18px;
+      color: #ffffff;
+      background-color: #2e2e40;
+      border: 3px solid #ffd54f;
+      box-shadow: 0 4px 0px #000, 0 8px 16px rgba(0,0,0,0.8);
     }
 
     .right-buttons-stack {
@@ -225,44 +239,6 @@
       font-size: 20px;
       flex-shrink: 0;
     }
-    .game-modal .goal-text {
-      font-size: 13px;
-      line-height: 1.4;
-      color: #e0e0e0;
-      margin-bottom: 12px;
-      background: rgba(255, 213, 79, 0.1);
-      border-left: 3px solid #ffd54f;
-      padding: 10px 12px;
-      border-radius: 4px;
-    }
-    .game-modal ul {
-      list-style-type: none;
-      font-size: 13px;
-      line-height: 1.4;
-      margin-bottom: 8px;
-    }
-    .game-modal li {
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .rule-icon {
-      width: 22px;
-      height: 22px;
-      object-fit: contain;
-      image-rendering: pixelated;
-      flex-shrink: 0;
-    }
-    .rule-icon-large {
-      width: 22px;
-      height: 22px;
-      object-fit: contain;
-      image-rendering: pixelated;
-      transform: scale(1.6);
-      transform-origin: center;
-      flex-shrink: 0;
-    }
 
     .modal-close-btn {
       display: block;
@@ -276,6 +252,41 @@
       cursor: pointer;
       box-shadow: 0 4px 0px #b29320;
       flex-shrink: 0;
+    }
+
+    /* SYSTEME D'EXPLICATION TUTORIEL (MODALE EN JEU) */
+    #tuto-dialog-box {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 85%;
+      max-width: 520px;
+      background: #111118;
+      border: 4px solid #ffd54f;
+      border-radius: 8px;
+      padding: 18px;
+      z-index: 65000;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(0,0,0,0.9);
+    }
+
+    #tuto-dialog-text {
+      font-size: 15px;
+      line-height: 1.5;
+      color: #ffffff;
+      margin-bottom: 16px;
+    }
+
+    #tuto-next-btn {
+      padding: 8px 24px;
+      font-size: 16px;
+      color: #1a1a24;
+      background-color: #ffd54f;
+      border: 3px solid #ffffff;
+      cursor: pointer;
+      font-weight: bold;
     }
 
     #score-prompt-box {
@@ -312,134 +323,6 @@
       padding: 12px;
       z-index: 60000;
       text-align: center;
-    }
-
-    #save-score-modal.keyboard-active {
-      top: 0px !important;
-      left: 50% !important;
-      transform: translateX(-50%) !important;
-      height: auto !important;
-      max-height: 48vh !important;
-      border-top: none;
-      border-radius: 0 0 8px 8px;
-      padding: 4px 10px 8px 10px !important;
-    }
-
-    #save-score-modal.keyboard-active h2 {
-      font-size: 13px !important;
-      margin-bottom: 2px !important;
-    }
-
-    #save-score-modal.keyboard-active .score-input-group {
-      margin: 3px 0 !important;
-    }
-
-    #save-score-modal.keyboard-active label {
-      font-size: 10px !important;
-    }
-
-    #save-score-modal.keyboard-active input {
-      padding: 4px 6px !important;
-      font-size: 14px !important;
-    }
-
-    .form-actions-row {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin-top: 10px;
-    }
-
-    #save-score-modal.keyboard-active .form-actions-row {
-      margin-top: 5px !important;
-    }
-
-    .btn-save-action {
-      background: #ffd54f;
-      color: #1a1a24;
-      border: 3px solid #ffffff;
-      box-shadow: 0 4px 0px #b29320;
-      padding: 8px 20px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .btn-back-action {
-      background: #2e2e40;
-      color: #ffffff;
-      border: 3px solid #ffd54f;
-      box-shadow: 0 4px 0px #000;
-      padding: 8px 16px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    #save-score-modal.keyboard-active .btn-save-action,
-    #save-score-modal.keyboard-active .btn-back-action {
-      padding: 4px 12px !important;
-      font-size: 12px !important;
-    }
-
-    .choice-btns {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 18px;
-    }
-
-    .choice-btn {
-      padding: 10px 24px;
-      font-size: 18px;
-      color: #1a1a24;
-      background-color: #ffd54f;
-      border: 3px solid #fff;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .score-input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      margin: 8px 0;
-      text-align: left;
-    }
-
-    .score-input-group label {
-      font-size: 11px;
-      color: #ffd54f;
-    }
-
-    .score-input-group input {
-      padding: 8px;
-      font-size: 16px;
-      font-family: 'Courier New', Courier, monospace;
-      background: #1a1a24;
-      border: 2px solid #ffd54f;
-      color: #fff;
-      border-radius: 4px;
-      user-select: text !important;
-      -webkit-user-select: text !important;
-    }
-
-    .leaderboard-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-
-    .leaderboard-table th, .leaderboard-table td {
-      padding: 8px;
-      text-align: left;
-      border-bottom: 1px solid #2e2e40;
-      font-size: 14px;
-    }
-
-    .leaderboard-table th {
-      color: #ffd54f;
-      border-bottom: 2px solid #ffd54f;
     }
 
     #mobile-hud-controls {
@@ -519,6 +402,7 @@
   
   <button id="desktop-fullscreen-btn" class="pixel-btn">⛶ PLEIN ÉCRAN</button>
 
+  <button id="tuto-main-btn" class="pixel-btn">TUTO</button>
   <button id="start-main-btn" class="pixel-btn">LANCER LA PARTIE</button>
   
   <div class="right-buttons-stack" id="right-stack">
@@ -538,35 +422,39 @@
     <button id="home-gameover-btn" class="pixel-btn">ACCUEIL</button>
   </div>
 
+  <!-- POPUP EXPLIQUATIVE TUTO -->
+  <div id="tuto-dialog-box">
+    <p id="tuto-dialog-text"></p>
+    <button id="tuto-next-btn" class="pixel-btn">SUIVANT</button>
+  </div>
+
   <div id="score-prompt-box">
     <p style="font-size: 18px; line-height: 1.4; color: #fff;">Veux-tu enregistrer ce score au<br><b style="color:#ffd54f;">Good Morning Classement</b> ?</p>
-    <div class="choice-btns">
-      <button id="prompt-yes-btn" class="pixel-btn choice-btn">OUI</button>
-      <button id="prompt-no-btn" class="pixel-btn choice-btn">NON</button>
+    <div class="choice-btns" style="display:flex; justify-content:center; gap:20px; margin-top:18px;">
+      <button id="prompt-yes-btn" class="pixel-btn choice-btn" style="padding:10px 24px; font-size:18px; background:#ffd54f;">OUI</button>
+      <button id="prompt-no-btn" class="pixel-btn choice-btn" style="padding:10px 24px; font-size:18px; background:#ffd54f;">NON</button>
     </div>
   </div>
 
   <div id="save-score-modal">
     <h2 id="score-modal-title" style="color:#ffd54f; margin-bottom:8px; font-size:16px; line-height:1.2;">ENREGISTRER TON SCORE</h2>
-    
     <div id="gift-notice" style="background: rgba(255, 213, 79, 0.15); border: 1px dashed #ffd54f; border-radius: 4px; padding: 6px; margin-bottom: 8px;">
       <p style="font-size: 11px; color: #ffffff; line-height: 1.2; font-weight: bold; margin: 0;">
         🎁 Pense à ajouter ton adresse mail pour que Roger te contacte s'il a envie de te donner des cadeaux !
       </p>
     </div>
-
     <form id="save-score-form">
-      <div class="score-input-group">
-        <label for="player-pseudo">PSEUDO :</label>
-        <input type="text" id="player-pseudo" name="pseudo" required maxlength="15" autocomplete="off" enterkeyhint="next">
+      <div style="display:flex; flex-direction:column; gap:4px; margin:8px 0; text-align:left;">
+        <label for="player-pseudo" style="font-size:11px; color:#ffd54f;">PSEUDO :</label>
+        <input type="text" id="player-pseudo" name="pseudo" required maxlength="15" autocomplete="off" style="padding:8px; font-size:16px; background:#1a1a24; border:2px solid #ffd54f; color:#fff;">
       </div>
-      <div class="score-input-group">
-        <label for="player-email">ADRESSE MAIL :</label>
-        <input type="email" id="player-email" name="email" required autocomplete="off" enterkeyhint="done">
+      <div style="display:flex; flex-direction:column; gap:4px; margin:8px 0; text-align:left;">
+        <label for="player-email" style="font-size:11px; color:#ffd54f;">ADRESSE MAIL :</label>
+        <input type="email" id="player-email" name="email" required autocomplete="off" style="padding:8px; font-size:16px; background:#1a1a24; border:2px solid #ffd54f; color:#fff;">
       </div>
-      <div class="form-actions-row">
-        <button type="button" id="cancel-save-btn" class="pixel-btn btn-back-action">RETOUR</button>
-        <button type="submit" id="save-btn" class="pixel-btn btn-save-action">SAVE</button>
+      <div style="display:flex; justify-content:center; gap:12px; margin-top:10px;">
+        <button type="button" id="cancel-save-btn" class="pixel-btn" style="background:#2e2e40; color:#fff; border:3px solid #ffd54f; padding:8px 16px;">RETOUR</button>
+        <button type="submit" id="save-btn" class="pixel-btn" style="background:#ffd54f; color:#1a1a24; border:3px solid #fff; padding:8px 20px;">SAVE</button>
       </div>
     </form>
   </div>
@@ -574,7 +462,7 @@
   <div id="rules-modal" class="game-modal">
     <h2>RÈGLES ET CONTRÔLES</h2>
     <div class="modal-content-scroll">
-      <div class="goal-text">
+      <div style="font-size:13px; line-height:1.4; color:#e0e0e0; margin-bottom:12px; background:rgba(255,213,79,0.1); border-left:3px solid #ffd54f; padding:10px 12px;">
         <b>But du jeu</b><br>
         OBTIENS LE PLUS GRAND SCORE !<br>
         Tu gagnes des points :<br>
@@ -584,7 +472,7 @@
         - En dégommant des obstacles pendant l'invincibilité (100 pts)<br>
         - En formant le mot ROGER avec les GROSSES lettres dorées (10 000 pts)
       </div>
-      <ul id="rules-list"></ul>
+      <ul id="rules-list" style="list-style:none; font-size:13px; line-height:1.4;"></ul>
     </div>
     <button id="close-rules-btn" class="pixel-btn modal-close-btn">FERMER</button>
   </div>
@@ -592,12 +480,12 @@
   <div id="leaderboard-modal" class="game-modal">
     <h2>TOP 10 SCORES</h2>
     <div class="modal-content-scroll">
-      <table class="leaderboard-table">
+      <table style="width:100%; border-collapse:collapse; margin-top:10px;">
         <thead>
-          <tr>
-            <th>#</th>
-            <th>PSEUDO</th>
-            <th>SCORE</th>
+          <tr style="color:#ffd54f; border-bottom:2px solid #ffd54f;">
+            <th style="padding:8px; text-align:left;">#</th>
+            <th style="padding:8px; text-align:left;">PSEUDO</th>
+            <th style="padding:8px; text-align:left;">SCORE</th>
           </tr>
         </thead>
         <tbody id="leaderboard-body">
@@ -612,14 +500,13 @@
     <h2>EN SAVOIR PLUS</h2>
     <div class="modal-content-scroll" style="font-size: 14px; line-height: 1.5; color: #e0e0e0;">
       <p style="margin-bottom: 12px; font-weight: bold; color: #ffd54f;">Bienvenue dans Good Morning Roger Sk8in’ Cat !</p>
-      <p style="margin-bottom: 12px;">Ce jeu accompagne la sortie de notre prochain CD “Club Roger 2”.<br>Et pour marquer le coup, on te propose un petit challenge : faire le meilleur score à GMR Sk8in’ Cat et gagner des cadeaux, t’en dis quoi ?</p>
-      <p style="margin-bottom: 12px;">Tous ceux qui sont dans le top 10 gagneront des lots en fonction de leur rang (voir site web pour les lots) donc il te reste qu’une chose à faire : die and retry !</p>
-      <p style="margin-bottom: 8px;">Et pense bien à mettre ton adresse mail quand tu enregistres ton score sinon on pourra pas te recontacter pour te filer tes cadeaux ! Ah, et seuls les scores au-dessus de 3 000 peuvent être enregistrés </p>
+      <p style="margin-bottom: 12px;">Ce jeu accompagne la sortie de notre prochain CD “Club Roger 2”.<br>Et pour marquer le coup, on te propose un petit challenge : faire le meilleur score à GMR Sk8in’ Cat et gagner des cadeaux !</p>
+      <p style="margin-bottom: 12px;">Tous ceux qui sont dans le top 10 gagneront des lots en fonction de leur rang !</p>
+      <p style="margin-bottom: 8px;">Pense bien à mettre ton adresse mail lors de l'enregistrement de ton score.</p>
     </div>
     <button id="close-about-btn" class="pixel-btn modal-close-btn">FERMER</button>
   </div>
 
-  <!-- MODALE CODE KONAMI -->
   <div id="konami-modal" class="game-modal">
     <h2>SECRET DÉBLOQUÉ !</h2>
     <div class="modal-content-scroll">
@@ -636,7 +523,6 @@ const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScUTfXrzeEMICD
 const ENTRY_PSEUDO    = 'entry.1092302864';
 const ENTRY_EMAIL     = 'entry.1741606296';
 const ENTRY_SCORE     = 'entry.1451417508';
-
 const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRyBiQW025rQchIQ03joD00dFjwIyepgCgZFBYT57hpzNDX_fMfuKa9yzCoHqFTVUwpE1cvz4pLGCAD/pub?output=csv';
 
 document.addEventListener('contextmenu', e => e.preventDefault());
@@ -652,6 +538,7 @@ canvas.width = 960;
 canvas.height = 540;
 
 const startMainBtn = document.getElementById('start-main-btn');
+const tutoMainBtn = document.getElementById('tuto-main-btn');
 const desktopFullscreenBtn = document.getElementById('desktop-fullscreen-btn');
 const rightStack = document.getElementById('right-stack');
 const rulesBtn = document.getElementById('rules-btn');
@@ -670,16 +557,17 @@ const mobileHomeBtn = document.getElementById('mobile-home-btn');
 const rulesModal = document.getElementById('rules-modal');
 const rulesList = document.getElementById('rules-list');
 const closeRulesBtn = document.getElementById('close-rules-btn');
-
 const leaderboardModal = document.getElementById('leaderboard-modal');
 const leaderboardBody = document.getElementById('leaderboard-body');
 const closeLeaderboardBtn = document.getElementById('close-leaderboard-btn');
-
 const aboutModal = document.getElementById('about-modal');
 const closeAboutBtn = document.getElementById('close-about-btn');
-
 const konamiModal = document.getElementById('konami-modal');
 const closeKonamiBtn = document.getElementById('close-konami-btn');
+
+const tutoDialogBox = document.getElementById('tuto-dialog-box');
+const tutoDialogText = document.getElementById('tuto-dialog-text');
+const tutoNextBtn = document.getElementById('tuto-next-btn');
 
 const scorePromptBox = document.getElementById('score-prompt-box');
 const promptYesBtn = document.getElementById('prompt-yes-btn');
@@ -694,7 +582,9 @@ const saveBtn = document.getElementById('save-btn');
 const inputPseudo = document.getElementById('player-pseudo');
 const inputEmail = document.getElementById('player-email');
 
-let promptSelectedOption = 'YES'; 
+let promptSelectedOption = 'YES';
+const mainButtonsList = [tutoMainBtn, startMainBtn];
+let mainButtonIdx = 1;
 
 const rightSideButtons = [rulesBtn, leaderboardBtn, aboutBtn, quitBtn];
 let menuFocusArea = 'START'; 
@@ -706,28 +596,27 @@ let gameOverSelectedIdx = 0;
 const formNavElements = [inputPseudo, inputEmail, cancelSaveBtn, saveBtn];
 let formNavIdx = 0;
 
-// GESTION CODE KONAMI
 const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 let konamiIndex = 0;
 
-function updateFormNavSelection() {
-  formNavElements.forEach((el, idx) => {
-    if (idx === formNavIdx) {
-      el.classList.add('nav-selected');
-      if (el.tagName === 'INPUT') el.focus();
-    } else {
-      el.classList.remove('nav-selected');
-      if (el.tagName === 'INPUT') el.blur();
-    }
-  });
-}
+// VARIABLES TUTORIEL
+let isTutoMode = false;
+let tutoStep = 0;
+let tutoTimer = 0;
+let tutoHighlightedZone = null; 
+let tutoInstructionMessage = "";
+let tutoSubState = 0;
+let tutoObstacleCount = 0;
+let tutoPlatActionState = 0; 
+let tutoNextCallback = null;
 
 function updateMenuSelection() {
   startMainBtn.classList.remove('nav-selected');
+  tutoMainBtn.classList.remove('nav-selected');
   rightSideButtons.forEach(btn => btn.classList.remove('nav-selected'));
 
   if (menuFocusArea === 'START') {
-    startMainBtn.classList.add('nav-selected');
+    mainButtonsList[mainButtonIdx].classList.add('nav-selected');
   } else {
     rightSideButtons[rightSideIdx].classList.add('nav-selected');
   }
@@ -789,7 +678,6 @@ sounds.wilhem.volume = 0.85;
 sounds.cri.volume = 0.85;
 
 let lastSpecialSoundIsWilhem = false;
-
 let audioUnlocked = false;
 let fadeInterval = null;
 let isPaused = false;
@@ -803,11 +691,8 @@ document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
 function handleFullscreenChange() {
   const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement);
   if (isFS) {
-    if (isMobileDevice) {
-      gameContainer.classList.add('mobile-fullscreen');
-    } else {
-      gameContainer.classList.add('desktop-fullscreen');
-    }
+    if (isMobileDevice) gameContainer.classList.add('mobile-fullscreen');
+    else gameContainer.classList.add('desktop-fullscreen');
   } else {
     gameContainer.classList.remove('mobile-fullscreen', 'desktop-fullscreen');
   }
@@ -816,76 +701,24 @@ function handleFullscreenChange() {
 function requestGameFullscreen() {
   if (isMobileDevice) {
     gameContainer.classList.add('mobile-fullscreen');
-
     const elem = document.documentElement;
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen().catch(() => {});
-    } else if (elem.webkitRequestFullscreen) {
-      elem.webkitRequestFullscreen().catch(() => {});
-    }
-
-    if (screen.orientation && screen.orientation.lock) {
-      screen.orientation.lock('landscape').catch(() => {});
-    }
-
-    setTimeout(() => {
-      window.scrollTo(0, 0);
-    }, 100);
+    if (elem.requestFullscreen) elem.requestFullscreen().catch(() => {});
+    else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen().catch(() => {});
+    if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {});
+    setTimeout(() => window.scrollTo(0, 0), 100);
   }
 }
 
 function toggleDesktopFullscreen() {
   if (!document.fullscreenElement && !document.webkitFullscreenElement) {
     const elem = document.documentElement;
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen().catch(() => {});
-    } else if (elem.webkitRequestFullscreen) {
-      elem.webkitRequestFullscreen().catch(() => {});
-    }
+    if (elem.requestFullscreen) elem.requestFullscreen().catch(() => {});
+    else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen().catch(() => {});
   } else {
-    if (document.exitFullscreen) {
-      document.exitFullscreen().catch(() => {});
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen().catch(() => {});
-    }
+    if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen().catch(() => {});
   }
 }
-
-function updatePromptSelection(option) {
-  promptSelectedOption = option;
-  if (option === 'YES') {
-    promptYesBtn.classList.add('nav-selected');
-    promptNoBtn.classList.remove('nav-selected');
-  } else {
-    promptNoBtn.classList.add('nav-selected');
-    promptYesBtn.classList.remove('nav-selected');
-  }
-}
-
-function focusAndScroll(el) {
-  if (!el) return;
-  if (isMobileDevice) {
-    saveScoreModal.classList.add('keyboard-active');
-    if (giftNotice) giftNotice.style.display = 'none';
-  }
-  setTimeout(() => {
-    el.scrollIntoView({ behavior: 'auto', block: 'start' });
-    saveScoreModal.scrollTop = el.offsetTop - 10;
-  }, 50);
-}
-
-const inputs = [inputPseudo, inputEmail];
-inputs.forEach(input => {
-  input.addEventListener('focus', () => {
-    focusAndScroll(input);
-  });
-  input.addEventListener('blur', () => {
-    if (isMobileDevice && !document.activeElement.tagName.match(/INPUT/i)) {
-      saveScoreModal.classList.remove('keyboard-active');
-      if (giftNotice) giftNotice.style.display = 'block';
-    }
-  });
-});
 
 function unlockAudio() {
   if (!audioUnlocked) {
@@ -915,9 +748,7 @@ function startBgMusic() {
   if (marioInvMusic.readyState >= 2) marioInvMusic.currentTime = 0;
   bgMusic.muted = false;
   bgMusic.volume = 0.8;
-  if (bgMusic.paused) {
-    bgMusic.play().catch(err => console.log("Audio play error:", err));
-  }
+  if (bgMusic.paused) bgMusic.play().catch(err => console.log("Audio play error:", err));
 }
 
 function stopAllSounds() {
@@ -929,7 +760,6 @@ function stopAllSounds() {
 
   marioInvMusic.pause();
   if (marioInvMusic.readyState >= 2) marioInvMusic.currentTime = 0;
-
   superSayanTheme.pause();
   if (superSayanTheme.readyState >= 2) superSayanTheme.currentTime = 0;
 
@@ -940,37 +770,31 @@ function stopAllSounds() {
 }
 
 function playRunSound() {
-  if (!audioUnlocked || !gameStarted || gameOver || isPaused || !cat.isGrounded || superSayen.active || freezeForSequence) {
+  if (!audioUnlocked || !gameStarted || gameOver || isPaused || !cat.isGrounded || superSayen.active || freezeForSequence || tutoHighlightedZone) {
     stopRunSound();
     return;
   }
-  if (sounds.run.paused) {
-    sounds.run.play().catch(() => {});
-  }
+  if (sounds.run.paused) sounds.run.play().catch(() => {});
 }
 
 function stopRunSound() {
   if (!sounds.run.paused) {
     sounds.run.pause();
-    if (sounds.run.readyState >= 2) {
-      sounds.run.currentTime = 0;
-    }
+    if (sounds.run.readyState >= 2) sounds.run.currentTime = 0;
   }
 }
 
 function playSoundEffect(sound) {
   if (audioUnlocked && !isPaused) {
     try {
-      if (sound.readyState >= 2) {
-        sound.currentTime = 0;
-      }
+      if (sound.readyState >= 2) sound.currentTime = 0;
       sound.play().catch(() => {});
     } catch(e) {}
   }
 }
 
 function togglePause() {
-  if (!gameStarted || gameOver) return;
+  if (!gameStarted || gameOver || isTutoMode && tutoHighlightedZone) return;
   isPaused = !isPaused;
   if (isPaused) {
     stopRunSound();
@@ -978,13 +802,9 @@ function togglePause() {
     if (!marioInvMusic.paused) marioInvMusic.pause();
     if (!superSayanTheme.paused) superSayanTheme.pause();
   } else {
-    if (superSayen.active) {
-      superSayanTheme.play().catch(() => {});
-    } else if (invincibleTimer > 0) {
-      marioInvMusic.play().catch(() => {});
-    } else {
-      bgMusic.play().catch(() => {});
-    }
+    if (superSayen.active) superSayanTheme.play().catch(() => {});
+    else if (invincibleTimer > 0) marioInvMusic.play().catch(() => {});
+    else bgMusic.play().catch(() => {});
   }
 }
 
@@ -992,6 +812,10 @@ function returnToHome() {
   gameStarted = false;
   gameOver = false;
   isPaused = false;
+  isTutoMode = false;
+  tutoHighlightedZone = null;
+  tutoInstructionMessage = "";
+  tutoDialogBox.style.display = 'none';
   superSayen.active = false;
   freezeForSequence = false;
   invincibleTimer = 0;
@@ -1000,6 +824,7 @@ function returnToHome() {
   punkBonus = null;
   ejectedObstacles = [];
   startMainBtn.style.display = 'block';
+  tutoMainBtn.style.display = 'block';
   if (!isMobileDevice) desktopFullscreenBtn.style.display = 'block';
   rightStack.style.display = 'flex';
   mobileHudControls.style.display = 'none';
@@ -1008,64 +833,18 @@ function returnToHome() {
   saveScoreModal.style.display = 'none';
   konamiModal.style.display = 'none';
   
-  if (isMobileDevice) {
-    gameContainer.classList.add('mobile-fullscreen');
-  } else {
-    gameContainer.classList.remove('mobile-fullscreen');
-  }
+  if (isMobileDevice) gameContainer.classList.add('mobile-fullscreen');
+  else gameContainer.classList.remove('mobile-fullscreen');
   
   stopAllSounds();
   playIntroMusic();
   menuFocusArea = 'START';
+  mainButtonIdx = 1;
   rightSideIdx = 0;
   updateMenuSelection();
 }
 
-function transitionSuperSayanToNormal() {
-  if (fadeInterval) clearInterval(fadeInterval);
-  
-  const fadeSteps = 30;
-  let step = 0;
-  
-  if (invincibleTimer > 0) {
-    if (marioInvMusic.readyState >= 2) marioInvMusic.currentTime = 0;
-    marioInvMusic.play().catch(() => {});
-    
-    fadeInterval = setInterval(() => {
-      step++;
-      const progress = step / fadeSteps;
-      superSayanTheme.volume = Math.max(0, 1.0 * (1 - progress));
-      if (step >= fadeSteps) {
-        clearInterval(fadeInterval);
-        superSayanTheme.pause();
-        if (superSayanTheme.readyState >= 2) superSayanTheme.currentTime = 0;
-        superSayanTheme.volume = 1.0;
-      }
-    }, 50);
-  } else {
-    bgMusic.muted = false;
-    bgMusic.volume = 0;
-    if (bgMusic.paused) bgMusic.play().catch(() => {});
-    
-    fadeInterval = setInterval(() => {
-      step++;
-      const progress = step / fadeSteps;
-      superSayanTheme.volume = Math.max(0, 1.0 * (1 - progress));
-      bgMusic.volume = Math.min(0.8, 0.8 * progress);
-      
-      if (step >= fadeSteps) {
-        clearInterval(fadeInterval);
-        superSayanTheme.pause();
-        if (superSayanTheme.readyState >= 2) superSayanTheme.currentTime = 0;
-        superSayanTheme.volume = 1.0;
-        bgMusic.volume = 0.8;
-      }
-    }, 50);
-  }
-}
-
-const ASSET_VERSION = 'v22'; 
-
+const ASSET_VERSION = 'v23'; 
 function loadSmartImage(baseName) {
   const img = new Image();
   const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG'];
@@ -1100,20 +879,12 @@ const assets = {
     crouchAir: loadSmartImage('chat_reception2 - Copie'),
     fail: loadSmartImage('chat_fail'),
     transform: [
-      loadSmartImage('chat_transform1'),
-      loadSmartImage('chat_transform2'),
-      loadSmartImage('chat_transform3'),
-      loadSmartImage('chat_transform4'),
-      loadSmartImage('chat_transform5'),
-      loadSmartImage('chat_transform6')
+      loadSmartImage('chat_transform1'), loadSmartImage('chat_transform2'), loadSmartImage('chat_transform3'),
+      loadSmartImage('chat_transform4'), loadSmartImage('chat_transform5'), loadSmartImage('chat_transform6')
     ],
     fly: [
-      loadSmartImage('chat_fly1'),
-      loadSmartImage('chat_fly2'),
-      loadSmartImage('chat_fly3'),
-      loadSmartImage('chat_fly4'),
-      loadSmartImage('chat_fly5'),
-      loadSmartImage('chat_fly6')
+      loadSmartImage('chat_fly1'), loadSmartImage('chat_fly2'), loadSmartImage('chat_fly3'),
+      loadSmartImage('chat_fly4'), loadSmartImage('chat_fly5'), loadSmartImage('chat_fly6')
     ]
   },
   platforms: {
@@ -1143,16 +914,10 @@ const assets = {
 function getObstacleDimensions(conf) {
   const sampleImg = (conf.type === 'anim') ? conf.frames[0] : conf.img;
   let w = conf.targetW || 100, h = conf.targetH || 100;
-
   if (sampleImg && sampleImg.complete && sampleImg.naturalWidth > 0 && sampleImg.naturalHeight > 0) {
     const ratio = sampleImg.naturalWidth / sampleImg.naturalHeight;
-    if (conf.targetH) {
-      h = conf.targetH;
-      w = h * ratio;
-    } else if (conf.targetW) {
-      w = conf.targetW;
-      h = w / ratio;
-    }
+    if (conf.targetH) { h = conf.targetH; w = h * ratio; }
+    else if (conf.targetW) { w = conf.targetW; h = w / ratio; }
   }
   return { w, h };
 }
@@ -1176,7 +941,7 @@ let bonusEffectTimer = 0;
 
 const rogerLetters = ['R', 'O', 'G', 'E', 'R'];
 let rogerCollected = [false, false, false, false, false];
-let completedWordsCount = 2; // Le joueur commence avec les grosses lettres R et O
+let completedWordsCount = 2; 
 
 let nextSpawnLetterIndex = 0;
 let lastLetterX = -1000;
@@ -1235,16 +1000,295 @@ let items = [];
 let lastObstacleX = -1000;
 let obstacleCounter = 0;
 
+function showTutoDialog(text, onNext, highlightRect = null) {
+  tutoDialogText.innerHTML = text;
+  tutoHighlightedZone = highlightRect;
+  tutoNextCallback = onNext;
+  tutoDialogBox.style.display = 'block';
+}
+
+tutoNextBtn.addEventListener('click', () => {
+  tutoDialogBox.style.display = 'none';
+  tutoHighlightedZone = null;
+  if (tutoNextCallback) {
+    const cb = tutoNextCallback;
+    tutoNextCallback = null;
+    cb();
+  }
+});
+
+function startTutorial() {
+  resetGame();
+  isTutoMode = true;
+  tutoStep = 1;
+  tutoTimer = 0;
+  tutoSubState = 0;
+  tutoObstacleCount = 0;
+  tutoPlatActionState = 0;
+  tutoInstructionMessage = "";
+  tutoHighlightedZone = null;
+}
+
+function updateTutorial() {
+  if (!isTutoMode || tutoHighlightedZone) return;
+
+  tutoTimer++;
+
+  // ÉTAPE 1 : Explication Score
+  if (tutoStep === 1) {
+    if (tutoTimer > 60) {
+      showTutoDialog(
+        "Ceci est ton score, le but est d'avoir le maximum de points. Plus tu avances loin, plus ton score augmente. Des bonus peuvent aussi te faire gagner des points.",
+        () => {
+          tutoStep = 2;
+          tutoTimer = 0;
+        },
+        { x: 15, y: 15, w: 230, h: 55 }
+      );
+    }
+  }
+  // ÉTAPE 2 : Explication Contrôles
+  else if (tutoStep === 2) {
+    if (tutoTimer > 60) {
+      const controlsText = isMobileDevice ?
+        "En appuyant sur le <b>CÔTÉ DROIT DE L'ÉCRAN</b>, Roger fait un saut avec son skate. Un appui court fait un petit saut, un appui long fait un grand saut.<br><br>En appuyant sur le <b>CÔTÉ GAUCHE DE L'ÉCRAN</b>, Roger se baisse.<br><br>Utilise les boutons en haut à droite pour mettre en pause ou quitter." :
+        "En appuyant sur <b>ESPACE</b>, Roger fait un saut avec son skate. Si tu fais un appui court, il fait un petit saut. Si tu fais un appui long, il fait un grand saut.<br><br>En appuyant sur la <b>FLÈCHE DU BAS</b>, Roger se baisse.<br><br>Pour mettre en pause appuie sur <b>ENTRÉE</b> et pour revenir à l'accueil appuie sur <b>ÉCHAP</b>.";
+
+      const isMobile = isMobileDevice;
+      const hudW = isMobile ? 260 : 320;
+      const hudX = isMobile ? canvas.width - 370 : canvas.width - 340;
+
+      showTutoDialog(
+        controlsText,
+        () => {
+          tutoStep = 3;
+          tutoSubState = 1; 
+          tutoTimer = 0;
+        },
+        { x: hudX - 5, y: 15, w: hudW + 10, h: 75 }
+      );
+    }
+  }
+  // ÉTAPE 3 : Essai des sauts et du baisser
+  else if (tutoStep === 3) {
+    if (tutoSubState === 1) {
+      tutoInstructionMessage = isMobileDevice ? "Vas-y essaie de sauter loin ! (Appui long à droite)" : "Vas-y essaie de sauter loin ! (Appui long sur ESPACE)";
+      if (!cat.isGrounded && cat.jumpTimer >= 10) {
+        tutoSubState = 2;
+        tutoTimer = 0;
+      }
+    } else if (tutoSubState === 2) {
+      tutoInstructionMessage = isMobileDevice ? "Maintenant baisse-toi ! (Appui à gauche)" : "Maintenant baisse-toi ! (Appui FLÈCHE BAS)";
+      if (cat.isCrouching) {
+        tutoSubState = 3;
+        tutoTimer = 0;
+      }
+    } else if (tutoSubState === 3) {
+      tutoInstructionMessage = isMobileDevice ? "Et pour finir, fais un tout petit saut ! (Appui court à droite)" : "Et pour finir, fais un tout petit saut ! (Appui court)";
+      if (cat.vy < 0 && cat.jumpTimer < 5 && !keys['Space'] && !keys['ArrowUp']) {
+        tutoStep = 4;
+        tutoTimer = 0;
+        tutoSubState = 0;
+        tutoInstructionMessage = "";
+      }
+    }
+  }
+  // ÉTAPE 4 : Découverte des Plateformes
+  else if (tutoStep === 4) {
+    if (platforms.length === 0) {
+      platforms.push({ x: canvas.width + 100, y: ENTITY_GROUND_Y - 110, w: 260, h: 65, key: 'bleu_medium' });
+    }
+
+    const plat = platforms[0];
+    if (plat && plat.x <= canvas.width - 300 && tutoSubState === 0) {
+      tutoSubState = 1;
+      showTutoDialog(
+        isMobileDevice ? 
+        "Ceci est une plateforme. Il en existe de différentes tailles. Tu peux sauter dessus mais aussi en descendre ou passer au travers en te baissant !" :
+        "Ceci est une plateforme. Il en existe de différentes tailles et hauteurs. Tu peux sauter dessus mais aussi en descendre ou passer au travers en appuyant sur FLÈCHE DU BAS !",
+        () => {
+          tutoSubState = 2; // Exercice 1 : Saute dessus
+        },
+        { x: plat.x - 10, y: plat.y - 10, w: plat.w + 20, h: plat.h + 20 }
+      );
+    }
+
+    if (tutoSubState === 2) {
+      tutoInstructionMessage = "Saute sur la plateforme !";
+      if (cat.isPlatformGrounded) {
+        tutoSubState = 3;
+      } else if (plat.x + plat.w < cat.x) {
+        plat.x = canvas.width + 100;
+      }
+    } else if (tutoSubState === 3) {
+      tutoInstructionMessage = "Saute sur la plateforme puis descends de la plateforme !";
+      if (plat.x + plat.w < cat.x - 50) {
+        plat.x = canvas.width + 100;
+        tutoPlatActionState = 0;
+      }
+      if (tutoPlatActionState === 0 && cat.isPlatformGrounded) {
+        tutoPlatActionState = 1;
+      } else if (tutoPlatActionState === 1 && !cat.isPlatformGrounded && cat.isGrounded) {
+        tutoSubState = 4;
+        tutoPlatActionState = 0;
+        plat.x = canvas.width + 100;
+      }
+    } else if (tutoSubState === 4) {
+      tutoInstructionMessage = "Maintenant, passe au travers de la plateforme !";
+      if (plat.x + plat.w < cat.x - 50) {
+        plat.x = canvas.width + 100;
+      }
+      if (cat.y < plat.y && cat.isCrouching && cat.vy > 0 && cat.x + cat.width > plat.x && cat.x < plat.x + plat.w) {
+        tutoStep = 5;
+        tutoTimer = 0;
+        tutoSubState = 0;
+        platforms = [];
+        tutoInstructionMessage = "";
+      }
+    }
+  }
+  // ÉTAPE 5 : Obstacles
+  else if (tutoStep === 5) {
+    if (tutoSubState === 0) {
+      if (obstacles.length === 0) {
+        const conf = assets.obstaclesConfig[4];
+        const dim = getObstacleDimensions(conf);
+        obstacles.push({ x: canvas.width + 100, y: ENTITY_GROUND_Y - dim.h + 25, w: dim.w, h: dim.h, configIdx: 4, frame: 0, animTimer: 0, flipX: false });
+      }
+
+      const obs = obstacles[0];
+      if (obs && obs.x <= canvas.width - 350) {
+        tutoSubState = 1;
+        showTutoDialog(
+          "Ça c'est un obstacle ! Il faut l'éviter en sautant par-dessus ou en passant en-dessous.",
+          () => {
+            tutoSubState = 2;
+            tutoObstacleCount = 0;
+            obstacles = [];
+            platforms = [];
+            tutoTimer = 0;
+          },
+          { x: obs.x - 10, y: obs.y - 10, w: obs.w + 20, h: obs.h + 20 }
+        );
+      }
+    } else if (tutoSubState === 2) {
+      tutoInstructionMessage = `Évite les obstacles ! (${tutoObstacleCount}/4)`;
+      
+      if (obstacles.length === 0 && tutoTimer > 60) {
+        tutoTimer = 0;
+        if (tutoObstacleCount === 0) {
+          const conf = assets.obstaclesConfig[4];
+          const dim = getObstacleDimensions(conf);
+          obstacles.push({ x: canvas.width + 100, y: ENTITY_GROUND_Y - dim.h + 25, w: dim.w, h: dim.h, configIdx: 4, frame: 0, animTimer: 0, flipX: false, tutoIdx: 1 });
+        } else if (tutoObstacleCount === 1) {
+          platforms.push({ x: canvas.width + 80, y: ENTITY_GROUND_Y - 90, w: 260, h: 65, key: 'bleu_medium' });
+          const conf = assets.obstaclesConfig[3];
+          const dim = getObstacleDimensions(conf);
+          obstacles.push({ x: canvas.width + 140, y: ENTITY_GROUND_Y - 90 - dim.h + 33, w: dim.w, h: dim.h, configIdx: 3, frame: 0, animTimer: 0, flipX: false, tutoIdx: 2 });
+        } else if (tutoObstacleCount === 2) {
+          platforms.push({ x: canvas.width + 80, y: ENTITY_GROUND_Y - 180, w: 260, h: 65, key: 'rouge_medium' });
+          const conf = assets.obstaclesConfig[3];
+          const dim = getObstacleDimensions(conf);
+          obstacles.push({ x: canvas.width + 140, y: ENTITY_GROUND_Y - 180 - dim.h + 33, w: dim.w, h: dim.h, configIdx: 3, frame: 0, animTimer: 0, flipX: false, tutoIdx: 3 });
+        } else if (tutoObstacleCount === 3) {
+          const conf = assets.obstaclesConfig[7];
+          const dim = getObstacleDimensions(conf);
+          const obsY = ENTITY_GROUND_Y - dim.h - 60;
+          obstacles.push({ x: canvas.width + 100, baseY: obsY, y: obsY, w: dim.w, h: dim.h, configIdx: 7, type: 'air', floatPhase: 0, flipX: false, tutoIdx: 4 });
+        }
+      }
+
+      if (obstacles.length > 0) {
+        const currentObs = obstacles[0];
+        if (currentObs.x + currentObs.w < cat.x && !currentObs.passed) {
+          currentObs.passed = true;
+          tutoObstacleCount++;
+          if (tutoObstacleCount >= 4) {
+            tutoStep = 6;
+            tutoSubState = 0;
+            tutoTimer = 0;
+            obstacles = [];
+            platforms = [];
+            tutoInstructionMessage = "";
+          }
+        }
+      }
+    }
+  }
+  // ÉTAPE 6 : Explication Grosses Lettres & Crash forcé
+  else if (tutoStep === 6) {
+    if (tutoSubState === 0) {
+      showTutoDialog(
+        "Ces GROSSES lettres R O G E R te protègent d'un choc avec un obstacle !",
+        () => {
+          tutoSubState = 1;
+        },
+        { x: 10, y: canvas.height - 125, w: 480, h: 110 }
+      );
+    } else if (tutoSubState === 1) {
+      tutoInstructionMessage = "Vas-y fonce sur un obstacle ! (C'est pour le TUTO 😉)";
+      if (obstacles.length === 0 && tutoTimer > 40) {
+        const conf = assets.obstaclesConfig[4];
+        const dim = getObstacleDimensions(conf);
+        obstacles.push({ x: canvas.width + 100, y: ENTITY_GROUND_Y - dim.h + 25, w: dim.w, h: dim.h, configIdx: 4, frame: 0, animTimer: 0, flipX: false });
+      }
+      if (completedWordsCount < 2) { // Perdu son 'O'
+        tutoStep = 7;
+        tutoSubState = 0;
+        tutoTimer = 0;
+        obstacles = [];
+        tutoInstructionMessage = "";
+      }
+    }
+  }
+  // ÉTAPE 7 : Collecte des lettres et complétion de ROGER
+  else if (tutoStep === 7) {
+    if (tutoSubState === 0) {
+      if (items.length === 0) {
+        items.push({ x: canvas.width + 100, y: ENTITY_GROUND_Y - 120, w: 65, h: 75, char: 'R', letterIdx: 0, frame: 0, animTimer: 0 });
+      }
+
+      const item = items[0];
+      if (item && item.x <= canvas.width - 350) {
+        tutoSubState = 1;
+        showTutoDialog(
+          "Collecte ces lettres afin de compléter le mot R O G E R en bas à droite, cela te fera gagner une GROSSE lettre !",
+          () => {
+            tutoSubState = 2;
+            tutoTimer = 0;
+          },
+          { x: item.x - 10, y: item.y - 10, w: item.w + 20, h: item.h + 20 }
+        );
+      }
+    } else if (tutoSubState === 2) {
+      tutoInstructionMessage = "Attrape toutes les lettres pour former ROGER !";
+      if (items.length === 0 && tutoTimer > 60 && !freezeForSequence) {
+        tutoTimer = 0;
+        const char = rogerLetters[nextSpawnLetterIndex];
+        items.push({ x: canvas.width + 100, y: ENTITY_GROUND_Y - 120, w: 65, h: 75, char: char, letterIdx: nextSpawnLetterIndex, frame: 0, animTimer: 0 });
+      }
+
+      if (completedWordsCount >= 2) {
+        showTutoDialog(
+          "Tu connais désormais les bases pour jouer à Good Morning Roger Sk8in' Cat. Lance-toi, plein d'autres surprises t'attendent dans le jeu !",
+          () => {
+            returnToHome();
+          }
+        );
+        tutoStep = 8;
+      }
+    }
+  }
+}
+
 function triggerSuperSayen() {
   if (!gameStarted || gameOver || superSayen.active) return;
-  
   superSayen.active = true;
   superSayen.state = 'TRANSFORM';
   superSayen.timer = 0;
   superSayen.transformFrame = 0;
   superSayen.flyFrame = 0;
   superSayen.animTimer = 0;
-  
   cat.vy = 0;
   cat.isGrounded = false;
   cat.isPlatformGrounded = false;
@@ -1262,37 +1306,27 @@ function triggerSuperSayen() {
 
 function triggerLetterFall(char, x, y) {
   fallingLetters.push({
-    char: char,
-    x: x,
-    y: y,
-    vy: -3,
-    vx: (Math.random() - 0.5) * 4,
-    angle: 0,
-    vAngle: (Math.random() - 0.5) * 0.2,
-    alpha: 1.0
+    char: char, x: x, y: y, vy: -3, vx: (Math.random() - 0.5) * 4,
+    angle: 0, vAngle: (Math.random() - 0.5) * 0.2, alpha: 1.0
   });
 }
 
 function isPositionNearObstacle(targetX, targetW = 65, safeMargin = 180) {
   for (let obs of obstacles) {
-    if (targetX + targetW + safeMargin > obs.x && targetX < obs.x + obs.w + safeMargin) {
-      return true;
-    }
+    if (targetX + targetW + safeMargin > obs.x && targetX < obs.x + obs.w + safeMargin) return true;
   }
   return false;
 }
 
 function isPositionNearLetter(targetX, targetW = 100, safeMargin = 180) {
   for (let item of items) {
-    if (targetX + targetW + safeMargin > item.x && targetX < item.x + item.w + safeMargin) {
-      return true;
-    }
+    if (targetX + targetW + safeMargin > item.x && targetX < item.x + item.w + safeMargin) return true;
   }
   return false;
 }
 
 function spawnWorldElements() {
-  if (superSayen.state === 'LANDING' || freezeForSequence || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
+  if (isTutoMode || superSayen.state === 'LANDING' || freezeForSequence || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
 
   const lastPlat = platforms[platforms.length - 1];
   const lastX = lastPlat ? lastPlat.x + lastPlat.w : 350;
@@ -1309,22 +1343,17 @@ function spawnWorldElements() {
 
     const heightDifference = prevY - targetY;
     let gap = 130 + Math.random() * 80;
-    if (heightDifference > 50) {
-      gap = 90 + Math.random() * 40;
-    }
+    if (heightDifference > 50) gap = 90 + Math.random() * 40;
 
     const x = Math.max(canvas.width + 100, lastX + gap);
-
     const types = ['short', 'medium', 'long'];
     const colors = ['bleu', 'rouge', 'vert'];
     const type = types[Math.floor(Math.random() * types.length)];
     const color = colors[Math.floor(Math.random() * colors.length)];
-    
     const widths = { short: 160, medium: 260, long: 360 };
     const w = widths[type];
 
-    const newPlat = { x, y: targetY, w, h: 65, key: `${color}_${type}` };
-    platforms.push(newPlat);
+    platforms.push({ x, y: targetY, w, h: 65, key: `${color}_${type}` });
 
     const platObstacleChance = 0.40 + Math.random() * 0.35;
     if (type !== 'short' && Math.random() < platObstacleChance && (x - lastObstacleX) > (160 + Math.random() * 80)) {
@@ -1332,7 +1361,6 @@ function spawnWorldElements() {
       const configIdx = platIndices[Math.floor(Math.random() * platIndices.length)];
       const conf = assets.obstaclesConfig[configIdx];
       const dim = getObstacleDimensions(conf);
-
       const obsX = x + (w / 2) - (dim.w / 2);
       
       if (!isPositionNearLetter(obsX, dim.w, 180)) {
@@ -1342,7 +1370,6 @@ function spawnWorldElements() {
 
         obstacles.push({ x: obsX, y: obsY, w: dim.w, h: dim.h, configIdx, frame: 0, animTimer: 0, flipX });
         lastObstacleX = obsX + dim.w;
-
         handleObstacleSpawned(obsX, obsY, dim.w);
       }
     }
@@ -1356,7 +1383,6 @@ function spawnWorldElements() {
     const configIdx = freeIndices[Math.floor(Math.random() * freeIndices.length)];
     const conf = assets.obstaclesConfig[configIdx];
     const dim = getObstacleDimensions(conf);
-
     const obsX = canvas.width + 100 + Math.random() * 150;
 
     if (!isPositionNearLetter(obsX, dim.w, 180)) {
@@ -1364,11 +1390,8 @@ function spawnWorldElements() {
       let obsY;
 
       if (conf.type === 'air') {
-        if (configIdx === 7) {
-          obsY = ENTITY_GROUND_Y - dim.h - 60 - (Math.random() * 15);
-        } else {
-          obsY = ENTITY_GROUND_Y - (140 + Math.random() * 60);
-        }
+        if (configIdx === 7) obsY = ENTITY_GROUND_Y - dim.h - 60 - (Math.random() * 15);
+        else obsY = ENTITY_GROUND_Y - (140 + Math.random() * 60);
         obstacles.push({
           x: obsX, baseY: obsY, y: obsY, w: dim.w, h: dim.h,
           configIdx, type: 'air', floatPhase: Math.random() * Math.PI * 2, flipX
@@ -1386,7 +1409,7 @@ function spawnWorldElements() {
 }
 
 function handleObstacleSpawned(obsX, obsY, obsW) {
-  if (superSayen.state === 'LANDING' || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
+  if (isTutoMode || superSayen.state === 'LANDING' || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
 
   obstacleCounter++;
   const spawnFrequency = 3 + (Math.floor(Math.random() * 3) - 1); 
@@ -1394,31 +1417,17 @@ function handleObstacleSpawned(obsX, obsY, obsW) {
   if (obstacleCounter % Math.max(2, spawnFrequency) === 0) {
     let letterX = obsX + obsW + 150 + (Math.random() * 100);
 
-    if (letterX - lastLetterX < 260) {
-      return;
-    }
-
-    if (!superSayen.active && isPositionNearObstacle(letterX, 65, 180)) {
-      letterX += 220 + Math.random() * 80;
-    }
+    if (letterX - lastLetterX < 260) return;
+    if (!superSayen.active && isPositionNearObstacle(letterX, 65, 180)) letterX += 220 + Math.random() * 80;
 
     const char = rogerLetters[nextSpawnLetterIndex];
     let letterY;
 
     if (superSayen.active && superSayen.state === 'FLY') {
-      const flyZones = [
-        30 + Math.random() * 90,   
-        140 + Math.random() * 100, 
-        260 + Math.random() * 120  
-      ];
+      const flyZones = [30 + Math.random() * 90, 140 + Math.random() * 100, 260 + Math.random() * 120];
       letterY = flyZones[Math.floor(Math.random() * flyZones.length)];
     } else {
-      const heights = [
-        ENTITY_GROUND_Y - 75,
-        ENTITY_GROUND_Y - 180,
-        ENTITY_GROUND_Y - 250
-      ];
-
+      const heights = [ENTITY_GROUND_Y - 75, ENTITY_GROUND_Y - 180, ENTITY_GROUND_Y - 250];
       let selectedLevelIdx = Math.floor(Math.random() * heights.length);
 
       if (selectedLevelIdx === lastLetterHeightLevel) {
@@ -1436,22 +1445,10 @@ function handleObstacleSpawned(obsX, obsY, obsW) {
       letterY = heights[selectedLevelIdx];
 
       const matchingPlat = platforms.find(p => letterX + 65 > p.x && letterX < p.x + p.w);
-      if (matchingPlat) {
-        letterY = matchingPlat.y - 75;
-      }
+      if (matchingPlat) letterY = matchingPlat.y - 75;
     }
 
-    items.push({
-      x: letterX, 
-      y: letterY, 
-      w: 65, 
-      h: 75,
-      char: char, 
-      letterIdx: nextSpawnLetterIndex, 
-      frame: 0, 
-      animTimer: 0
-    });
-
+    items.push({ x: letterX, y: letterY, w: 65, h: 75, char: char, letterIdx: nextSpawnLetterIndex, frame: 0, animTimer: 0 });
     lastLetterX = letterX;
     nextSpawnLetterIndex = (nextSpawnLetterIndex + 1) % rogerLetters.length;
   }
@@ -1510,8 +1507,11 @@ window.addEventListener('keydown', (e) => {
         menuFocusArea = 'RIGHT';
         rightSideIdx = 0; 
         updateMenuSelection();
+      } else if (e.code === 'ArrowDown' || e.code === 'ArrowUp') {
+        mainButtonIdx = (mainButtonIdx + 1) % mainButtonsList.length;
+        updateMenuSelection();
       } else if (e.code === 'Enter' || e.code === 'Space') {
-        startMainBtn.click();
+        mainButtonsList[mainButtonIdx].click();
       }
     } else if (menuFocusArea === 'RIGHT') {
       if (e.code === 'ArrowUp') {
@@ -1544,16 +1544,11 @@ window.addEventListener('keydown', (e) => {
   }
 
   if (scorePromptBox.style.display === 'block') {
-    if (e.code === 'ArrowLeft') {
-      updatePromptSelection('YES');
-    } else if (e.code === 'ArrowRight') {
-      updatePromptSelection('NO');
-    } else if (e.code === 'Enter' || e.code === 'Space') {
-      if (promptSelectedOption === 'YES') {
-        promptYesBtn.click();
-      } else {
-        promptNoBtn.click();
-      }
+    if (e.code === 'ArrowLeft') updatePromptSelection('YES');
+    else if (e.code === 'ArrowRight') updatePromptSelection('NO');
+    else if (e.code === 'Enter' || e.code === 'Space') {
+      if (promptSelectedOption === 'YES') promptYesBtn.click();
+      else promptNoBtn.click();
     }
     return;
   }
@@ -1625,15 +1620,10 @@ function handleTouchAction(e, isTouchStart) {
     const touch = e.touches[i];
     const clientX = touch.clientX;
 
-    if (gameOver) {
-      return;
-    }
+    if (gameOver) return;
 
-    if (clientX < viewportWidth / 2) {
-      wantDown = true;
-    } else {
-      wantJump = true;
-    }
+    if (clientX < viewportWidth / 2) wantDown = true;
+    else wantJump = true;
   }
 
   keys['ArrowDown'] = wantDown;
@@ -1643,39 +1633,33 @@ function handleTouchAction(e, isTouchStart) {
 
 document.addEventListener('touchstart', (e) => {
   requestGameFullscreen();
-  if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn') || e.target.closest('#score-prompt-box') || e.target.closest('#save-score-modal')) return;
+  if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn') || e.target.closest('#score-prompt-box') || e.target.closest('#save-score-modal') || tutoHighlightedZone) return;
   e.preventDefault();
   unlockAudio();
   handleTouchAction(e, true);
 }, { passive: false });
 
 document.addEventListener('touchmove', (e) => {
-  if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn') || e.target.closest('#score-prompt-box') || e.target.closest('#save-score-modal')) return;
+  if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn') || e.target.closest('#score-prompt-box') || e.target.closest('#save-score-modal') || tutoHighlightedZone) return;
   e.preventDefault();
-  if (e.touches.length > 0) {
-    handleTouchAction(e, true);
-  }
+  if (e.touches.length > 0) handleTouchAction(e, true);
 }, { passive: false });
 
 document.addEventListener('touchend', (e) => {
-  if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn') || e.target.closest('#score-prompt-box') || e.target.closest('#save-score-modal')) return;
+  if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn') || e.target.closest('#score-prompt-box') || e.target.closest('#save-score-modal') || tutoHighlightedZone) return;
   e.preventDefault();
-  if (e.touches.length === 0) {
-    handleTouchAction(e, false);
-  } else {
-    handleTouchAction(e, true);
-  }
+  if (e.touches.length === 0) handleTouchAction(e, false);
+  else handleTouchAction(e, true);
 }, { passive: false });
 
 function updateRulesText() {
   const punkBonusSrc = assets.punkBonus.src || 'punkbonus.png';
-
   if (isMobileDevice) {
     rulesList.innerHTML = `
       <li>🎮 <b>Tap droite</b> : Sauter (Appui court ou long pour ajuster le niveau du saut)</li>
       <li>🎮 <b>Tap gauche</b> : Se baisser</li>
       <li><img src="R1.png" alt="R" class="rule-icon"> <b>Lettres ROGER</b> : Collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
-      <li>❤️ <b>Système de vies</b> : Chaque GROSSE lettre te protège contre un choc (on te file le R et le O pour démarrer). Si tu obtiens 5 GROSSES lettres R O G E R, alors Roger se transforme en Super-Chat pour un max de scoring !</li>
+      <li>❤️ <b>Système de vies</b> : Tu débutes avec les GROSSES lettres R et O ! Chaque GROSSE lettre te protège contre un choc. Si tu obtiens 5 GROSSES lettres R O G E R, alors Roger se transforme en Super-Chat pour un max de scoring !</li>
       <li><img src="${punkBonusSrc}" alt="Bonus Punk" class="rule-icon-large"><b>Bonus Punk</b> : Attrape cet item et devient invincible pendant 15 secondes. Tu peux dégommer tous les obstacles sur ton passage.</li>
       <li>⏸️ <b>Bouton P</b> : Mettre le jeu en pause / Reprendre le jeu</li>
       <li>🏠 <b>Bouton R</b> : Revenir à l'écran d'accueil</li>
@@ -1685,7 +1669,7 @@ function updateRulesText() {
       <li>🎮 <b>Espace</b> : Sauter (Appui court ou long pour ajuster le niveau du saut)</li>
       <li>🎮 <b>Flèche du bas</b> : Se baisser</li>
       <li><img src="R1.png" alt="R" class="rule-icon"> <b>Lettres ROGER</b> : Collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
-      <li>❤️ <b>Système de vies</b> : Chaque GROSSE lettre te protège contre un choc (on te file le R et O pour démarrer). Si tu obtiens 5 GROSSES lettres R O G E R, alors Roger se transforme en Super-Chat pour un max de scoring !</li>
+      <li>❤️ <b>Système de vies</b> : Tu débutes avec les GROSSES lettres R et O ! Chaque GROSSE lettre te protège contre un choc. Si tu obtiens 5 GROSSES lettres R O G E R, alors Roger se transforme en Super-Chat pour un max de scoring !</li>
       <li><img src="${punkBonusSrc}" alt="Bonus Punk" class="rule-icon-large"><b>Bonus Punk</b> : Attrape cet item et devient invincible pendant 15 secondes. Tu peux dégommer tous les obstacles sur ton passage.</li>
       <li>⏸️ <b>Entrée</b> : Mettre le jeu en pause / Reprendre le jeu</li>
       <li>🏠 <b>Echap</b> : Revenir à l'écran d'accueil</li>
@@ -1715,7 +1699,6 @@ function parseCSVLine(line) {
 
 function fetchLeaderboard() {
   leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Chargement du Top 10...</td></tr>';
-  
   fetch(GOOGLE_SHEET_CSV_URL + '&t=' + Date.now())
     .then(response => {
       if (!response.ok) throw new Error("Erreur réseau");
@@ -1729,7 +1712,6 @@ function fetchLeaderboard() {
       }
 
       const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase());
-      
       let pseudoIdx = headers.findIndex(h => h.includes('pseudo'));
       let scoreIdx  = headers.findIndex(h => h.includes('score'));
 
@@ -1742,15 +1724,12 @@ function fetchLeaderboard() {
         if (row.length > scoreIdx) {
           const pseudo = row[pseudoIdx] || 'Anonyme';
           const scoreVal = parseInt(row[scoreIdx], 10);
-          if (!isNaN(scoreVal)) {
-            entries.push({ pseudo, score: scoreVal });
-          }
+          if (!isNaN(scoreVal)) entries.push({ pseudo, score: scoreVal });
         }
       }
 
       entries.sort((a, b) => b.score - a.score);
       const top10 = entries.slice(0, 10);
-
       leaderboardBody.innerHTML = '';
       if (top10.length === 0) {
         leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Aucun score pour le moment !</td></tr>';
@@ -1759,11 +1738,7 @@ function fetchLeaderboard() {
 
       top10.forEach((row, idx) => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><b>${idx + 1}</b></td>
-          <td>${row.pseudo}</td>
-          <td style="color:#ffd54f; font-weight:bold;">${row.score}</td>
-        `;
+        tr.innerHTML = `<td><b>${idx + 1}</b></td><td>${row.pseudo}</td><td style="color:#ffd54f; font-weight:bold;">${row.score}</td>`;
         leaderboardBody.appendChild(tr);
       });
     })
@@ -1780,6 +1755,7 @@ startMainBtn.addEventListener('click', () => {
     introVideo.currentTime = 0;
   }
   startMainBtn.style.display = 'none';
+  tutoMainBtn.style.display = 'none';
   desktopFullscreenBtn.style.display = 'none';
   rightStack.style.display = 'none';
   if (isMobileDevice) mobileHudControls.style.display = 'flex';
@@ -1787,55 +1763,32 @@ startMainBtn.addEventListener('click', () => {
   resetGame();
 });
 
-desktopFullscreenBtn.addEventListener('click', () => {
-  toggleDesktopFullscreen();
-});
-
-rulesBtn.addEventListener('click', () => {
-  playIntroMusic();
-  updateRulesText();
-  rulesModal.style.display = 'flex';
-});
-
-closeRulesBtn.addEventListener('click', () => {
-  rulesModal.style.display = 'none';
-});
-
-closeKonamiBtn.addEventListener('click', () => {
-  konamiModal.style.display = 'none';
-});
-
-leaderboardBtn.addEventListener('click', () => {
-  playIntroMusic();
-  fetchLeaderboard();
-  leaderboardModal.style.display = 'flex';
-});
-
-closeLeaderboardBtn.addEventListener('click', () => {
-  leaderboardModal.style.display = 'none';
-});
-
-aboutBtn.addEventListener('click', () => {
-  playIntroMusic();
-  aboutModal.style.display = 'flex';
-});
-
-closeAboutBtn.addEventListener('click', () => {
-  aboutModal.style.display = 'none';
-});
-
-quitBtn.addEventListener('click', () => {
-  window.location.href = 'https://www.goodmorningroger.fr/skate-cat.html';
-});
-
-restartBtn.addEventListener('click', () => {
+tutoMainBtn.addEventListener('click', () => {
+  requestGameFullscreen();
+  if (introVideo) {
+    introVideo.pause();
+    introVideo.currentTime = 0;
+  }
+  startMainBtn.style.display = 'none';
+  tutoMainBtn.style.display = 'none';
+  desktopFullscreenBtn.style.display = 'none';
+  rightStack.style.display = 'none';
+  if (isMobileDevice) mobileHudControls.style.display = 'flex';
   startBgMusic();
-  resetGame();
+  startTutorial();
 });
 
-homeGameOverBtn.addEventListener('click', () => {
-  returnToHome();
-});
+desktopFullscreenBtn.addEventListener('click', () => toggleDesktopFullscreen());
+rulesBtn.addEventListener('click', () => { playIntroMusic(); updateRulesText(); rulesModal.style.display = 'flex'; });
+closeRulesBtn.addEventListener('click', () => { rulesModal.style.display = 'none'; });
+closeKonamiBtn.addEventListener('click', () => { konamiModal.style.display = 'none'; });
+leaderboardBtn.addEventListener('click', () => { playIntroMusic(); fetchLeaderboard(); leaderboardModal.style.display = 'flex'; });
+closeLeaderboardBtn.addEventListener('click', () => { leaderboardModal.style.display = 'none'; });
+aboutBtn.addEventListener('click', () => { playIntroMusic(); aboutModal.style.display = 'flex'; });
+closeAboutBtn.addEventListener('click', () => { aboutModal.style.display = 'none'; });
+quitBtn.addEventListener('click', () => { window.location.href = 'https://www.goodmorningroger.fr/skate-cat.html'; });
+restartBtn.addEventListener('click', () => { startBgMusic(); if (isTutoMode) startTutorial(); else resetGame(); });
+homeGameOverBtn.addEventListener('click', () => returnToHome());
 
 promptYesBtn.addEventListener('click', () => {
   scorePromptBox.style.display = 'none';
@@ -1852,27 +1805,15 @@ promptNoBtn.addEventListener('click', () => {
   updateGameOverSelection();
 });
 
-promptYesBtn.addEventListener('mouseenter', () => updatePromptSelection('YES'));
-promptNoBtn.addEventListener('mouseenter', () => updatePromptSelection('NO'));
-
-startMainBtn.addEventListener('mouseenter', () => {
-  menuFocusArea = 'START';
-  updateMenuSelection();
-});
+startMainBtn.addEventListener('mouseenter', () => { menuFocusArea = 'START'; mainButtonIdx = 1; updateMenuSelection(); });
+tutoMainBtn.addEventListener('mouseenter', () => { menuFocusArea = 'START'; mainButtonIdx = 0; updateMenuSelection(); });
 
 rightSideButtons.forEach((btn, idx) => {
-  btn.addEventListener('mouseenter', () => {
-    menuFocusArea = 'RIGHT';
-    rightSideIdx = idx;
-    updateMenuSelection();
-  });
+  btn.addEventListener('mouseenter', () => { menuFocusArea = 'RIGHT'; rightSideIdx = idx; updateMenuSelection(); });
 });
 
 gameOverButtons.forEach((btn, idx) => {
-  btn.addEventListener('mouseenter', () => {
-    gameOverSelectedIdx = idx;
-    updateGameOverSelection();
-  });
+  btn.addEventListener('mouseenter', () => { gameOverSelectedIdx = idx; updateGameOverSelection(); });
 });
 
 cancelSaveBtn.addEventListener('click', () => {
@@ -1913,32 +1854,16 @@ saveScoreForm.addEventListener('submit', (e) => {
     mode: 'no-cors',
     body: formData
   })
-  .then(() => {
-    clearTimeout(timeoutId);
-    finalizeSubmit();
-  })
-  .catch(() => {
-    clearTimeout(timeoutId);
-    finalizeSubmit();
-  });
+  .then(() => { clearTimeout(timeoutId); finalizeSubmit(); })
+  .catch(() => { clearTimeout(timeoutId); finalizeSubmit(); });
 });
 
-mobilePauseBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  togglePause();
-});
-
-mobileHomeBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  returnToHome();
-});
+mobilePauseBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePause(); });
+mobileHomeBtn.addEventListener('click', (e) => { e.stopPropagation(); returnToHome(); });
 
 window.addEventListener('load', () => {
-  if (isMobileDevice) {
-    gameContainer.classList.add('mobile-fullscreen');
-  } else {
-    desktopFullscreenBtn.style.display = 'block';
-  }
+  if (isMobileDevice) gameContainer.classList.add('mobile-fullscreen');
+  else desktopFullscreenBtn.style.display = 'block';
   playIntroMusic();
   updateRulesText();
   updateMenuSelection();
@@ -1956,13 +1881,17 @@ function resetGame() {
   gameOver = false;
   gameStarted = true;
   isPaused = false;
+  isTutoMode = false;
+  tutoHighlightedZone = null;
+  tutoInstructionMessage = "";
+  tutoDialogBox.style.display = 'none';
   bonusEffectTimer = 0;
   lastObstacleX = -1000;
   lastLetterX = -1000;
   lastLetterHeightLevel = -1;
   heightLevelRepeatCount = 0;
   obstacleCounter = 0;
-  completedWordsCount = 2; // Le joueur démarre avec 2 grosses lettres (R et O)
+  completedWordsCount = 2; 
   nextSpawnLetterIndex = 0;
   invulnerableTimer = 0;
   fallingLetters = [];
@@ -1975,7 +1904,6 @@ function resetGame() {
   currentGameSpeed = BASE_GAME_SPEED;
   jumpKeyReleased = true;
   lastSpecialSoundIsWilhem = false;
-  
   invincibleTimer = 0;
   debonusPlayed = false;
   debonusEndPlayed = false;
@@ -2015,14 +1943,20 @@ function update() {
     return;
   }
 
+  if (isTutoMode) {
+    updateTutorial();
+    if (tutoHighlightedZone) {
+      stopRunSound();
+      return; 
+    }
+  }
+
   if (freezeForSequence) {
     stopRunSound();
     sequenceAngle += 0.12; 
-    
     if (sequenceAngle >= Math.PI * 2) {
       sequenceAngle = 0;
       sequenceCurrentLetterIndex++;
-      
       if (sequenceCurrentLetterIndex >= 5) {
         freezeForSequence = false;
         completedWordsCount = 0; 
@@ -2034,24 +1968,12 @@ function update() {
   }
 
   bounceTimer += 0.08;
-
-  if (invulnerableTimer > 0) {
-    invulnerableTimer--;
-  }
+  if (invulnerableTimer > 0) invulnerableTimer--;
 
   if (invincibleTimer > 0) {
     invincibleTimer--;
-    
-    if (invincibleTimer === 120 && !debonusPlayed) {
-      playSoundEffect(sounds.debonus);
-      debonusPlayed = true;
-    }
-
-    if (invincibleTimer === 60 && !debonusEndPlayed) {
-      playSoundEffect(sounds.debonusend);
-      debonusEndPlayed = true;
-    }
-
+    if (invincibleTimer === 120 && !debonusPlayed) { playSoundEffect(sounds.debonus); debonusPlayed = true; }
+    if (invincibleTimer === 60 && !debonusEndPlayed) { playSoundEffect(sounds.debonusend); debonusEndPlayed = true; }
     if (invincibleTimer === 0) {
       marioInvMusic.pause();
       if (marioInvMusic.readyState >= 2) marioInvMusic.currentTime = 0;
@@ -2064,27 +1986,20 @@ function update() {
     }
   }
 
-  punkBonusTimer++;
-  if (punkBonusTimer >= 1800 && !punkBonus && !superSayen.active) {
-    punkBonusTimer = 0;
-    
-    let targetH = 65;
-    let targetW = 65;
-    if (assets.punkBonus.complete && assets.punkBonus.naturalWidth > 0 && assets.punkBonus.naturalHeight > 0) {
-      const ratio = assets.punkBonus.naturalWidth / assets.punkBonus.naturalHeight;
-      targetW = targetH * ratio;
+  if (!isTutoMode) {
+    punkBonusTimer++;
+    if (punkBonusTimer >= 1800 && !punkBonus && !superSayen.active) {
+      punkBonusTimer = 0;
+      let targetH = 65, targetW = 65;
+      if (assets.punkBonus.complete && assets.punkBonus.naturalWidth > 0 && assets.punkBonus.naturalHeight > 0) {
+        const ratio = assets.punkBonus.naturalWidth / assets.punkBonus.naturalHeight;
+        targetW = targetH * ratio;
+      }
+      punkBonus = {
+        x: canvas.width + 50, baseY: 120 + Math.random() * 160, y: 150,
+        w: targetW, h: targetH, time: 0, angle: 0, trail: []
+      };
     }
-
-    punkBonus = {
-      x: canvas.width + 50,
-      baseY: 120 + Math.random() * 160,
-      y: 150,
-      w: targetW,
-      h: targetH,
-      time: 0,
-      angle: 0,
-      trail: []
-    };
   }
 
   if (punkBonus) {
@@ -2096,14 +2011,10 @@ function update() {
     punkBonus.trail.push({
       x: punkBonus.x + punkBonus.w / 2 + (Math.random() * 14 - 7),
       y: punkBonus.y + punkBonus.h / 2 + (Math.random() * 14 - 7),
-      size: Math.random() * 8 + 4,
-      alpha: 1.0,
-      color: Math.random() < 0.6 ? '#ffd54f' : '#ffffff'
+      size: Math.random() * 8 + 4, alpha: 1.0, color: Math.random() < 0.6 ? '#ffd54f' : '#ffffff'
     });
 
-    if (punkBonus.x + punkBonus.w < -100) {
-      punkBonus = null;
-    }
+    if (punkBonus.x + punkBonus.w < -100) punkBonus = null;
   }
 
   if (punkBonus) {
@@ -2116,19 +2027,12 @@ function update() {
   }
 
   ejectedObstacles.forEach(eo => {
-    eo.x += eo.vx;
-    eo.y += eo.vy;
-    eo.vy += 0.5;
-    eo.angle += eo.vRot;
+    eo.x += eo.vx; eo.y += eo.vy; eo.vy += 0.5; eo.angle += eo.vRot;
   });
   ejectedObstacles = ejectedObstacles.filter(eo => eo.y < canvas.height + 200 && eo.x < canvas.width + 200 && eo.x > -200);
 
   fallingLetters.forEach(fl => {
-    fl.y += fl.vy;
-    fl.x += fl.vx;
-    fl.vy += 0.4;
-    fl.angle += fl.vAngle;
-    fl.alpha -= 0.02;
+    fl.y += fl.vy; fl.x += fl.vx; fl.vy += 0.4; fl.angle += fl.vAngle; fl.alpha -= 0.02;
   });
   fallingLetters = fallingLetters.filter(fl => fl.alpha > 0);
 
@@ -2142,9 +2046,7 @@ function update() {
   baseSpeedMultiplier = Math.pow(1.05, speedLevel);
   let effectiveBaseSpeed = BASE_GAME_SPEED * baseSpeedMultiplier;
 
-  if (invincibleTimer > 0) {
-    effectiveBaseSpeed *= 1.25;
-  }
+  if (invincibleTimer > 0) effectiveBaseSpeed *= 1.25;
 
   const jumpPressed = !!(keys['Space'] || keys['ArrowUp']);
   const flyUpPressed = !!(keys['Space'] || keys['ArrowUp'] || keys['KeyW']);
@@ -2152,66 +2054,37 @@ function update() {
 
   if (superSayen.active) {
     superSayen.animTimer++;
-
     if (superSayen.state === 'TRANSFORM') {
       currentGameSpeed = effectiveBaseSpeed * 0.5;
-      
-      if (cat.y > superSayen.targetY) {
-        cat.y -= 3;
-      }
-
+      if (cat.y > superSayen.targetY) cat.y -= 3;
       const frameInterval = (superSayen.transformFrame === 5) ? 4 : 14;
-
       if (superSayen.animTimer % frameInterval === 0) {
-        if (superSayen.transformFrame < 5) {
-          superSayen.transformFrame++;
-        } else {
-          superSayen.state = 'FLY';
-          superSayen.timer = 0;
-        }
+        if (superSayen.transformFrame < 5) superSayen.transformFrame++;
+        else { superSayen.state = 'FLY'; superSayen.timer = 0; }
       }
     } else if (superSayen.state === 'FLY') {
       currentGameSpeed = effectiveBaseSpeed * 3.5;
       superSayen.timer++;
       score += 15;
-
       const flySpeed = 7;
       const maxFlyY = ENTITY_GROUND_Y - cat.height + 65; 
-      
-      if (flyUpPressed) {
-        cat.y = Math.max(30, cat.y - flySpeed);
-      }
-      if (downPressed) {
-        cat.y = Math.min(maxFlyY, cat.y + flySpeed);
-      }
+      if (flyUpPressed) cat.y = Math.max(30, cat.y - flySpeed);
+      if (downPressed) cat.y = Math.min(maxFlyY, cat.y + flySpeed);
 
-      if (superSayen.animTimer % 4 === 0) {
-        superSayen.flyFrame = (superSayen.flyFrame + 1) % 6;
-      }
-
+      if (superSayen.animTimer % 4 === 0) superSayen.flyFrame = (superSayen.flyFrame + 1) % 6;
       if (superSayen.timer >= 450) {
         superSayen.state = 'LANDING';
-        obstacles = [];
-        items = [];
-        platforms = [];
-        lastObstacleX = canvas.width + 400;
-        lastLetterX = canvas.width + 400;
+        obstacles = []; items = []; platforms = [];
+        lastObstacleX = canvas.width + 400; lastLetterX = canvas.width + 400;
         transitionSuperSayanToNormal();
       }
     } else if (superSayen.state === 'LANDING') {
       currentGameSpeed = effectiveBaseSpeed;
-
-      if (cat.y < ENTITY_GROUND_Y - cat.height) {
-        cat.y += 6;
-      } else {
-        cat.y = ENTITY_GROUND_Y - cat.height;
-        cat.isGrounded = true;
-        cat.vy = 0;
-        superSayen.active = false;
-        superSayen.state = 'NONE';
-
-        lastObstacleX = cat.x + 300;
-        lastLetterX = cat.x + 300;
+      if (cat.y < ENTITY_GROUND_Y - cat.height) cat.y += 6;
+      else {
+        cat.y = ENTITY_GROUND_Y - cat.height; cat.isGrounded = true; cat.vy = 0;
+        superSayen.active = false; superSayen.state = 'NONE';
+        lastObstacleX = cat.x + 300; lastLetterX = cat.x + 300;
       }
     }
   } else {
@@ -2224,45 +2097,26 @@ function update() {
 
   if (!superSayen.active) {
     if (downPressed && cat.isPlatformGrounded) {
-      cat.y += 12;
-      cat.isGrounded = false;
-      cat.isPlatformGrounded = false;
-      stopRunSound();
+      cat.y += 12; cat.isGrounded = false; cat.isPlatformGrounded = false; stopRunSound();
     }
 
     if (jumpPressed && cat.isGrounded && jumpKeyReleased) {
-      cat.vy = JUMP_FORCE;
-      cat.isGrounded = false;
-      cat.isPlatformGrounded = false;
-      cat.isJumping = true;
-      cat.jumpTimer = 0;
-      cat.isRun4Pose = false;
-      cat.state = 'RUN';
-      jumpKeyReleased = false;
-      stopRunSound();
-      playSoundEffect(sounds.jump);
+      cat.vy = JUMP_FORCE; cat.isGrounded = false; cat.isPlatformGrounded = false;
+      cat.isJumping = true; cat.jumpTimer = 0; cat.isRun4Pose = false; cat.state = 'RUN';
+      jumpKeyReleased = false; stopRunSound(); playSoundEffect(sounds.jump);
     }
 
     if (jumpPressed && cat.isJumping) {
-      if (cat.jumpTimer < MAX_JUMP_TIME) {
-        cat.vy += JUMP_HOLD_FORCE;
-        cat.jumpTimer++;
-      }
+      if (cat.jumpTimer < MAX_JUMP_TIME) { cat.vy += JUMP_HOLD_FORCE; cat.jumpTimer++; }
     }
 
     cat.isCrouching = downPressed;
     if (cat.isCrouching) {
       cat.crouchTimer++;
-      if (cat.crouchTimer % 6 === 0) {
-        cat.crouchFrame = (cat.crouchFrame + 1) % 3;
-      }
-    } else {
-      cat.crouchFrame = 0;
-      cat.crouchTimer = 0;
-    }
+      if (cat.crouchTimer % 6 === 0) cat.crouchFrame = (cat.crouchFrame + 1) % 3;
+    } else { cat.crouchFrame = 0; cat.crouchTimer = 0; }
 
-    cat.vy += GRAVITY;
-    cat.y += cat.vy;
+    cat.vy += GRAVITY; cat.y += cat.vy;
   }
 
   let catBoxX = cat.x + 25;
@@ -2288,10 +2142,7 @@ function update() {
     ) {
       playSoundEffect(sounds.punkbonus);
       invincibleTimer = 900; 
-      debonusPlayed = false;
-      debonusEndPlayed = false;
-      punkBonus = null;
-
+      debonusPlayed = false; debonusEndPlayed = false; punkBonus = null;
       if (!superSayen.active) {
         bgMusic.pause();
         if (marioInvMusic.readyState >= 2) marioInvMusic.currentTime = 0;
@@ -2301,34 +2152,20 @@ function update() {
   }
 
   if (!superSayen.active) {
-    cat.wasGrounded = cat.isGrounded;
-    cat.isGrounded = false;
-    cat.isPlatformGrounded = false;
-
+    cat.wasGrounded = cat.isGrounded; cat.isGrounded = false; cat.isPlatformGrounded = false;
     if (cat.y + cat.height >= ENTITY_GROUND_Y) {
-      cat.y = ENTITY_GROUND_Y - cat.height;
-      cat.vy = 0;
-      cat.isGrounded = true;
-      cat.isJumping = false;
+      cat.y = ENTITY_GROUND_Y - cat.height; cat.vy = 0; cat.isGrounded = true; cat.isJumping = false;
     }
 
     if (!downPressed || cat.vy < 0) {
       platforms.forEach(p => {
         const depthOffset = 14; 
         const surfaceY = p.y + depthOffset;
-
         if (
-          cat.x + cat.width > p.x &&
-          cat.x < p.x + p.w &&
-          cat.y + cat.height >= surfaceY &&
-          cat.y + cat.height <= surfaceY + 20 &&
-          cat.vy >= 0
+          cat.x + cat.width > p.x && cat.x < p.x + p.w &&
+          cat.y + cat.height >= surfaceY && cat.y + cat.height <= surfaceY + 20 && cat.vy >= 0
         ) {
-          cat.y = surfaceY - cat.height;
-          cat.vy = 0;
-          cat.isGrounded = true;
-          cat.isPlatformGrounded = true;
-          cat.isJumping = false;
+          cat.y = surfaceY - cat.height; cat.vy = 0; cat.isGrounded = true; cat.isPlatformGrounded = true; cat.isJumping = false;
         }
       });
     }
@@ -2337,40 +2174,29 @@ function update() {
   platforms.forEach(p => p.x -= currentGameSpeed);
 
   if (!superSayen.active) {
-    if (!cat.wasGrounded && cat.isGrounded) {
-      playSoundEffect(sounds.reception);
-    }
-    if (cat.isGrounded) {
-      playRunSound();
-    } else {
-      stopRunSound();
-    }
+    if (!cat.wasGrounded && cat.isGrounded) playSoundEffect(sounds.reception);
+    if (cat.isGrounded) playRunSound();
+    else stopRunSound();
   }
 
   platforms = platforms.filter(p => p.x + p.w > -100);
 
   obstacles.forEach(o => {
     o.x -= currentGameSpeed;
-
     if (o.type === 'air') {
       o.floatPhase += 0.05;
       const amp = (o.configIdx === 7) ? 8 : 12;
       o.y = o.baseY + Math.sin(o.floatPhase) * amp;
     } else {
       o.animTimer++;
-      if (o.animTimer % 10 === 0) {
-        o.frame = (o.frame + 1) % 3;
-      }
+      if (o.animTimer % 10 === 0) o.frame = (o.frame + 1) % 3;
     }
 
     let obsBoxX = o.x + 10;
     let obsBoxWidth = Math.max(10, o.w - 20);
     let obsBoxY = o.type === 'air' ? o.y + 4 : o.y + 10;
     let obsBoxHeight = o.type === 'air' ? Math.max(10, o.h - 8) : Math.max(10, o.h - 20);
-
-    if (o.configIdx === 3) {
-      obsBoxHeight = Math.max(10, o.h - 38); 
-    }
+    if (o.configIdx === 3) obsBoxHeight = Math.max(10, o.h - 38); 
 
     const isHit = (
       catBoxX < obsBoxX + obsBoxWidth &&
@@ -2385,48 +2211,38 @@ function update() {
           const soundToPlay = lastSpecialSoundIsWilhem ? sounds.cri : sounds.wilhem;
           playSoundEffect(soundToPlay);
           lastSpecialSoundIsWilhem = !lastSpecialSoundIsWilhem;
-        } else {
-          playSoundEffect(sounds.degom);
-        }
+        } else playSoundEffect(sounds.degom);
 
         score += 100;
-
-        let vx = 8 + Math.random() * 6;
-        let vy = -8 - Math.random() * 6;
-
-        if (cat.vy > 0 && catBoxY + catBoxHeight - cat.vy <= obsBoxY + 20) {
-          vy = 6 + Math.random() * 6;
-        }
+        let vx = 8 + Math.random() * 6, vy = -8 - Math.random() * 6;
+        if (cat.vy > 0 && catBoxY + catBoxHeight - cat.vy <= obsBoxY + 20) vy = 6 + Math.random() * 6;
 
         const conf = assets.obstaclesConfig[o.configIdx];
         let imgToDraw = (conf.type === 'anim') ? conf.frames[o.frame] : conf.img;
-
         ejectedObstacles.push({
-          x: o.x,
-          y: o.y,
-          w: o.w,
-          h: o.h,
-          img: imgToDraw,
-          vx: vx,
-          vy: vy,
-          angle: 0,
-          vRot: (Math.random() - 0.5) * 0.5,
-          flipX: o.flipX
+          x: o.x, y: o.y, w: o.w, h: o.h, img: imgToDraw, vx: vx, vy: vy, angle: 0, vRot: (Math.random() - 0.5) * 0.5, flipX: o.flipX
         });
-
         o.ejected = true;
       } else if (!superSayen.active && invulnerableTimer <= 0) {
         playSoundEffect(sounds.damage);
 
+        if (isTutoMode && tutoStep === 5) {
+          // Recommencer la série de 4 obstacles au tuto sans dégâts
+          obstacles = [];
+          platforms = [];
+          tutoObstacleCount = 0;
+          tutoTimer = 0;
+          invulnerableTimer = 60;
+          return;
+        }
+
         if (completedWordsCount > 0) {
           completedWordsCount--;
           invulnerableTimer = 90;
-          
           const masterHudX = 20;
           const masterHudY = canvas.height - 115;
           const lostChar = rogerLetters[completedWordsCount];
           const lostX = masterHudX + (completedWordsCount * 95);
-          
           triggerLetterFall(lostChar, lostX, masterHudY);
         } else {
           gameOver = true;
@@ -2434,7 +2250,7 @@ function update() {
           stopRunSound();
           stopAllSounds();
           
-          if (score >= 3000) {
+          if (!isTutoMode && score >= 3000) {
             updatePromptSelection('YES');
             scorePromptBox.style.display = 'block';
           } else {
@@ -2451,20 +2267,11 @@ function update() {
   items.forEach(it => {
     it.x -= currentGameSpeed;
     it.animTimer++;
-    if (it.animTimer % 6 === 0) {
-      it.frame = (it.frame + 1) % 8;
-    }
+    if (it.animTimer % 6 === 0) it.frame = (it.frame + 1) % 8;
 
-    let hitW = it.w;
-    let hitH = it.h;
-    let hitX = it.x;
-    let hitY = it.y;
-
+    let hitW = it.w, hitH = it.h, hitX = it.x, hitY = it.y;
     if (superSayen.active && superSayen.state === 'FLY') {
-      hitW = it.w + 60;
-      hitH = it.h + 90;
-      hitX = it.x - 30;
-      hitY = it.y - 45;
+      hitW = it.w + 60; hitH = it.h + 90; hitX = it.x - 30; hitY = it.y - 45;
     }
 
     const itemHit = (
@@ -2509,22 +2316,16 @@ function update() {
   });
   items = items.filter(it => !it.collected && it.x + it.w > -100);
 
-  if (bonusEffectTimer > 0) {
-    bonusEffectTimer--;
-  }
+  if (bonusEffectTimer > 0) bonusEffectTimer--;
 
   spawnWorldElements();
 
   cat.animTimer++;
-  if (cat.animTimer % 14 === 0) {
-    cat.animFrame = (cat.animFrame + 1) % 4;
-  }
+  if (cat.animTimer % 14 === 0) cat.animFrame = (cat.animFrame + 1) % 4;
 }
 
 function drawHomeScreen() {
-  if (introVideo.paused) {
-    introVideo.play().catch(() => {});
-  }
+  if (introVideo.paused) introVideo.play().catch(() => {});
 
   if (introVideo.readyState >= 2) {
     const vidRatio = introVideo.videoWidth / introVideo.videoHeight;
@@ -2532,17 +2333,10 @@ function drawHomeScreen() {
     let renderW, renderH, offsetX, offsetY;
 
     if (canvasRatio > vidRatio) {
-      renderW = canvas.width;
-      renderH = canvas.width / vidRatio;
-      offsetX = 0;
-      offsetY = (canvas.height - renderH) / 2;
+      renderW = canvas.width; renderH = canvas.width / vidRatio; offsetX = 0; offsetY = (canvas.height - renderH) / 2;
     } else {
-      renderH = canvas.height;
-      renderW = canvas.height * vidRatio;
-      offsetX = (canvas.width - renderW) / 2;
-      offsetY = 0;
+      renderH = canvas.height; renderW = canvas.height * vidRatio; offsetX = (canvas.width - renderW) / 2; offsetY = 0;
     }
-
     ctx.drawImage(introVideo, Math.round(offsetX), Math.round(offsetY), Math.round(renderW), Math.round(renderH));
   } else {
     ctx.fillStyle = '#1a1a24';
@@ -2556,9 +2350,7 @@ function draw() {
 
   if (!gameStarted) {
     drawHomeScreen();
-    if (gameOver) {
-      drawGameOverOverlay();
-    }
+    if (gameOver) drawGameOverOverlay();
     return;
   }
 
@@ -2583,14 +2375,9 @@ function draw() {
 
   platforms.forEach(p => {
     const img = assets.platforms[p.key];
-    const px = Math.round(p.x);
-    const py = Math.round(p.y);
-    const pw = Math.round(p.w);
-    const ph = Math.round(p.h);
-
-    if (img && img.complete && img.naturalWidth > 0) {
-      ctx.drawImage(img, px, py, pw, ph);
-    } else {
+    const px = Math.round(p.x), py = Math.round(p.y), pw = Math.round(p.w), ph = Math.round(p.h);
+    if (img && img.complete && img.naturalWidth > 0) ctx.drawImage(img, px, py, pw, ph);
+    else {
       ctx.fillStyle = p.key.includes('bleu') ? '#4fc3f7' : p.key.includes('rouge') ? '#e57373' : '#81c784';
       ctx.fillRect(px, py, pw, ph);
     }
@@ -2599,9 +2386,7 @@ function draw() {
   let shadowTargetY = ENTITY_GROUND_Y;
   platforms.forEach(p => {
     const surfaceY = p.y + 14;
-    if (cat.x + cat.width > p.x && cat.x < p.x + p.w && cat.y + cat.height <= surfaceY + 20) {
-      shadowTargetY = surfaceY;
-    }
+    if (cat.x + cat.width > p.x && cat.x < p.x + p.w && cat.y + cat.height <= surfaceY + 20) shadowTargetY = surfaceY;
   });
   const jumpDistance = Math.max(0, shadowTargetY - (cat.y + cat.height));
   const catShadowRadius = Math.max(12, 35 - (jumpDistance * 0.12));
@@ -2618,41 +2403,28 @@ function draw() {
       let targetUnderY = ENTITY_GROUND_Y;
       platforms.forEach(p => {
         const surfaceY = p.y + 14;
-        if (o.x + o.w > p.x && o.x < p.x + p.w && o.y + o.h < surfaceY) {
-          targetUnderY = surfaceY;
-        }
+        if (o.x + o.w > p.x && o.x < p.x + p.w && o.y + o.h < surfaceY) targetUnderY = surfaceY;
       });
       obsShadowY = targetUnderY;
       const airDistance = targetUnderY - (o.y + o.h);
       radiusX = Math.max(15, (o.w * 0.35) - (airDistance * 0.05));
       opacity = Math.max(0.12, 0.35 - (airDistance * 0.0015));
     }
-
     drawShadow(o.x + o.w / 2, obsShadowY, radiusX, 5, opacity);
   });
 
   obstacles.forEach(o => {
     const conf = assets.obstaclesConfig[o.configIdx];
     let imgToDraw = (conf.type === 'anim') ? conf.frames[o.frame] : conf.img;
-
-    const ox = Math.round(o.x);
-    const oy = Math.round(o.y);
-    const ow = Math.round(o.w);
-    const oh = Math.round(o.h);
+    const ox = Math.round(o.x), oy = Math.round(o.y), ow = Math.round(o.w), oh = Math.round(o.h);
 
     if (imgToDraw && imgToDraw.complete && imgToDraw.naturalWidth > 0) {
       if (o.flipX) {
-        ctx.save();
-        ctx.translate(ox + ow, oy);
-        ctx.scale(-1, 1);
-        ctx.drawImage(imgToDraw, 0, 0, ow, oh);
-        ctx.restore();
-      } else {
-        ctx.drawImage(imgToDraw, ox, oy, ow, oh);
-      }
+        ctx.save(); ctx.translate(ox + ow, oy); ctx.scale(-1, 1);
+        ctx.drawImage(imgToDraw, 0, 0, ow, oh); ctx.restore();
+      } else ctx.drawImage(imgToDraw, ox, oy, ow, oh);
     } else {
-      ctx.fillStyle = '#ff9800';
-      ctx.fillRect(ox, oy, ow, oh);
+      ctx.fillStyle = '#ff9800'; ctx.fillRect(ox, oy, ow, oh);
     }
   });
 
@@ -2661,62 +2433,37 @@ function draw() {
     ctx.translate(Math.round(eo.x + eo.w / 2), Math.round(eo.y + eo.h / 2));
     ctx.rotate(eo.angle);
     if (eo.flipX) ctx.scale(-1, 1);
-    if (eo.img && eo.img.complete && eo.img.naturalWidth > 0) {
-      ctx.drawImage(eo.img, -eo.w / 2, -eo.h / 2, eo.w, eo.h);
-    } else {
-      ctx.fillStyle = '#ff9800';
-      ctx.fillRect(-eo.w / 2, -eo.h / 2, eo.w, eo.h);
-    }
+    if (eo.img && eo.img.complete && eo.img.naturalWidth > 0) ctx.drawImage(eo.img, -eo.w / 2, -eo.h / 2, eo.w, eo.h);
+    else { ctx.fillStyle = '#ff9800'; ctx.fillRect(-eo.w / 2, -eo.h / 2, eo.w, eo.h); }
     ctx.restore();
   });
 
   if (punkBonus) {
     ctx.save();
     punkBonus.trail.forEach(pt => {
-      ctx.fillStyle = pt.color;
-      ctx.shadowColor = pt.color;
-      ctx.shadowBlur = 12;
-      ctx.globalAlpha = Math.max(0, pt.alpha);
-      ctx.beginPath();
-      ctx.arc(Math.round(pt.x), Math.round(pt.y), Math.round(pt.size), 0, Math.PI * 2);
-      ctx.fill();
+      ctx.fillStyle = pt.color; ctx.shadowColor = pt.color; ctx.shadowBlur = 12;
+      ctx.globalAlpha = Math.max(0, pt.alpha); ctx.beginPath();
+      ctx.arc(Math.round(pt.x), Math.round(pt.y), Math.round(pt.size), 0, Math.PI * 2); ctx.fill();
     });
     ctx.restore();
   }
 
   if (punkBonus) {
     ctx.save();
-    const px = Math.round(punkBonus.x);
-    const py = Math.round(punkBonus.y);
-    const pw = Math.round(punkBonus.w);
-    const ph = Math.round(punkBonus.h);
-
+    const px = Math.round(punkBonus.x), py = Math.round(punkBonus.y), pw = Math.round(punkBonus.w), ph = Math.round(punkBonus.h);
     const pulse = 1 + Math.sin(Date.now() / 120) * 0.08;
     const flashColor = Math.floor(Date.now() / 60) % 2 === 0 ? '#ffffff' : '#ffd54f';
     
-    ctx.shadowColor = flashColor;
-    ctx.shadowBlur = 35;
+    ctx.shadowColor = flashColor; ctx.shadowBlur = 35;
+    ctx.translate(px + pw / 2, py + ph / 2); ctx.scale(pulse, pulse); ctx.rotate(punkBonus.angle);
 
-    ctx.translate(px + pw / 2, py + ph / 2);
-    ctx.scale(pulse, pulse);
-    ctx.rotate(punkBonus.angle);
-
-    if (assets.punkBonus.complete && assets.punkBonus.naturalWidth > 0) {
-      ctx.drawImage(assets.punkBonus, -pw / 2, -ph / 2, pw, ph);
-    } else {
-      ctx.fillStyle = '#ff00ff';
-      ctx.beginPath();
-      ctx.arc(0, 0, ph / 2, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    if (assets.punkBonus.complete && assets.punkBonus.naturalWidth > 0) ctx.drawImage(assets.punkBonus, -pw / 2, -ph / 2, pw, ph);
+    else { ctx.fillStyle = '#ff00ff'; ctx.beginPath(); ctx.arc(0, 0, ph / 2, 0, Math.PI * 2); ctx.fill(); }
     ctx.restore();
   }
 
   if (superSayen.active && superSayen.state === 'FLY') {
-    ctx.save();
-    ctx.shadowBlur = 0;
-    ctx.shadowColor = 'transparent';
-
+    ctx.save(); ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
     const displaySize = 270;
     const catCenterX = Math.round(cat.x + (cat.width / 2));
     const catCenterY = Math.round(cat.y + cat.height - (displaySize / 2) + 40);
@@ -2732,8 +2479,7 @@ function draw() {
     ctx.lineTo(catCenterX - 350, catCenterY - 15);
     ctx.lineTo(catCenterX - 350, catCenterY + 15);
     ctx.lineTo(catCenterX + 20, catCenterY + 40);
-    ctx.closePath();
-    ctx.fill();
+    ctx.closePath(); ctx.fill();
 
     for (let i = 0; i < 12; i++) {
       const pX = Math.round(catCenterX - 40 - (Math.random() * 280));
@@ -2749,72 +2495,50 @@ function draw() {
 
   if (!isBlinking) {
     let catSprite;
-
     if (superSayen.active) {
       let displaySize = 310;
       if (superSayen.state === 'TRANSFORM') {
         catSprite = assets.cat.transform[superSayen.transformFrame];
         if (superSayen.transformFrame >= 3) displaySize = 270;
       } else if (superSayen.state === 'FLY') {
-        catSprite = assets.cat.fly[superSayen.flyFrame];
-        displaySize = 270;
+        catSprite = assets.cat.fly[superSayen.flyFrame]; displaySize = 270;
       } else if (superSayen.state === 'LANDING') {
-        catSprite = assets.cat.transform[5];
-        displaySize = 270;
+        catSprite = assets.cat.transform[5]; displaySize = 270;
       }
 
       if (catSprite && catSprite.complete && catSprite.naturalWidth > 0) {
         ctx.save();
-        if (superSayen.state === 'FLY') {
-          ctx.shadowColor = '#ffd54f';
-          ctx.shadowBlur = 20;
-        }
+        if (superSayen.state === 'FLY') { ctx.shadowColor = '#ffd54f'; ctx.shadowBlur = 20; }
         const drawX = Math.round(cat.x + (cat.width / 2) - (displaySize / 2));
         const drawY = Math.round(cat.y + cat.height - displaySize + 40);
         ctx.drawImage(catSprite, drawX, drawY, displaySize, displaySize);
         ctx.restore();
       }
     } else {
-      if (cat.state === 'FAIL') {
-        catSprite = assets.cat.fail;
-      } else if (cat.isCrouching && !cat.isGrounded) {
-        catSprite = assets.cat.crouchAir;
-      } else if (!cat.isGrounded) {
-        catSprite = assets.cat.jump[Math.min(1, cat.animFrame % 3)];
-      } else if (cat.isCrouching) {
-        catSprite = assets.cat.crouchSequence[cat.crouchFrame % 3];
-      } else if (cat.isRun4Pose) {
-        catSprite = assets.cat.run4;
-      } else {
-        catSprite = assets.cat.runSequence[cat.animFrame % 4];
-      }
+      if (cat.state === 'FAIL') catSprite = assets.cat.fail;
+      else if (cat.isCrouching && !cat.isGrounded) catSprite = assets.cat.crouchAir;
+      else if (!cat.isGrounded) catSprite = assets.cat.jump[Math.min(1, cat.animFrame % 3)];
+      else if (cat.isCrouching) catSprite = assets.cat.crouchSequence[cat.crouchFrame % 3];
+      else if (cat.isRun4Pose) catSprite = assets.cat.run4;
+      else catSprite = assets.cat.runSequence[cat.animFrame % 4];
 
       if (cat.state !== 'FAIL') {
-        let drawWidth = cat.width;
-        let drawHeight = cat.height;
-        let drawX = cat.x;
-        let drawY = cat.y;
-
+        let drawWidth = cat.width, drawHeight = cat.height, drawX = cat.x, drawY = cat.y;
         if (catSprite && catSprite.complete && catSprite.naturalWidth > 0) {
           const spriteRatio = catSprite.naturalWidth / catSprite.naturalHeight;
-
           if (cat.isCrouching) {
             let crouchScale = 0.85;
             if (!cat.isGrounded) crouchScale = 0.70;
-            
             drawWidth = cat.width * 1.3 * crouchScale;
             drawHeight = drawWidth / spriteRatio;
             drawY = cat.y + (cat.height - drawHeight);
           }
-
           ctx.save();
           if (invincibleTimer > 0) {
             const flashTick = Math.floor(Date.now() / 50) % 3;
             const flashColor = flashTick === 0 ? '#ffffff' : flashTick === 1 ? '#ffd54f' : '#ffeb3b';
-            ctx.shadowColor = flashColor;
-            ctx.shadowBlur = 40;
+            ctx.shadowColor = flashColor; ctx.shadowBlur = 40;
           }
-
           ctx.drawImage(catSprite, Math.round(drawX), Math.round(drawY), Math.round(drawWidth), Math.round(drawHeight));
           ctx.restore();
         } else {
@@ -2825,58 +2549,38 @@ function draw() {
     }
   }
 
-  ctx.save();
-  ctx.shadowBlur = 0;
-  ctx.shadowColor = 'transparent';
-
+  ctx.save(); ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
   items.forEach(it => {
     const letterFrames = assets.letters[it.char];
     const img = letterFrames ? letterFrames[it.frame] : null;
-
-    const ix = Math.round(it.x);
-    const iy = Math.round(it.y);
-    const iw = Math.round(it.w);
-    const ih = Math.round(it.h);
-
-    if (img && img.complete && img.naturalWidth > 0) {
-      ctx.drawImage(img, ix, iy, iw, ih);
-    } else {
-      ctx.fillStyle = '#ffd54f';
-      ctx.beginPath();
-      ctx.arc(ix + iw/2, iy + ih/2, 28, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#000';
-      ctx.font = 'bold 28px Courier New';
-      ctx.fillText(it.char, ix + 20, iy + 45);
+    const ix = Math.round(it.x), iy = Math.round(it.y), iw = Math.round(it.w), ih = Math.round(it.h);
+    if (img && img.complete && img.naturalWidth > 0) ctx.drawImage(img, ix, iy, iw, ih);
+    else {
+      ctx.fillStyle = '#ffd54f'; ctx.beginPath(); ctx.arc(ix + iw/2, iy + ih/2, 28, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#000'; ctx.font = 'bold 28px Courier New'; ctx.fillText(it.char, ix + 20, iy + 45);
     }
   });
   ctx.restore();
 
   if (freezeForSequence) {
-    ctx.save();
-    ctx.fillStyle = 'rgba(255, 213, 79, 0.35)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.restore();
+    ctx.save(); ctx.fillStyle = 'rgba(255, 213, 79, 0.35)'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.restore();
   }
 
-  ctx.fillStyle = 'rgba(0,0,0,0.65)';
-  ctx.fillRect(20, 20, 220, 45);
+  // AFFICHAGE SCORE
+  ctx.fillStyle = 'rgba(0,0,0,0.65)'; ctx.fillRect(20, 20, 220, 45);
   ctx.fillStyle = superSayen.active ? '#ffd54f' : '#fff';
   ctx.font = 'bold 22px Courier New';
   ctx.fillText(`SCORE: ${score}`, 32, 50);
 
+  // CONTRÔLES HAUT DROITE
   const isMobile = isMobileDevice;
   const hudWidth = isMobile ? 260 : 320;
   const hudXPos = isMobile ? canvas.width - 370 : canvas.width - 340;
 
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
-  ctx.fillRect(hudXPos, 20, hudWidth, 65);
-  ctx.strokeStyle = '#ffffff';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(hudXPos, 20, hudWidth, 65);
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.65)'; ctx.fillRect(hudXPos, 20, hudWidth, 65);
+  ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1; ctx.strokeRect(hudXPos, 20, hudWidth, 65);
 
-  ctx.fillStyle = '#ffd54f';
-  ctx.font = 'bold 13px Courier New';
+  ctx.fillStyle = '#ffd54f'; ctx.font = 'bold 13px Courier New';
   if (isMobile) {
     ctx.fillText("TAP DROITE : SAUTER", hudXPos + 15, 40);
     ctx.fillText("TAP GAUCHE : BAISSER", hudXPos + 15, 58);
@@ -2886,37 +2590,32 @@ function draw() {
     ctx.fillText("ECHAP  : ACCUEIL", hudXPos + 15, 76);
   }
 
+  // MOT ROGER DORÉ (BAS DROITE)
   const hudX = canvas.width - 340;
   const hudY = canvas.height - 85;
-  ctx.fillStyle = '#000000'; 
-  ctx.fillRect(hudX - 10, hudY - 10, 335, 80);
-  ctx.strokeStyle = '#ffd54f';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(hudX - 10, hudY - 10, 335, 80);
+  ctx.fillStyle = '#000000'; ctx.fillRect(hudX - 10, hudY - 10, 335, 80);
+  ctx.strokeStyle = '#ffd54f'; ctx.lineWidth = 2; ctx.strokeRect(hudX - 10, hudY - 10, 335, 80);
 
   rogerLetters.forEach((char, idx) => {
     const slotX = hudX + (idx * 64);
     const isCollected = rogerCollected[idx];
     const hudImg = assets.letters[char] ? assets.letters[char][0] : null;
-
     if (hudImg && hudImg.complete && hudImg.naturalWidth > 0) {
       ctx.globalAlpha = isCollected ? 1.0 : 0.25;
       ctx.drawImage(hudImg, slotX, hudY, 52, 60);
       ctx.globalAlpha = 1.0;
     } else {
-      ctx.fillStyle = isCollected ? '#ffd54f' : '#555';
-      ctx.font = 'bold 36px Courier New';
+      ctx.fillStyle = isCollected ? '#ffd54f' : '#555'; ctx.font = 'bold 36px Courier New';
       ctx.fillText(char, slotX + 14, hudY + 44);
     }
   });
 
+  // GROSSES LETTRES VIES (BAS GAUCHE)
   const masterHudX = 20;
   const masterHudY = canvas.height - 115;
-
   rogerLetters.forEach((char, idx) => {
     const slotX = masterHudX + (idx * 95);
     const isWordCompleted = idx < completedWordsCount;
-
     if (isWordCompleted) {
       const hudImg = assets.letters[char] ? assets.letters[char][0] : null;
       const bounceOffset = Math.sin(bounceTimer + idx * 0.6) * 12;
@@ -2924,66 +2623,43 @@ function draw() {
 
       ctx.save();
       if (freezeForSequence && idx === sequenceCurrentLetterIndex) {
-        const letterWidth = 90;
-        const letterHeight = 105;
+        const letterWidth = 90, letterHeight = 105;
         ctx.translate(slotX + letterWidth / 2, currentY + letterHeight / 2);
         ctx.scale(Math.cos(sequenceAngle), 1);
         ctx.translate(-(slotX + letterWidth / 2), -(currentY + letterHeight / 2));
       }
 
-      if (hudImg && hudImg.complete && hudImg.naturalWidth > 0) {
-        ctx.drawImage(hudImg, slotX, currentY, 90, 105);
-      } else {
-        ctx.fillStyle = '#ffd54f';
-        ctx.font = 'bold 64px Courier New';
+      if (hudImg && hudImg.complete && hudImg.naturalWidth > 0) ctx.drawImage(hudImg, slotX, currentY, 90, 105);
+      else {
+        ctx.fillStyle = '#ffd54f'; ctx.font = 'bold 64px Courier New';
         ctx.fillText(char, slotX + 15, currentY + 75);
       }
-
       ctx.restore();
     }
   });
 
   if (freezeForSequence) {
-    ctx.save();
-    ctx.textAlign = 'center';
-    ctx.font = '900 48px Courier New';
-    ctx.fillStyle = '#ffd54f';
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 4;
-    ctx.shadowColor = '#ffd54f';
-    ctx.shadowBlur = 20;
+    ctx.save(); ctx.textAlign = 'center'; ctx.font = '900 48px Courier New';
+    ctx.fillStyle = '#ffd54f'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 4;
+    ctx.shadowColor = '#ffd54f'; ctx.shadowBlur = 20;
     ctx.strokeText('+ 10 000 POINTS !', canvas.width / 2, 140);
-    ctx.fillText('+ 10 000 POINTS !', canvas.width / 2, 140);
-    ctx.restore();
+    ctx.fillText('+ 10 000 POINTS !', canvas.width / 2, 140); ctx.restore();
   }
 
   fallingLetters.forEach(fl => {
     const hudImg = assets.letters[fl.char] ? assets.letters[fl.char][0] : null;
-    ctx.save();
-    ctx.globalAlpha = Math.max(0, fl.alpha);
-    ctx.translate(Math.round(fl.x + 45), Math.round(fl.y + 50));
-    ctx.rotate(fl.angle);
-
-    if (hudImg && hudImg.complete && hudImg.naturalWidth > 0) {
-      ctx.drawImage(hudImg, -45, -50, 90, 105);
-    } else {
-      ctx.fillStyle = '#ff3333';
-      ctx.font = 'bold 64px Courier New';
-      ctx.fillText(fl.char, -30, 25);
-    }
+    ctx.save(); ctx.globalAlpha = Math.max(0, fl.alpha);
+    ctx.translate(Math.round(fl.x + 45), Math.round(fl.y + 50)); ctx.rotate(fl.angle);
+    if (hudImg && hudImg.complete && hudImg.naturalWidth > 0) ctx.drawImage(hudImg, -45, -50, 90, 105);
+    else { ctx.fillStyle = '#ff3333'; ctx.font = 'bold 64px Courier New'; ctx.fillText(fl.char, -30, 25); }
     ctx.restore();
   });
 
   if (bonusEffectTimer > 0) {
     ctx.save();
     const alpha = Math.min(1, bonusEffectTimer / 25);
-    ctx.globalAlpha = alpha;
-    ctx.fillStyle = '#ffd54f';
-    ctx.textAlign = 'center';
-    ctx.font = 'bold 26px Courier New';
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 4;
-
+    ctx.globalAlpha = alpha; ctx.fillStyle = '#ffd54f'; ctx.textAlign = 'center';
+    ctx.font = 'bold 26px Courier New'; ctx.strokeStyle = '#000000'; ctx.lineWidth = 4;
     const popupX = hudX + 157;
     const popupY = Math.round((hudY - 20) - (90 - bonusEffectTimer) * 0.3);
     ctx.strokeText('+1 000 PTS !', popupX, popupY);
@@ -2991,28 +2667,50 @@ function draw() {
     ctx.restore();
   }
 
-  if (isPaused) {
+  // ANNONCES & INSTRUCTIONS EN JEU (TUTO)
+  if (isTutoMode && tutoInstructionMessage && !tutoHighlightedZone) {
+    ctx.save();
     ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.textAlign = 'center';
-
+    ctx.fillRect(canvas.width / 2 - 320, 80, 640, 45);
+    ctx.strokeStyle = '#ffd54f';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(canvas.width / 2 - 320, 80, 640, 45);
     ctx.fillStyle = '#ffd54f';
-    ctx.font = '900 48px Courier New';
-    ctx.fillText("PARTIE EN PAUSE", canvas.width / 2, canvas.height / 2 - 20);
+    ctx.font = 'bold 16px Courier New';
+    ctx.textAlign = 'center';
+    ctx.fillText(tutoInstructionMessage, canvas.width / 2, 108);
+    ctx.restore();
+  }
 
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 20px Courier New';
-    if (isMobileDevice) {
-      ctx.fillText("Appuyer de nouveau l'écran pour reprendre la partie", canvas.width / 2, canvas.height / 2 + 40);
-    } else {
-      ctx.fillText("Appuyer sur Entrée pour reprendre la partie", canvas.width / 2, canvas.height / 2 + 40);
-    }
+  // OMBRAGE / SURBRILLANCE DU TUTORIEL
+  if (isTutoMode && tutoHighlightedZone) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+
+    const z = tutoHighlightedZone;
+    // Remplissage en 4 rectangles autour de la zone ciblée
+    ctx.fillRect(0, 0, canvas.width, z.y);
+    ctx.fillRect(0, z.y, z.x, z.h);
+    ctx.fillRect(z.x + z.w, z.y, canvas.width - (z.x + z.w), z.h);
+    ctx.fillRect(0, z.y + z.h, canvas.width, canvas.height - (z.y + z.h));
+
+    ctx.strokeStyle = '#ffd54f';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(z.x, z.y, z.w, z.h);
+    ctx.restore();
+  }
+
+  if (isPaused) {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.75)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.textAlign = 'center'; ctx.fillStyle = '#ffd54f'; ctx.font = '900 48px Courier New';
+    ctx.fillText("PARTIE EN PAUSE", canvas.width / 2, canvas.height / 2 - 20);
+    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 20px Courier New';
+    if (isMobileDevice) ctx.fillText("Appuyer de nouveau l'écran pour reprendre la partie", canvas.width / 2, canvas.height / 2 + 40);
+    else ctx.fillText("Appuyer sur Entrée pour reprendre la partie", canvas.width / 2, canvas.height / 2 + 40);
     ctx.textAlign = 'left';
   }
 
-  if (gameOver) {
-    drawGameOverOverlay();
-  }
+  if (gameOver) drawGameOverOverlay();
 }
 
 function drawGameOverOverlay() {
@@ -3036,16 +2734,8 @@ function drawGameOverOverlay() {
     const targetHeight = 150;
     const aspectRatio = failImg.naturalWidth / failImg.naturalHeight;
     const targetWidth = targetHeight * aspectRatio;
-    
-    ctx.drawImage(
-      failImg, 
-      Math.round(canvas.width / 2 - (targetWidth / 2)), 
-      180, 
-      Math.round(targetWidth), 
-      targetHeight
-    );
+    ctx.drawImage(failImg, Math.round(canvas.width / 2 - (targetWidth / 2)), 180, Math.round(targetWidth), targetHeight);
   }
-
   ctx.textAlign = 'left';
 }
 
@@ -3053,7 +2743,6 @@ let lastFrameTime = performance.now();
 
 function gameLoop(currentTime) {
   requestAnimationFrame(gameLoop);
-
   const deltaTime = currentTime - lastFrameTime;
   if (deltaTime < 10) return;
   lastFrameTime = currentTime;
