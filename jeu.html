@@ -87,7 +87,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.5-FIX-SUPER-SAYEN-MUSIC</div>
+  <div id="version-display">v13.6-FIX-BG-MUSIC-RESET</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -378,7 +378,17 @@ function unlockAudio() {
 
 function playIntroMusic() { unlockAudio(); if (introMusic.paused && !gameStarted) introMusic.play().catch(() => {}); }
 function stopIntroMusic() { introMusic.pause(); if (introMusic.readyState >= 2) introMusic.currentTime = 0; }
-function startBgMusic() { unlockAudio(); stopIntroMusic(); marioInvMusic.pause(); bgMusic.muted = false; bgMusic.volume = 0.8; if (bgMusic.paused) bgMusic.play().catch(() => {}); }
+
+// CORRECTION : La musique du jeu repart de 0 à chaque lancement / recommencement
+function startBgMusic() { 
+  unlockAudio(); 
+  stopIntroMusic(); 
+  marioInvMusic.pause(); 
+  bgMusic.muted = false; 
+  bgMusic.volume = 0.8; 
+  if (bgMusic.readyState >= 2) bgMusic.currentTime = 0;
+  bgMusic.play().catch(() => {}); 
+}
 
 function stopAllSounds() {
   if (fadeInterval) clearInterval(fadeInterval);
@@ -424,7 +434,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.5'; 
+const ASSET_VERSION = 'v13.6'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -793,7 +803,6 @@ function triggerSuperSayen() {
   playSoundEffect(sounds.sayan); playSoundEffect(sounds.speedFly);
 }
 
-// CORRECTION ICI : Relance propre de la musique principale au terme de l'atterrissage Super-Sayen
 function transitionSuperSayanToNormal() {
   superSayanTheme.pause();
   bgMusic.muted = false;
@@ -983,7 +992,6 @@ window.addEventListener('keyup', (e) => {
   if (e.code === 'Space' || e.code === 'ArrowUp') { cat.isJumping = false; jumpKeyReleased = true; }
 });
 
-// ÉCOUTEURS TACTILES SÉCURISÉS (Taps gauche / droit)
 function handleTouchAction(e, isTouchActive) {
   if (!gameStarted || rulesModal.style.display === 'flex' || leaderboardModal.style.display === 'flex' || aboutModal.style.display === 'flex' || scorePromptBox.style.display === 'block' || saveScoreModal.style.display === 'block') return;
   if (isPaused) { if (isTouchActive) togglePause(); return; }
