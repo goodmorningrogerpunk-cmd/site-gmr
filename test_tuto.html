@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Skate Cat - Tutoriel Définitif Corrigé</title>
+  <title>Skate Cat - Tutoriel Officiel Parfait</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
     html, body { width: 100%; height: 100%; background-color: #000; font-family: 'Courier New', Courier, monospace; color: #fff; overflow: hidden; touch-action: none !important; }
@@ -35,7 +35,8 @@
       display: none; position: absolute; width: 440px; min-height: 180px; background: #111118; border: 4px solid #ffd54f; border-radius: 8px;
       padding: 32px 24px 24px 24px; z-index: 65000; text-align: center; box-shadow: 0 0 30px rgba(0,0,0,0.9);
     }
-    #tuto-dialog-text { font-size: 14px; line-height: 1.6; color: #ffffff; margin-bottom: 20px; text-align: left; display: block; }
+    /* CORRECTION FINALE DU TEXTE COUPÉ EN HAUT */
+    #tuto-dialog-text { font-size: 14px; line-height: 2.2; color: #ffffff; margin-top: 10px; margin-bottom: 20px; text-align: left; display: block; }
     #tuto-next-btn { padding: 8px 24px; font-size: 15px; color: #1a1a24; background-color: #ffd54f; border: 3px solid #ffffff; cursor: pointer; font-weight: bold; }
   </style>
 </head>
@@ -44,7 +45,7 @@
 <div id="game-container">
   <canvas id="gameCanvas" width="960" height="540"></canvas>
   <button id="tuto-main-btn" class="pixel-btn">LANCER LE TUTORIEL</button>
-  <div id="version-display">v8.1-FIX</div>
+  <div id="version-display">v9.0-PERFECT</div>
 
   <div id="tuto-dialog-box">
     <p id="tuto-dialog-text"></p>
@@ -87,7 +88,7 @@ function playRunSound() {
 function stopRunSound() { if (!sounds.run.paused) { sounds.run.pause(); if (sounds.run.readyState >= 2) sounds.run.currentTime = 0; } }
 function playSoundEffect(sound) { if (audioUnlocked) { try { if (sound.readyState >= 2) sound.currentTime = 0; sound.play().catch(() => {}); } catch(e) {} } }
 
-const ASSET_VERSION = 'v8.1';
+const ASSET_VERSION = 'v9.0';
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -146,7 +147,7 @@ const rogerLetters = ['R', 'O', 'G', 'E', 'R'];
 let rogerCollected = [false, false, false, false, false];
 let completedWordsCount = 2; 
 
-const cat = { x: 100, y: ENTITY_GROUND_Y - 110, width: 110, height: 110, vy: 0, isGrounded: true, wasGrounded: true, isPlatformGrounded: false, isCrouching: false, jumpTimer: 0, isJumping: false, animFrame: 0, animTimer: 0, crouchFrame: 0, crouchTimer: 0, state: 'RUN' };
+const cat = { x: 100, y: ENTITY_GROUND_Y - 110, width: 110, height: 110, vy: 0, isGrounded: true, wasGrounded: true, isPlatformGrounded: false, isCrouching: false, jumpTimer: 0, isJumping: false, animFrame: 0, animTimer: 0, crouchFrame: 0, crouchTimer: 0, state: 'RUN', damageFlashTimer: 0 };
 let platforms = []; let obstacles = []; let items = []; let keys = {};
 let bounceTimer = 0; let nextSpawnLetterIndex = 1;
 
@@ -246,7 +247,7 @@ function updateTutorialScript() {
   if (tutoHighlightedZone) return;
   tutoTimer++;
 
-  // ÉTAPE 1 : SCORE (1 seconde / 60 frames)
+  // ÉTAPE 1 : SCORE
   if (tutoStep === 1) {
     if (tutoTimer > 60) {
       showTutoDialogSide(
@@ -286,7 +287,7 @@ function updateTutorialScript() {
       }
     }
   }
-  // ÉTAPE 4 : PLATEFORME SCRIPTÉE (Flux continu et indépendant de la validation)
+  // ÉTAPE 4 : PLATEFORME SCRIPTÉE
   else if (tutoStep === 4) {
     const plat = platforms[0];
     if (plat && plat.x <= canvas.width - 350 && tutoSubState === 1 && !plat.shownPopup) {
@@ -298,15 +299,10 @@ function updateTutorialScript() {
       );
     }
 
-    // ÉTAPE A : "Vas-y, saute sur une plateforme"
     if (tutoSubState === 2) {
       tutoInstructionMessage = "Vas-y, saute sur une plateforme";
-      if (cat.isPlatformGrounded) { 
-        tutoSubState = 3; 
-      }
-    } 
-    // ÉTAPE B : "Maintenant, saute sur une plateforme et descend pendant que tu es dessus avec la FLÈCHE DU BAS"
-    else if (tutoSubState === 3) {
+      if (cat.isPlatformGrounded) { tutoSubState = 3; }
+    } else if (tutoSubState === 3) {
       tutoInstructionMessage = "Maintenant, saute sur une plateforme et descend pendant que tu es dessus avec la FLÈCHE DU BAS";
       const pLong = platforms[0];
       if (pLong) {
@@ -314,20 +310,13 @@ function updateTutorialScript() {
         if (pLong.wasOnPlat && cat.isCrouching && !cat.isPlatformGrounded && cat.y + cat.height < ENTITY_GROUND_Y) {
           pLong.descendedFromPlat = true;
         }
-        if (pLong.descendedFromPlat && cat.isGrounded) {
-          tutoSubState = 4;
-        }
+        if (pLong.descendedFromPlat && cat.isGrounded) { tutoSubState = 4; }
       }
-    } 
-    // ÉTAPE C : "Enfin, saute et passe au travers de la plateforme en appuyant sur ESPACE et tout de suite après sur la FLÈCHE DU BAS"
-    else if (tutoSubState === 4) {
+    } else if (tutoSubState === 4) {
       tutoInstructionMessage = "Enfin, saute et passe au travers de la plateforme en appuyant sur ESPACE et tout de suite après sur la FLÈCHE DU BAS";
       const pPass = platforms[0];
       if (pPass) {
-        if (cat.isPlatformGrounded) {
-          pPass.touchedPlatform = true; // Si le chat roule dessus, on invalide pour cet essai
-        }
-        // Validation stricte : passe au travers en l'air sans s'être posé dessus
+        if (cat.isPlatformGrounded) { pPass.touchedPlatform = true; }
         const surfaceY = pPass.y + 14;
         if (!pPass.touchedPlatform && cat.isCrouching && cat.vy > 0 && cat.x + cat.width > pPass.x && cat.x < pPass.x + pPass.w && cat.y + cat.height >= surfaceY && cat.y < surfaceY) {
           tutoStep = 5; tutoTimer = 0; tutoSubState = 0; platforms = []; tutoInstructionMessage = "";
@@ -335,7 +324,7 @@ function updateTutorialScript() {
       }
     }
   }
-  // ÉTAPE 5 : SÉRIE DE 4 OBSTACLES (Délai de 2 secondes avant l'affichage)
+  // ÉTAPE 5 : SÉRIE DE 4 OBSTACLES (Ajustements demandés)
   else if (tutoStep === 5) {
     if (tutoSubState === 0) {
       if (tutoTimer > 120) {
@@ -350,7 +339,7 @@ function updateTutorialScript() {
           showTutoDialogSide(
             "Ça c'est un obstacle, il faut l'éviter, en sautant par dessus ou en passant en dessous.",
             { x: obs.x, y: obs.y, w: obs.w, h: obs.h },
-            () => { tutoSubState = 2; tutoObstacleCount = 0; obstacles = []; tutoTimer = 0; }
+            () => { tutoSubState = 2; tutoObstacleCount = 0; tutoTimer = 0; } // L'obstacle exemple reste en place et continue sa course !
           );
         }
       }
@@ -359,18 +348,26 @@ function updateTutorialScript() {
       if (obstacles.length === 0 && tutoTimer > 60) {
         tutoTimer = 0;
         let configIdx = 5;
-        if (tutoObstacleCount === 1) configIdx = 3;
-        else if (tutoObstacleCount === 2) configIdx = 4;
-        else if (tutoObstacleCount === 3) configIdx = 7;
+        if (tutoObstacleCount === 1) configIdx = 3; // Obstacle 1 sur plateforme
+        else if (tutoObstacleCount === 2) configIdx = 4; // Obstacle 2 au sol
+        else if (tutoObstacleCount === 3) configIdx = 7; // Obstacle 6 en l'air (air = index 7)
 
         const conf = assets.obstaclesConfig[configIdx]; const dim = getObstacleDimensions(conf);
         let obsY = ENTITY_GROUND_Y - dim.h + 5;
-        if (configIdx === 7) obsY = ENTITY_GROUND_Y - dim.h - 60;
-        if (configIdx === 3 || configIdx === 4) {
-          obsY = ENTITY_GROUND_Y - 120 - dim.h + 30;
-          platforms.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 120, w: 260, h: 65, key: 'bleu_medium' });
+        
+        if (configIdx === 7) {
+          // Obstacle 6 en l'air avec oscillation verticale
+          obsY = ENTITY_GROUND_Y - dim.h - 70;
+        } else if (configIdx === 3) {
+          // Obstacle 1 sur plateforme abaissée (pour forcer le baisser)
+          obsY = ENTITY_GROUND_Y - 100 - dim.h + 20;
+          platforms.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 100, w: 260, h: 65, key: 'bleu_medium' });
+        } else if (configIdx === 4) {
+          // Obstacle 2 directement au sol
+          obsY = ENTITY_GROUND_Y - dim.h + 5;
         }
-        obstacles.push({ x: canvas.width + 100, y: obsY, w: dim.w, h: dim.h, configIdx, frame: 0, animTimer: 0 });
+        
+        obstacles.push({ x: canvas.width + 100, y: obsY, w: dim.w, h: dim.h, configIdx, frame: 0, animTimer: 0, baseY: obsY });
       }
 
       if (obstacles.length > 0) {
@@ -441,13 +438,10 @@ function updateTutorialScript() {
   }
 }
 
-// MOTEUR DE JEU & SPAWN CONTINU DES PLATEFORMES DU TUTO
 function updatePlatformStream() {
   if (!gameStarted) return;
   if (tutoStep === 4 && platforms.length === 0) {
-    let pKey = 'bleu_medium'; let pW = 260;
-    if (tutoSubState === 3) { pKey = 'bleu_long'; pW = 360; }
-    platforms.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 130, w: pW, h: 65, key: pKey, wasOnPlat: false, descendedFromPlat: false, touchedPlatform: false });
+    platforms.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 130, w: 260, h: 65, key: 'bleu_medium', wasOnPlat: false, descendedFromPlat: false, touchedPlatform: false });
   }
 }
 
@@ -459,6 +453,8 @@ function update() {
     score += 50; 
     lastScoreTime = now; 
   }
+
+  if (cat.damageFlashTimer > 0) cat.damageFlashTimer--;
 
   updatePlatformStream();
   updateTutorialScript();
@@ -510,15 +506,29 @@ function update() {
 
   obstacles.forEach(o => {
     o.x -= currentGameSpeed;
-    o.animTimer++; if (o.animTimer % 10 === 0) o.frame = (o.frame + 1) % 3;
+    o.animTimer++; 
+    if (o.animTimer % 10 === 0) o.frame = (o.frame + 1) % 3;
+    
+    // Oscillation haut en bas pour l'obstacle 6 (air)
+    if (o.configIdx === 7 && o.baseY !== undefined) {
+      o.y = o.baseY + Math.sin(o.animTimer * 0.1) * 20;
+    }
+
     let obsBoxX = o.x + 10; let obsBoxWidth = Math.max(10, o.w - 20); 
     let obsBoxY = o.y + 10; let obsBoxHeight = Math.max(10, o.h - 20);
 
     const isHit = (catBoxX < obsBoxX + obsBoxWidth && catBoxX + catBoxWidth > obsBoxX && catBoxY < obsBoxY + obsBoxHeight && catBoxY + catBoxHeight > obsBoxY);
-    if (isHit) {
+    if (isHit && cat.damageFlashTimer === 0) {
       playSoundEffect(sounds.damage);
+      cat.damageFlashTimer = 30; // Animation de clignotement dégâts
+      
       if (tutoStep === 5) {
-        obstacles = []; platforms = []; tutoObstacleCount = 0; tutoTimer = 0; return;
+        // En cas de choc à l'étape 5 : réinitialisation de la série de 4 obstacles
+        tutoObstacleCount = 0;
+        obstacles = [];
+        platforms = [];
+        tutoTimer = 0;
+        return;
       } else if (tutoStep === 6) {
         completedWordsCount = 1; 
         return;
@@ -573,24 +583,33 @@ function draw() {
   obstacles.forEach(o => {
     const conf = assets.obstaclesConfig[o.configIdx]; let imgToDraw = (conf.type === 'anim') ? conf.frames[o.frame] : conf.img;
     const ox = Math.round(o.x), oy = Math.round(o.y), ow = Math.round(o.w), oh = Math.round(o.h);
+    
+    // Ombre au sol spécifique pour l'obstacle aérien (obstacle6)
+    if (o.configIdx === 7) {
+      drawShadow(ox + ow / 2, ENTITY_GROUND_Y, ow * 0.35, 5, 0.3);
+    }
+
     if (imgToDraw && imgToDraw.complete && imgToDraw.naturalWidth > 0) {
       ctx.drawImage(imgToDraw, ox, oy, ow, oh);
     } else { ctx.fillStyle = '#ff9800'; ctx.fillRect(ox, oy, ow, oh); }
   });
 
-  let catSprite;
-  if (!cat.isGrounded) catSprite = assets.cat.jump[Math.min(1, cat.animFrame % 3)];
-  else if (cat.isCrouching) catSprite = assets.cat.crouchSequence[cat.crouchFrame % 3];
-  else catSprite = assets.cat.runSequence[cat.animFrame % 4];
+  // Clignotement en cas de dégâts
+  if (cat.damageFlashTimer === 0 || Math.floor(cat.damageFlashTimer / 4) % 2 === 0) {
+    let catSprite;
+    if (!cat.isGrounded) catSprite = assets.cat.jump[Math.min(1, cat.animFrame % 3)];
+    else if (cat.isCrouching) catSprite = assets.cat.crouchSequence[cat.crouchFrame % 3];
+    else catSprite = assets.cat.runSequence[cat.animFrame % 4];
 
-  let drawWidth = cat.width, drawHeight = cat.height, drawX = cat.x, drawY = cat.y;
-  if (catSprite && catSprite.complete && catSprite.naturalWidth > 0) {
-    const spriteRatio = catSprite.naturalWidth / catSprite.naturalHeight;
-    if (cat.isCrouching) {
-      drawWidth = cat.width * 1.3 * 0.85; drawHeight = drawWidth / spriteRatio; drawY = cat.y + (cat.height - drawHeight);
-    }
-    ctx.drawImage(catSprite, Math.round(drawX), Math.round(drawY), Math.round(drawWidth), Math.round(drawHeight));
-  } else { ctx.fillStyle = '#ab47bc'; ctx.fillRect(Math.round(cat.x), Math.round(cat.y), Math.round(cat.width), Math.round(cat.height)); }
+    let drawWidth = cat.width, drawHeight = cat.height, drawX = cat.x, drawY = cat.y;
+    if (catSprite && catSprite.complete && catSprite.naturalWidth > 0) {
+      const spriteRatio = catSprite.naturalWidth / catSprite.naturalHeight;
+      if (cat.isCrouching) {
+        drawWidth = cat.width * 1.3 * 0.85; drawHeight = drawWidth / spriteRatio; drawY = cat.y + (cat.height - drawHeight);
+      }
+      ctx.drawImage(catSprite, Math.round(drawX), Math.round(drawY), Math.round(drawWidth), Math.round(drawHeight));
+    } else { ctx.fillStyle = '#ab47bc'; ctx.fillRect(Math.round(cat.x), Math.round(cat.y), Math.round(cat.width), Math.round(cat.height)); }
+  }
 
   ctx.save(); ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
   items.forEach(it => {
