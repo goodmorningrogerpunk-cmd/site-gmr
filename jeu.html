@@ -619,7 +619,6 @@
     <button id="close-about-btn" class="pixel-btn modal-close-btn">FERMER</button>
   </div>
 
-  <!-- MODALE CODE KONAMI -->
   <div id="konami-modal" class="game-modal">
     <h2>SECRET DÉBLOQUÉ !</h2>
     <div class="modal-content-scroll">
@@ -706,7 +705,6 @@ let gameOverSelectedIdx = 0;
 const formNavElements = [inputPseudo, inputEmail, cancelSaveBtn, saveBtn];
 let formNavIdx = 0;
 
-// GESTION CODE KONAMI
 const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 let konamiIndex = 0;
 
@@ -1064,7 +1062,7 @@ function transitionSuperSayanToNormal() {
   }
 }
 
-const ASSET_VERSION = 'v21'; 
+const ASSET_VERSION = 'v22'; 
 
 function loadSmartImage(baseName) {
   const img = new Image();
@@ -1083,6 +1081,7 @@ function loadSmartImage(baseName) {
 
 const assets = {
   bg: loadSmartImage('background4'),
+  cadre: loadSmartImage('cadre'),
   cat: {
     runSequence: [
       loadSmartImage('chat_push2'),
@@ -1176,7 +1175,9 @@ let bonusEffectTimer = 0;
 
 const rogerLetters = ['R', 'O', 'G', 'E', 'R'];
 let rogerCollected = [false, false, false, false, false];
-let completedWordsCount = 0;
+
+let completedWordsCount = 2; // Accorde 2 cadres / vies au lancement
+let actualGoldenLettersCount = 0; // Compteur de vraies lettres dorées débloquées
 
 let nextSpawnLetterIndex = 0;
 let lastLetterX = -1000;
@@ -1675,7 +1676,7 @@ function updateRulesText() {
       <li>🎮 <b>Tap droite</b> : Sauter (Appui court ou long pour ajuster le niveau du saut)</li>
       <li>🎮 <b>Tap gauche</b> : Se baisser</li>
       <li><img src="R1.png" alt="R" class="rule-icon"> <b>Lettres ROGER</b> : Collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
-      <li>❤️ <b>Système de vies</b> : Chaque GROSSE lettre te protège contre un choc. Si tu obtiens 5 GROSSES lettres R O G E R, alors Roger se transforme en Super-Chat pour un max de scoring !</li>
+      <li>❤️ <b>Système de vies</b> : Chaque GROSSE lettre te protège contre un choc. Tu démarrer la partie avec 2 VIES GRATUITES représentées sous forme de cadres ! Si tu obtiens 5 GROSSES lettres R O G E R, alors Roger se transforme en Super-Chat pour un max de scoring !</li>
       <li><img src="${punkBonusSrc}" alt="Bonus Punk" class="rule-icon-large"><b>Bonus Punk</b> : Attrape cet item et devient invincible pendant 15 secondes. Tu peux dégommer tous les obstacles sur ton passage.</li>
       <li>⏸️ <b>Bouton P</b> : Mettre le jeu en pause / Reprendre le jeu</li>
       <li>🏠 <b>Bouton R</b> : Revenir à l'écran d'accueil</li>
@@ -1685,7 +1686,7 @@ function updateRulesText() {
       <li>🎮 <b>Espace</b> : Sauter (Appui court ou long pour ajuster le niveau du saut)</li>
       <li>🎮 <b>Flèche du bas</b> : Se baisser</li>
       <li><img src="R1.png" alt="R" class="rule-icon"> <b>Lettres ROGER</b> : Collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
-      <li>❤️ <b>Système de vies</b> : Chaque GROSSE lettre te protège contre un choc. Si tu obtiens 5 GROSSES lettres R O G E R, alors Roger se transforme en Super-Chat pour un max de scoring !</li>
+      <li>❤️ <b>Système de vies</b> : Chaque GROSSE lettre te protège contre un choc. Tu démarrer la partie avec 2 VIES GRATUITES représentées sous forme de cadres ! Si tu obtiens 5 GROSSES lettres R O G E R, alors Roger se transforme en Super-Chat pour un max de scoring !</li>
       <li><img src="${punkBonusSrc}" alt="Bonus Punk" class="rule-icon-large"><b>Bonus Punk</b> : Attrape cet item et devient invincible pendant 15 secondes. Tu peux dégommer tous les obstacles sur ton passage.</li>
       <li>⏸️ <b>Entrée</b> : Mettre le jeu en pause / Reprendre le jeu</li>
       <li>🏠 <b>Echap</b> : Revenir à l'écran d'accueil</li>
@@ -1962,7 +1963,11 @@ function resetGame() {
   lastLetterHeightLevel = -1;
   heightLevelRepeatCount = 0;
   obstacleCounter = 0;
-  completedWordsCount = 0;
+  
+  // 2 cadres / vies gratuites au départ
+  completedWordsCount = 2;
+  actualGoldenLettersCount = 0;
+
   nextSpawnLetterIndex = 0;
   invulnerableTimer = 0;
   fallingLetters = [];
@@ -2026,6 +2031,7 @@ function update() {
       if (sequenceCurrentLetterIndex >= 5) {
         freezeForSequence = false;
         completedWordsCount = 0; 
+        actualGoldenLettersCount = 0;
         score += 10000;
         triggerSuperSayen();
       }
@@ -2424,9 +2430,15 @@ function update() {
           
           const masterHudX = 20;
           const masterHudY = canvas.height - 115;
-          const lostChar = rogerLetters[completedWordsCount];
-          const lostX = masterHudX + (completedWordsCount * 95);
-          triggerLetterFall(lostChar, lostX, masterHudY);
+          
+          // Si on perd une VRAIE lettre dorée débloquée, on la fait tomber
+          if (completedWordsCount < actualGoldenLettersCount) {
+            actualGoldenLettersCount = completedWordsCount;
+            const lostChar = rogerLetters[completedWordsCount];
+            const lostX = masterHudX + (completedWordsCount * 95);
+            triggerLetterFall(lostChar, lostX, masterHudY);
+          }
+          // Sinon (si ce n'était qu'un cadre bonus de départ), le cadre disparaît simplement sans animation de chute de lettre
         } else {
           gameOver = true;
           cat.state = 'FAIL';
@@ -2495,9 +2507,14 @@ function update() {
         bonusEffectTimer = 90;
         rogerCollected = [false, false, false, false, false];
         
-        if (completedWordsCount < 5) {
-          completedWordsCount++;
-          if (completedWordsCount === 5) {
+        if (actualGoldenLettersCount < 5) {
+          actualGoldenLettersCount++;
+          // Si le joueur a encore des cadres non consommés, la vraie lettre remplace le cadre sans cumuler une vie en plus
+          if (completedWordsCount < actualGoldenLettersCount) {
+            completedWordsCount = actualGoldenLettersCount;
+          }
+          
+          if (actualGoldenLettersCount === 5) {
             freezeForSequence = true;
             sequenceCurrentLetterIndex = 0;
             sequenceAngle = 0;
@@ -2917,7 +2934,6 @@ function draw() {
     const isWordCompleted = idx < completedWordsCount;
 
     if (isWordCompleted) {
-      const hudImg = assets.letters[char] ? assets.letters[char][0] : null;
       const bounceOffset = Math.sin(bounceTimer + idx * 0.6) * 12;
       const currentY = Math.round(masterHudY + bounceOffset);
 
@@ -2929,6 +2945,10 @@ function draw() {
         ctx.scale(Math.cos(sequenceAngle), 1);
         ctx.translate(-(slotX + letterWidth / 2), -(currentY + letterHeight / 2));
       }
+
+      // Si cet emplacement est débloqué via une vraie lettre dorée :
+      const isActualGolden = idx < actualGoldenLettersCount;
+      const hudImg = isActualGolden ? (assets.letters[char] ? assets.letters[char][0] : null) : assets.cadre;
 
       if (hudImg && hudImg.complete && hudImg.naturalWidth > 0) {
         ctx.drawImage(hudImg, slotX, currentY, 90, 105);
