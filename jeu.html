@@ -5,384 +5,59 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Skate Cat - Roger Bonus Game</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
-    }
-    html, body {
-      width: 100%;
-      height: 100%;
-      background-color: #000000;
-      font-family: 'Courier New', Courier, monospace;
-      color: #ffffff;
-      overflow: hidden;
-      touch-action: none !important;
-    }
-    body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    html, body { width: 100%; height: 100%; background-color: #000; font-family: 'Courier New', Courier, monospace; color: #fff; overflow: hidden; touch-action: none !important; }
+    body { display: flex; flex-direction: column; align-items: center; justify-content: center; }
     
     #game-container {
-      position: relative;
-      width: 100%;
-      max-width: 960px;
-      height: 100%;
-      max-height: 540px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-      border-radius: 12px;
-      overflow: hidden;
-      border: 4px solid #2e2e40;
-      background: #000;
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
+      position: relative; width: 100%; max-width: 960px; height: 100%; max-height: 540px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.7); border-radius: 12px; overflow: hidden; border: 4px solid #2e2e40; background: #000;
     }
+    #game-container.desktop-fullscreen { width: 100vw !important; height: 100vh !important; max-width: 100vw !important; max-height: 100vh !important; border-radius: 0 !important; border: none !important; }
+    #game-container.mobile-fullscreen { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; max-width: 100vw !important; max-height: 100vh !important; border-radius: 0 !important; border: none !important; z-index: 999999 !important; }
 
-    #game-container.desktop-fullscreen {
-      width: 100vw !important;
-      height: 100vh !important;
-      max-width: 100vw !important;
-      max-height: 100vh !important;
-      border-radius: 0 !important;
-      border: none !important;
-    }
+    canvas { width: 100%; height: 100%; object-fit: contain; display: block; image-rendering: pixelated; }
 
-    #game-container.mobile-fullscreen {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      max-width: 100vw !important;
-      max-height: 100vh !important;
-      border-radius: 0 !important;
-      border: none !important;
-      z-index: 999999 !important;
-    }
+    .pixel-btn { font-family: 'Courier New', Courier, monospace; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.1s ease; z-index: 25; }
+    .pixel-btn.nav-selected, input.nav-selected { background-color: #ffffff !important; border-color: #ff3333 !important; color: #1a1a24 !important; transform: scale(1.04); box-shadow: 0 0 15px #ffd54f !important; }
 
-    canvas {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-      image-rendering: -webkit-optimize-contrast;
-      image-rendering: crisp-edges;
-      image-rendering: pixelated;
-      will-change: transform;
-      -webkit-transform: translate3d(0, 0, 0);
-      transform: translate3d(0, 0, 0);
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      touch-action: none !important;
-    }
+    #desktop-fullscreen-btn { position: absolute; top: 15px; left: 15px; padding: 8px 14px; font-size: 12px; color: #ffd54f; background-color: rgba(26, 26, 36, 0.85); border: 2px solid #ffd54f; box-shadow: 0 4px 0px #000; z-index: 30; display: none; }
 
-    .pixel-btn {
-      font-family: 'Courier New', Courier, monospace;
-      font-weight: bold;
-      border-radius: 6px;
-      cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      transition: all 0.1s ease;
-      z-index: 25;
-      image-rendering: pixelated;
-    }
+    /* BOUTONS D'ACCUEIL */
+    #tuto-main-btn { position: absolute; top: 62%; left: 5%; transform: translateY(-50%); padding: 12px 24px; font-size: 18px; color: #ffffff; background-color: #2e2e40; border: 3px solid #ffd54f; box-shadow: 0 4px 0px #000; }
+    #start-main-btn { position: absolute; top: 78%; left: 5%; transform: translateY(-50%); padding: 16px 28px; font-size: 20px; color: #1a1a24; background-color: #ffd54f; border: 4px solid #ffffff; box-shadow: 0 6px 0px #b29320; }
 
-    .pixel-btn.nav-selected, input.nav-selected {
-      background-color: #ffffff !important;
-      border-color: #ff3333 !important;
-      color: #1a1a24 !important;
-      transform: scale(1.04);
-      box-shadow: 0 0 15px #ffd54f !important;
-    }
+    .right-buttons-stack { position: absolute; top: 60%; right: 5%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 25; }
+    .secondary-btn { padding: 8px 16px; font-size: 13px; color: #ffd54f; background-color: #1a1a24; border: 3px solid #ffd54f; box-shadow: 0 4px 0px #000; text-align: center; }
+    .quit-btn { color: #ff5252; border-color: #ff5252; }
 
-    #desktop-fullscreen-btn {
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      padding: 8px 14px;
-      font-size: 12px;
-      color: #ffd54f;
-      background-color: rgba(26, 26, 36, 0.85);
-      border: 2px solid #ffd54f;
-      box-shadow: 0 4px 0px #000;
-      z-index: 30;
-      display: none;
-    }
+    .game-over-actions { display: none; position: absolute; top: 80%; left: 50%; transform: translate(-50%, -50%); flex-direction: row; gap: 16px; z-index: 20; }
+    #restart-btn, #home-gameover-btn { padding: 14px 28px; font-size: 18px; color: #1a1a24; background-color: #ffd54f; border: 4px solid #ffffff; box-shadow: 0 6px 0px #b29320; }
+    #home-gameover-btn { background-color: #2e2e40; color: #ffffff; border-color: #ffd54f; box-shadow: 0 6px 0px #000000; }
 
-    #desktop-fullscreen-btn:hover {
-      background-color: #ffd54f;
-      color: #1a1a24;
-    }
+    .game-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 680px; max-height: 85vh; background: #111118; border: 4px solid #ffd54f; border-radius: 8px; padding: 16px; z-index: 50000; color: #fff; flex-direction: column; }
+    .modal-content-scroll { flex: 1; overflow-y: auto; padding-right: 6px; margin-bottom: 12px; }
+    .modal-close-btn { display: block; margin: 0 auto; padding: 10px 24px; background: #ffd54f; color: #1a1a24; border: 3px solid #ffffff; font-size: 15px; font-weight: bold; cursor: pointer; }
 
-    #tuto-main-btn {
-      position: absolute;
-      top: 64%; 
-      left: 5%;
-      transform: translateY(-50%);
-      padding: 12px 24px;
-      font-size: 18px;
-      color: #ffffff;
-      background-color: #2e2e40;
-      border: 3px solid #ffd54f;
-      box-shadow: 0 4px 0px #000, 0 8px 16px rgba(0,0,0,0.8);
-    }
-
-    #start-main-btn {
-      position: absolute;
-      top: 78%; 
-      left: 5%;
-      transform: translateY(-50%);
-      padding: 16px 28px;
-      font-size: 20px;
-      color: #1a1a24;
-      background-color: #ffd54f;
-      border: 4px solid #ffffff;
-      box-shadow: 0 6px 0px #b29320, 0 10px 20px rgba(0,0,0,0.8);
-    }
-
-    .right-buttons-stack {
-      position: absolute;
-      top: 60%;
-      right: 5%;
-      transform: translateY(-50%);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      z-index: 25;
-    }
-
-    .secondary-btn {
-      padding: 8px 16px;
-      font-size: 13px;
-      color: #ffd54f;
-      background-color: #1a1a24;
-      border: 3px solid #ffd54f;
-      box-shadow: 0 4px 0px #000, 0 6px 12px rgba(0,0,0,0.7);
-      text-align: center;
-    }
-
-    .quit-btn {
-      color: #ff5252;
-      border-color: #ff5252;
-    }
-
-    .game-over-actions {
-      display: none;
-      position: absolute;
-      top: 80%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      flex-direction: row;
-      gap: 16px;
-      z-index: 20;
-    }
-
-    #restart-btn, #home-gameover-btn {
-      padding: 14px 28px;
-      font-size: 18px;
-      color: #1a1a24;
-      background-color: #ffd54f;
-      border: 4px solid #ffffff;
-      box-shadow: 0 6px 0px #b29320, 0 10px 20px rgba(0,0,0,0.6);
-    }
-
-    #home-gameover-btn {
-      background-color: #2e2e40;
-      color: #ffffff;
-      border-color: #ffd54f;
-      box-shadow: 0 6px 0px #000000, 0 10px 20px rgba(0,0,0,0.6);
-    }
-
-    .game-modal {
-      display: none;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 90%;
-      max-width: 680px;
-      max-height: 85vh;
-      background: #111118;
-      border: 4px solid #ffd54f;
-      border-radius: 8px;
-      padding: 16px;
-      z-index: 50000;
-      box-shadow: 0 0 30px rgba(0,0,0,0.9);
-      color: #fff;
-      flex-direction: column;
-    }
-
-    .modal-content-scroll {
-      flex: 1;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-y !important;
-      padding-right: 6px;
-      margin-bottom: 12px;
-    }
-
-    .game-modal h2 {
-      color: #ffd54f;
-      text-align: center;
-      margin-bottom: 12px;
-      font-size: 20px;
-      flex-shrink: 0;
-    }
-
-    .modal-close-btn {
-      display: block;
-      margin: 0 auto;
-      padding: 10px 24px;
-      background: #ffd54f;
-      color: #1a1a24;
-      border: 3px solid #ffffff;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 4px 0px #b29320;
-      flex-shrink: 0;
-    }
-
+    /* POPUP DU TUTORIEL SCRIPTÉ */
     #tuto-dialog-box {
-      display: none;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 88%;
-      max-width: 520px;
-      background: #111118;
-      border: 4px solid #ffd54f;
-      border-radius: 8px;
-      padding: 20px;
-      z-index: 65000;
-      text-align: center;
-      box-shadow: 0 0 40px rgba(0,0,0,0.95);
+      display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 85%; max-width: 520px; background: #111118; border: 4px solid #ffd54f; border-radius: 8px;
+      padding: 18px; z-index: 65000; text-align: center; box-shadow: 0 0 30px rgba(0,0,0,0.9);
     }
-    #tuto-dialog-text {
-      font-size: 15px;
-      line-height: 1.5;
-      color: #ffffff;
-      margin-bottom: 18px;
-    }
-    #tuto-next-btn {
-      padding: 10px 28px;
-      font-size: 16px;
-      color: #1a1a24;
-      background-color: #ffd54f;
-      border: 3px solid #ffffff;
-      cursor: pointer;
-      font-weight: bold;
-      box-shadow: 0 4px 0px #b29320;
-    }
+    #tuto-dialog-text { font-size: 15px; line-height: 1.5; color: #ffffff; margin-bottom: 16px; }
+    #tuto-next-btn { padding: 8px 24px; font-size: 16px; color: #1a1a24; background-color: #ffd54f; border: 3px solid #ffffff; cursor: pointer; font-weight: bold; }
 
-    #score-prompt-box {
-      display: none;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 90%;
-      max-width: 520px;
-      background: #111118;
-      border: 4px solid #ffd54f;
-      border-radius: 8px;
-      padding: 20px;
-      z-index: 60000;
-      text-align: center;
-    }
+    #score-prompt-box, #save-score-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111118; border: 4px solid #ffd54f; border-radius: 8px; padding: 20px; z-index: 60000; text-align: center; }
+    #mobile-hud-controls { display: none; position: absolute; top: 15px; right: 15px; gap: 8px; z-index: 40; }
+    .hud-touch-btn { width: 42px; height: 42px; background: rgba(0, 0, 0, 0.7); border: 2px solid #ffd54f; color: #ffd54f; font-weight: bold; font-size: 18px; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
 
-    #save-score-modal {
-      display: none;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 92%;
-      max-width: 500px;
-      max-height: 85vh;
-      overflow-y: auto !important;
-      -webkit-overflow-scrolling: touch !important;
-      touch-action: pan-y !important;
-      background: #111118;
-      border: 4px solid #ffd54f;
-      border-radius: 8px;
-      padding: 12px;
-      z-index: 60000;
-      text-align: center;
-    }
-
-    #mobile-hud-controls {
-      display: none;
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      gap: 8px;
-      z-index: 40;
-    }
-    .hud-touch-btn {
-      width: 42px;
-      height: 42px;
-      background: rgba(0, 0, 0, 0.7);
-      border: 2px solid #ffd54f;
-      color: #ffd54f;
-      font-weight: bold;
-      font-size: 18px;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-
-    #rotate-device-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: #111118;
-      z-index: 999999;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 20px;
-    }
-    #rotate-device-overlay .rotate-icon {
-      font-size: 60px;
-      margin-bottom: 20px;
-      animation: rotateAnim 2s infinite ease-in-out;
-    }
-    #rotate-device-overlay p {
-      color: #ffd54f;
-      font-size: 20px;
-      font-weight: bold;
-      line-height: 1.4;
-    }
-
-    @keyframes rotateAnim {
-      0%, 10% { transform: rotate(0deg); }
-      50%, 60% { transform: rotate(-90deg); }
-      100% { transform: rotate(0deg); }
-    }
-
-    @media screen and (orientation: portrait) and (max-width: 900px) {
-      #rotate-device-overlay {
-        display: flex;
-      }
-    }
+    #rotate-device-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #111118; z-index: 999999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+    #rotate-device-overlay .rotate-icon { font-size: 60px; margin-bottom: 20px; animation: rotateAnim 2s infinite ease-in-out; }
+    #rotate-device-overlay p { color: #ffd54f; font-size: 20px; font-weight: bold; line-height: 1.4; }
+    @keyframes rotateAnim { 0%, 10% { transform: rotate(0deg); } 50%, 60% { transform: rotate(-90deg); } 100% { transform: rotate(0deg); } }
+    @media screen and (orientation: portrait) and (max-width: 900px) { #rotate-device-overlay { display: flex; } }
   </style>
 </head>
 <body>
@@ -432,7 +107,7 @@
     </div>
   </div>
 
-  <div id="save-score-modal">
+  <div id="save-score-modal" style="width: 92%; max-width: 500px;">
     <h2 id="score-modal-title" style="color:#ffd54f; margin-bottom:8px; font-size:16px;">ENREGISTRER TON SCORE</h2>
     <div id="gift-notice" style="background: rgba(255, 213, 79, 0.15); border: 1px dashed #ffd54f; border-radius: 4px; padding: 6px; margin-bottom: 8px;">
       <p style="font-size: 11px; color: #ffffff; font-weight: bold; margin: 0;">🎁 Pense à ajouter ton adresse mail pour que Roger te contacte s'il a envie de te donner des cadeaux !</p>
@@ -454,7 +129,7 @@
   </div>
   
   <div id="rules-modal" class="game-modal">
-    <h2>RÈGLES ET CONTRÔLES</h2>
+    <h2 style="color:#ffd54f; text-align:center; margin-bottom:12px;">RÈGLES ET CONTRÔLES</h2>
     <div class="modal-content-scroll">
       <ul id="rules-list" style="list-style:none; font-size:13px; line-height:1.4;"></ul>
     </div>
@@ -462,7 +137,7 @@
   </div>
 
   <div id="leaderboard-modal" class="game-modal">
-    <h2>TOP 10 SCORES</h2>
+    <h2 style="color:#ffd54f; text-align:center; margin-bottom:12px;">TOP 10 SCORES</h2>
     <div class="modal-content-scroll">
       <table style="width:100%; border-collapse:collapse; margin-top:10px;">
         <thead>
@@ -481,7 +156,7 @@
   </div>
 
   <div id="about-modal" class="game-modal">
-    <h2>EN SAVOIR PLUS</h2>
+    <h2 style="color:#ffd54f; text-align:center; margin-bottom:12px;">EN SAVOIR PLUS</h2>
     <div class="modal-content-scroll" style="font-size: 14px; line-height: 1.5; color: #e0e0e0;">
       <p style="margin-bottom: 12px; font-weight: bold; color: #ffd54f;">Bienvenue dans Good Morning Roger Sk8in’ Cat !</p>
       <p style="margin-bottom: 12px;">Ce jeu accompagne la sortie de notre CD “Club Roger 2”. Fais le meilleur score et tente de gagner des cadeaux !</p>
@@ -579,6 +254,7 @@ let formNavIdx = 0;
 const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 let konamiIndex = 0;
 
+// VARIABLES MOTEUR TUTORIEL DÉDIÉ
 let isTutoMode = false;
 let tutoStep = 0;
 let tutoTimer = 0;
@@ -823,17 +499,16 @@ function startTutorial() {
   tutoInstructionMessage = "";
   tutoHighlightedZone = null;
   completedWordsCount = 2;
-  platforms = [];
-  obstacles = [];
-  items = [];
+  platforms = []; obstacles = []; items = [];
 }
 
-function updateTutorialEngine() {
+// LOGIQUE EXCLUSIVE ET SCRIPTÉE DU TUTORIEL
+function updateTutorialScript() {
   if (!isTutoMode || tutoHighlightedZone) return;
 
   tutoTimer++;
 
-  // Step 1: Score Explanation
+  // ÉTAPE 1 : SCORE
   if (tutoStep === 1) {
     if (tutoTimer > 60) {
       showTutoDialog(
@@ -843,11 +518,11 @@ function updateTutorialEngine() {
       );
     }
   }
-  // Step 2: Controls Explanation
+  // ÉTAPE 2 : CONTRÔLES
   else if (tutoStep === 2) {
     if (tutoTimer > 60) {
       const controlsText = isMobileDevice ?
-        "En appuyant à DROITE DE L'ÉCRAN, Roger fait un saut. Appui court = petit saut, appui long = grand saut.<br><br>En appuyant à GAUCHE, Roger se baisse.<br><br>Utilise les boutons P et R en haut à droite pour mettre en pause ou revenir au menu." :
+        "En appuyant sur le <b>CÔTÉ DROIT DE L'ÉCRAN</b>, Roger fait un saut avec son skate. Si tu fais un appui court, il fait un petit saut. Si tu fais un appui long il fait un plus grand saut.<br><br>En appuyant sur le <b>CÔTÉ GAUCHE DE L'ÉCRAN</b>, Roger se baisse.<br><br>Pour mettre le jeu en pause, appuie sur <b>P</b> et pour revenir à l'écran principal appuie sur <b>R</b>." :
         "En appuyant sur \"ESPACE\", Roger fait un saut avec son skate. Si tu fais un appui court, il fait un petit saut. Si tu fais un appui long il fait un plus grand saut.<br><br>En appuyant sur la \"FLÈCHE DU BAS\", Roger se baisse.<br><br>Pour mettre le jeu en pause, appuie sur \"ENTRÉE\" et pour revenir à l'écran principal appuie sur \"ÉCHAP\".";
 
       const isMobile = isMobileDevice;
@@ -861,7 +536,7 @@ function updateTutorialEngine() {
       );
     }
   }
-  // Step 3: Input Verification (Long jump, crouch, short jump)
+  // ÉTAPE 3 : VALDATION MOUSSE/SAUTS
   else if (tutoStep === 3) {
     if (tutoSubState === 1) {
       tutoInstructionMessage = "Vas-y essaie de sauter loin";
@@ -876,7 +551,7 @@ function updateTutorialEngine() {
       }
     }
   }
-  // Step 4: Platform Exercise
+  // ÉTAPE 4 : PLATEFORME SCRIPTÉE
   else if (tutoStep === 4) {
     if (platforms.length === 0 && tutoSubState === 0) {
       platforms.push({ x: canvas.width + 100, y: ENTITY_GROUND_Y - 110, w: 260, h: 65, key: 'bleu_medium' });
@@ -913,7 +588,7 @@ function updateTutorialEngine() {
       }
     }
   }
-  // Step 5: Obstacle Series (4 in a row)
+  // ÉTAPE 5 : SÉRIE DES 4 OBSTACLES (COMPTEUR 1/4 À 4/4)
   else if (tutoStep === 5) {
     if (tutoSubState === 0) {
       if (obstacles.length === 0) {
@@ -965,7 +640,7 @@ function updateTutorialEngine() {
       }
     }
   }
-  // Step 6: Forced Crash (Lose O)
+  // ÉTAPE 6 : CHOC FORCÉ & PERTE DU O
   else if (tutoStep === 6) {
     if (tutoSubState === 0) {
       showTutoDialog(
@@ -984,7 +659,7 @@ function updateTutorialEngine() {
       }
     }
   }
-  // Step 7: Letter Collection to Regain BIG Letter
+  // ÉTAPE 7 : COLLECTE DU MOT ROGER
   else if (tutoStep === 7) {
     if (tutoSubState === 0) {
       if (items.length === 0) {
@@ -1245,7 +920,7 @@ function updateRulesText() {
     rulesList.innerHTML = `
       <li>🎮 <b>Tap droite</b> : Sauter (Appui court ou long pour ajuster le niveau du saut)</li>
       <li>🎮 <b>Tap gauche</b> : Se baisser</li>
-      <li><img src="R1.png" alt="R" style="width:22px;"> <b>Lettres ROGER</b> : Collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
+      <li><img src="R1.png" alt="R" class="rule-icon" style="width:22px;"> <b>Lettres ROGER</b> : Collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
       <li>❤️ <b>Système de vies</b> : Tu débutes avec les GROSSES lettres R et O ! Chaque GROSSE lettre te protège contre un choc. Si tu obtiens 5 GROSSES lettres R O G E R, alors Roger se transforme en Super-Chat pour un max de scoring !</li>
       <li><img src="${punkBonusSrc}" alt="Bonus Punk" style="width:22px;"> <b>Bonus Punk</b> : Attrape cet item et devient invincible pendant 15 secondes. Tu peux dégommer tous les obstacles sur ton passage.</li>
       <li>⏸️ <b>Bouton P</b> : Mettre le jeu en pause / Reprendre le jeu</li>
@@ -1382,8 +1057,9 @@ function resetGame() {
 function update() {
   if (!gameStarted || gameOver || isPaused) { stopRunSound(); return; }
 
+  // IF TUTORIAL ACTIVE -> EXECUTE DEDICATED SCRIPT ONLY
   if (isTutoMode) {
-    updateTutorialEngine();
+    updateTutorialScript();
     if (tutoHighlightedZone) { stopRunSound(); return; }
   }
 
@@ -1526,8 +1202,16 @@ function update() {
       } else if (!superSayen.active && invulnerableTimer <= 0) {
         playSoundEffect(sounds.damage);
 
-        if (isTutoMode && tutoStep === 5) {
-          obstacles = []; platforms = []; tutoObstacleCount = 0; tutoTimer = 0; invulnerableTimer = 60; return;
+        // GESTION COLLISION EXCLUSIVE POUR LE TUTORIEL (AUCUN GAME OVER POSSIBLE)
+        if (isTutoMode) {
+          if (tutoStep === 5) {
+            obstacles = []; platforms = []; tutoObstacleCount = 0; tutoTimer = 0; invulnerableTimer = 60; return;
+          } else if (tutoStep === 6) {
+            completedWordsCount = 1; invulnerableTimer = 90;
+            const masterHudX = 20; const masterHudY = canvas.height - 115;
+            triggerLetterFall('O', masterHudX + 95, masterHudY);
+            return;
+          }
         }
 
         if (completedWordsCount > 0) {
@@ -1558,7 +1242,7 @@ function update() {
       if (rogerCollected.every(val => val === true)) {
         score += 1000; bonusEffectTimer = 90; rogerCollected = [false, false, false, false, false];
         if (completedWordsCount < 5) {
-          completedWordsCount++; if (completedWordsCount === 5) { freezeForSequence = true; sequenceCurrentLetterIndex = 0; sequenceAngle = 0; }
+          completedWordsCount++; if (completedWordsCount === 5 && !isTutoMode) { freezeForSequence = true; sequenceCurrentLetterIndex = 0; sequenceAngle = 0; }
         }
       }
     }
@@ -1566,7 +1250,11 @@ function update() {
   items = items.filter(it => !it.collected && it.x + it.w > -100);
 
   if (bonusEffectTimer > 0) bonusEffectTimer--;
-  spawnWorldElements();
+  
+  if (!isTutoMode) {
+    spawnWorldElements();
+  }
+  
   cat.animTimer++; if (cat.animTimer % 14 === 0) cat.animFrame = (cat.animFrame + 1) % 4;
 }
 
