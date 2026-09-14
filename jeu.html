@@ -87,7 +87,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.0-MOBILE-TUTO</div>
+  <div id="version-display">v13.1-MOBILE-FIX</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -405,7 +405,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.0'; 
+const ASSET_VERSION = 'v13.1'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -643,7 +643,6 @@ function updateTutorialScript() {
         if (configIdx === 7) {
           obsY = ENTITY_GROUND_Y - dim.h - 70;
         } else if (configIdx === 3) {
-          // Obstacle 1 sur plateforme enfoncé de 10px supplémentaires pour effet 3D parfait
           obsY = ENTITY_GROUND_Y - 100 - dim.h + 30;
           platforms.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 100, w: 260, h: 65, key: 'bleu_medium' });
         } else if (configIdx === 4) {
@@ -717,7 +716,6 @@ function updateTutorialScript() {
         } else if (customLetterSpawnIndex === 1) {
           items.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 120, w: 65, h: 75, char: 'O', letterIdx: 1, frame: 0, animTimer: 0 });
           const conf = assets.obstaclesConfig[3]; const dim = getObstacleDimensions(conf);
-          // Obstacle 1 sur plateforme enfoncé de 30px pour effet 3D parfait
           obstacles.push({ x: canvas.width + 280, y: ENTITY_GROUND_Y - 100 - dim.h + 30, w: dim.w, h: dim.h, configIdx: 3, frame: 0, animTimer: 0 });
           platforms.push({ x: canvas.width + 230, y: ENTITY_GROUND_Y - 100, w: 260, h: 65, key: 'bleu_medium' });
           customLetterSpawnIndex = 2;
@@ -961,7 +959,7 @@ window.addEventListener('keyup', (e) => {
 });
 
 function handleTouchAction(e, isTouchStart) {
-  if (!gameStarted || rulesModal.style.display === 'flex' || leaderboardModal.style.display === 'flex' || aboutModal.style.display === 'flex' || scorePromptBox.style.display === 'block' || saveScoreModal.style.display === 'block' || konamiModal.style.display !== 'flex') return;
+  if (!gameStarted || rulesModal.style.display === 'flex' || leaderboardModal.style.display === 'flex' || aboutModal.style.display === 'flex' || scorePromptBox.style.display === 'block' || saveScoreModal.style.display === 'block') return;
   if (isPaused) { if (isTouchStart) togglePause(); return; }
   if (!isTouchStart) { keys['ArrowDown'] = false; keys['Space'] = false; keys['ArrowUp'] = false; cat.isJumping = false; jumpKeyReleased = true; return; }
 
@@ -1549,7 +1547,6 @@ function draw() {
     ctx.strokeText('+1 000 PTS !', popupX, popupY); ctx.fillText('+1 000 PTS !', popupX, popupY); ctx.restore();
   }
 
-  // BANDEAU CANVAS EN JEU : Taille de texte grossie et adaptée mobile/PC
   if (isTutoMode && tutoInstructionMessage && tutoDialogBox.style.display !== 'block') {
     ctx.save(); 
     ctx.fillStyle = 'rgba(0, 0, 0, 0.9)'; 
