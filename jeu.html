@@ -252,13 +252,16 @@
       height: 22px;
       object-fit: contain;
       image-rendering: pixelated;
+      flex-shrink: 0;
     }
     .rule-icon-large {
-      width: 42px;
-      height: 42px;
+      width: 22px;
+      height: 22px;
       object-fit: contain;
       image-rendering: pixelated;
-      margin-right: -4px;
+      transform: scale(1.6);
+      transform-origin: center;
+      flex-shrink: 0;
     }
 
     .modal-close-btn {
@@ -700,7 +703,7 @@ let gameOverSelectedIdx = 0;
 const formNavElements = [inputPseudo, inputEmail, cancelSaveBtn, saveBtn];
 let formNavIdx = 0;
 
-// GESTION CORRIGÉE DU CODE KONAMI
+// GESTION CODE KONAMI
 const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 let konamiIndex = 0;
 
@@ -1058,7 +1061,7 @@ function transitionSuperSayanToNormal() {
   }
 }
 
-const ASSET_VERSION = 'v20'; 
+const ASSET_VERSION = 'v21'; 
 
 function loadSmartImage(baseName) {
   const img = new Image();
@@ -1469,7 +1472,6 @@ window.addEventListener('keydown', (e) => {
 
   unlockAudio();
 
-  // DÉTECTION CODE KONAMI CORRIGÉE SUR L'ÉCRAN D'ACCUEIL
   if (!gameStarted && rulesModal.style.display !== 'flex' && leaderboardModal.style.display !== 'flex' && aboutModal.style.display !== 'flex') {
     const inputKey = e.key.length === 1 ? e.key.toLowerCase() : e.code;
     const targetKey = konamiCode[konamiIndex];
@@ -2010,7 +2012,6 @@ function update() {
     return;
   }
 
-  // GEL TOTAL DU MONDE DE JEU SI SEQUENCE DES 5 GROSSES LETTRES ACTIVÉE
   if (freezeForSequence) {
     stopRunSound();
     sequenceAngle += 0.12; 
@@ -2847,7 +2848,6 @@ function draw() {
   });
   ctx.restore();
 
-  // APPLICATION DU FILTRE JAUNE QUAND LES 5 GROSSES LETTRES TOURNENT
   if (freezeForSequence) {
     ctx.save();
     ctx.fillStyle = 'rgba(255, 213, 79, 0.35)';
