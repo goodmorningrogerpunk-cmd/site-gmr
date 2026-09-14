@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Skate Cat - Tutoriel Officiel</title>
+  <title>Skate Cat - Tutoriel Officiel Validé</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
     html, body { width: 100%; height: 100%; background-color: #000; font-family: 'Courier New', Courier, monospace; color: #fff; overflow: hidden; touch-action: none !important; }
@@ -32,7 +32,7 @@
     }
 
     #tuto-dialog-box {
-      display: none; position: absolute; width: 360px; background: #111118; border: 4px solid #ffd54f; border-radius: 8px;
+      display: none; position: absolute; width: 380px; background: #111118; border: 4px solid #ffd54f; border-radius: 8px;
       padding: 18px; z-index: 65000; text-align: center; box-shadow: 0 0 30px rgba(0,0,0,0.9);
     }
     #tuto-dialog-text { font-size: 14px; line-height: 1.5; color: #ffffff; margin-bottom: 16px; text-align: left; }
@@ -44,7 +44,7 @@
 <div id="game-container">
   <canvas id="gameCanvas" width="960" height="540"></canvas>
   <button id="tuto-main-btn" class="pixel-btn">LANCER LE TUTORIEL</button>
-  <div id="version-display">v7.2-EXACT</div>
+  <div id="version-display">v7.3-STRICT</div>
 
   <div id="tuto-dialog-box">
     <p id="tuto-dialog-text"></p>
@@ -87,7 +87,7 @@ function playRunSound() {
 function stopRunSound() { if (!sounds.run.paused) { sounds.run.pause(); if (sounds.run.readyState >= 2) sounds.run.currentTime = 0; } }
 function playSoundEffect(sound) { if (audioUnlocked) { try { if (sound.readyState >= 2) sound.currentTime = 0; sound.play().catch(() => {}); } catch(e) {} } }
 
-const ASSET_VERSION = 'v7.2';
+const ASSET_VERSION = 'v7.3';
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -141,7 +141,7 @@ let currentGameSpeed = BASE_GAME_SPEED;
 const GROUND_Y = 430; const ENTITY_GROUND_Y = 418; const GRAVITY = 0.8;
 const JUMP_FORCE = -12; const JUMP_HOLD_FORCE = -0.55; const MAX_JUMP_TIME = 15;
 
-let bgX = 0; let score = 0; let gameStarted = false;
+let bgX = 0; let score = 0; let gameStarted = false; let lastScoreTime = Date.now();
 const rogerLetters = ['R', 'O', 'G', 'E', 'R'];
 let rogerCollected = [false, false, false, false, false];
 let completedWordsCount = 2; 
@@ -157,7 +157,6 @@ let tutoHighlightedZone = null;
 let tutoInstructionMessage = "";
 let tutoSubState = 0;
 let tutoObstacleCount = 0;
-let tutoPlatActionState = 0;
 let tutoNextCallback = null;
 
 function showTutoDialogSide(text, highlightRect, onNext) {
@@ -186,7 +185,6 @@ tutoNextBtn.addEventListener('click', () => {
   }
 });
 
-// ÉCOUTEURS CLAVIER ET TACTILE
 window.addEventListener('keydown', (e) => {
   if (['Space', 'ArrowUp', 'ArrowDown'].includes(e.code)) e.preventDefault();
   unlockAudio();
@@ -235,7 +233,6 @@ function startTutorial() {
   tutoTimer = 0;
   tutoSubState = 0;
   tutoObstacleCount = 0;
-  tutoPlatActionState = 0;
   tutoInstructionMessage = "";
   tutoHighlightedZone = null;
   completedWordsCount = 2;
@@ -248,9 +245,9 @@ function updateTutorialScript() {
   if (tutoHighlightedZone) return;
   tutoTimer++;
 
-  // ÉTAPE 1 : SCORE (Délai d'une seconde au lancement)
+  // ÉTAPE 1 : SCORE (Délai de 3 secondes pour faire tourner le score au départ)
   if (tutoStep === 1) {
-    if (tutoTimer > 40) {
+    if (tutoTimer > 180) {
       showTutoDialogSide(
         "Ceci est ton score, le but est d'avoir le maximum de points. Plus tu avances loin, plus ton score augmente. Des bonus peuvent aussi te faire gagner des points.",
         { x: 15, y: 15, w: 230, h: 55 },
@@ -273,30 +270,30 @@ function updateTutorialScript() {
       );
     }
   }
-  // ÉTAPE 3 : MANIPULATION SAUTS ET BAISSER
+  // ÉTAPE 3 : MANIPULATION SAUTS ET BAISSER (Consignes textuelles strictes)
   else if (tutoStep === 3) {
     if (tutoSubState === 1) {
-      tutoInstructionMessage = "Vas-y essaie de sauter loin";
+      tutoInstructionMessage = "Vas-y fais un long saut (appui long sur ESPACE)";
       if (!cat.isGrounded && cat.jumpTimer >= 10) { tutoSubState = 2; tutoTimer = 0; }
     } else if (tutoSubState === 2) {
-      tutoInstructionMessage = "Maintenant baisse toi";
+      tutoInstructionMessage = "Maintenant, baisse toi (FLÈCHE DU BAS)";
       if (cat.isCrouching) { tutoSubState = 3; tutoTimer = 0; }
     } else if (tutoSubState === 3) {
-      tutoInstructionMessage = "Et pour finir, fais un tout petit saut";
+      tutoInstructionMessage = "Et pour finir, fais un tout petit saut (appui court sur ESPACE)";
       if (cat.vy < 0 && cat.jumpTimer < 5 && !keys['Space'] && !keys['ArrowUp']) {
-        tutoStep = 4; tutoTimer = 0; tutoSubState = 0; tutoInstructionMessage = "";
+        tutoStep = 4; tutoTimer = 0; tutoSubState = 1; tutoInstructionMessage = "";
       }
     }
   }
-  // ÉTAPE 4 : PLATEFORME SCRIPTÉE
+  // ÉTAPE 4 : PLATEFORME SCRIPTÉE (Les 3 sous-étapes strictes)
   else if (tutoStep === 4) {
-    if (platforms.length === 0 && tutoSubState === 0) {
+    if (platforms.length === 0 && tutoSubState === 1) {
       platforms.push({ x: canvas.width + 100, y: ENTITY_GROUND_Y - 130, w: 260, h: 65, key: 'bleu_medium' });
     }
 
     const plat = platforms[0];
-    if (plat && plat.x <= canvas.width - 350 && tutoSubState === 0) {
-      tutoSubState = 1;
+    if (plat && plat.x <= canvas.width - 350 && tutoSubState === 1 && !plat.shownPopup) {
+      plat.shownPopup = true;
       showTutoDialogSide(
         "Ceci est une plateforme, il en existe de différentes tailles et de différentes hauteurs. Tu peux sauter dessus mais aussi en descendre ou passer au travers en appuyant sur FLÈCHE DU BAS.",
         { x: plat.x, y: plat.y, w: plat.w, h: plat.h },
@@ -304,30 +301,45 @@ function updateTutorialScript() {
       );
     }
 
+    // ÉTAPE A : "Vas-y, saute sur une plateforme"
     if (tutoSubState === 2) {
-      tutoInstructionMessage = "Vas-y saute sur la plateforme";
-      if (cat.isPlatformGrounded) { tutoSubState = 3; tutoPlatActionState = 0; }
-      else if (plat && plat.x + plat.w < 0) { platforms.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 130, w: 260, h: 65, key: 'bleu_medium' }); }
-    } else if (tutoSubState === 3) {
-      tutoInstructionMessage = "Maintenant, saute sur la plateforme et une fois dessus, descends avec la FLÈCHE DU BAS";
-      if (platforms.length === 0) platforms.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 130, w: 360, h: 65, key: 'bleu_long' });
-      const currentPlat = platforms[0];
-      if (currentPlat && currentPlat.x + currentPlat.w < 0) {
-        platforms = [{ x: canvas.width + 50, y: ENTITY_GROUND_Y - 130, w: 360, h: 65, key: 'bleu_long' }];
+      tutoInstructionMessage = "Vas-y, saute sur une plateforme";
+      if (cat.isPlatformGrounded) { 
+        tutoSubState = 3; 
+        platforms = [{ x: canvas.width + 100, y: ENTITY_GROUND_Y - 130, w: 360, h: 65, key: 'bleu_long', wasOnPlat: false, descendedFromPlat: false }];
+      } else if (plat && plat.x + plat.w < 0) { 
+        platforms = [{ x: canvas.width + 50, y: ENTITY_GROUND_Y - 130, w: 260, h: 65, key: 'bleu_medium' }]; 
       }
-      if (tutoPlatActionState === 0 && cat.isPlatformGrounded) { tutoPlatActionState = 1; }
-      else if (tutoPlatActionState === 1 && !cat.isPlatformGrounded && cat.isGrounded) {
-        tutoSubState = 4; tutoPlatActionState = 0; platforms = [];
+    } 
+    // ÉTAPE B : "Maintenant, saute sur une plateforme et descend pendant que tu es dessus avec la FLÈCHE DU BAS"
+    else if (tutoSubState === 3) {
+      tutoInstructionMessage = "Maintenant, saute sur une plateforme et descend pendant que tu es dessus avec la FLÈCHE DU BAS";
+      const pLong = platforms[0];
+      if (pLong) {
+        if (cat.isPlatformGrounded) pLong.wasOnPlat = true;
+        if (pLong.wasOnPlat && cat.isCrouching && !cat.isPlatformGrounded && cat.y + cat.height < ENTITY_GROUND_Y) {
+          pLong.descendedFromPlat = true;
+        }
+        if (pLong.descendedFromPlat && cat.isGrounded) {
+          tutoSubState = 4;
+          platforms = [{ x: canvas.width + 100, y: ENTITY_GROUND_Y - 130, w: 260, h: 65, key: 'bleu_medium' }];
+        }
+        if (pLong.x + pLong.w < 0 && !pLong.descendedFromPlat) {
+          platforms = [{ x: canvas.width + 50, y: ENTITY_GROUND_Y - 130, w: 360, h: 65, key: 'bleu_long', wasOnPlat: false, descendedFromPlat: false }];
+        }
       }
-    } else if (tutoSubState === 4) {
-      tutoInstructionMessage = "Et enfin saute et passe au travers de la plateforme en appuyant sur espace et tout de suite après FLÈCHE DU BAS";
-      if (platforms.length === 0) platforms.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 130, w: 260, h: 65, key: 'bleu_medium' });
-      const currentPlat = platforms[0];
-      if (currentPlat && currentPlat.x + currentPlat.w < 0) {
-        platforms = [{ x: canvas.width + 50, y: ENTITY_GROUND_Y - 130, w: 260, h: 65, key: 'bleu_medium' }];
-      }
-      if (currentPlat && cat.y < currentPlat.y && cat.isCrouching && cat.vy > 0 && cat.x + cat.width > currentPlat.x && cat.x < currentPlat.x + currentPlat.w) {
-        tutoStep = 5; tutoTimer = 0; tutoSubState = 0; platforms = []; tutoInstructionMessage = "";
+    } 
+    // ÉTAPE C : "Enfin, saute et passe au travers de la plateforme en appuyant sur ESPACE et tout de suite après sur la FLÈCHE DU BAS"
+    else if (tutoSubState === 4) {
+      tutoInstructionMessage = "Enfin, saute et passe au travers de la plateforme en appuyant sur ESPACE et tout de suite après sur la FLÈCHE DU BAS";
+      const pPass = platforms[0];
+      if (pPass) {
+        if (pPass.x + pPass.w < 0) {
+          platforms = [{ x: canvas.width + 50, y: ENTITY_GROUND_Y - 130, w: 260, h: 65, key: 'bleu_medium' }];
+        }
+        if (cat.y < pPass.y && cat.y + cat.height > pPass.y && cat.isCrouching && cat.vy > 0 && cat.x + cat.width > pPass.x && cat.x < pPass.x + pPass.w) {
+          tutoStep = 5; tutoTimer = 0; tutoSubState = 0; platforms = []; tutoInstructionMessage = "";
+        }
       }
     }
   }
@@ -340,7 +352,8 @@ function updateTutorialScript() {
           obstacles.push({ x: canvas.width + 100, y: ENTITY_GROUND_Y - dim.h + 5, w: dim.w, h: dim.h, configIdx: 5, frame: 0, animTimer: 0 });
         }
         const obs = obstacles[0];
-        if (obs && obs.x <= canvas.width - 350) {
+        if (obs && obs.x <= canvas.width - 350 && !obs.shownPopup) {
+          obs.shownPopup = true;
           tutoSubState = 1;
           showTutoDialogSide(
             "Ça c'est un obstacle, il faut l'éviter, en sautant par dessus ou en passant en dessous.",
@@ -361,8 +374,8 @@ function updateTutorialScript() {
         const conf = assets.obstaclesConfig[configIdx]; const dim = getObstacleDimensions(conf);
         let obsY = ENTITY_GROUND_Y - dim.h + 5;
         if (configIdx === 7) obsY = ENTITY_GROUND_Y - dim.h - 60;
-        if (configIdx === 3 || configIdx === 4) obsY = ENTITY_GROUND_Y - 120 - dim.h + 30;
         if (configIdx === 3 || configIdx === 4) {
+          obsY = ENTITY_GROUND_Y - 120 - dim.h + 30;
           platforms.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 120, w: 260, h: 65, key: 'bleu_medium' });
         }
         obstacles.push({ x: canvas.width + 100, y: obsY, w: dim.w, h: dim.h, configIdx, frame: 0, animTimer: 0 });
@@ -406,7 +419,8 @@ function updateTutorialScript() {
         items.push({ x: canvas.width + 100, y: ENTITY_GROUND_Y - 120, w: 65, h: 75, char: 'R', letterIdx: 0, frame: 0, animTimer: 0 });
       }
       const item = items[0];
-      if (item && item.x <= canvas.width - 350) {
+      if (item && item.x <= canvas.width - 350 && !item.shownPopup) {
+        item.shownPopup = true;
         tutoSubState = 1;
         showTutoDialogSide(
           "Collecte ces lettres afin de compléter le mot R O G E R en bas à droite, cela te fera gagner une GROSSE lettre.",
@@ -438,6 +452,9 @@ function updateTutorialScript() {
 // MOTEUR DE JEU & PHYSIQUE EXACTE ORIGINALE
 function update() {
   if (!gameStarted) { stopRunSound(); return; }
+
+  const now = Date.now();
+  if (now - lastScoreTime >= 1000) { score += 50; lastScoreTime = now; }
 
   updateTutorialScript();
   if (tutoHighlightedZone) { stopRunSound(); return; }
@@ -475,7 +492,7 @@ function update() {
     platforms.forEach(p => {
       const depthOffset = 14; const surfaceY = p.y + depthOffset;
       if (cat.x + cat.width > p.x && cat.x < p.x + p.w && cat.y + cat.height >= surfaceY && cat.y + cat.height <= surfaceY + 20 && cat.vy >= 0) {
-        cat.y = surfaceY - cat.height + 6; // Ajustement calage chat enfoncé
+        cat.y = surfaceY - cat.height + 6; 
         cat.vy = 0; cat.isGrounded = true; cat.isPlatformGrounded = true; cat.isJumping = false;
       }
     });
@@ -613,12 +630,27 @@ function draw() {
     }
   });
 
-  // MESSAGE D'INSTRUCTION EN JEU
+  // MESSAGE D'INSTRUCTION EN JEU (PROPREMENT RETOURNÉ À LA LIGNE / ENCADRÉ)
   if (tutoInstructionMessage && tutoDialogBox.style.display !== 'block') {
-    ctx.save(); ctx.fillStyle = 'rgba(0, 0, 0, 0.75)'; ctx.fillRect(canvas.width / 2 - 340, 80, 680, 45);
-    ctx.strokeStyle = '#ffd54f'; ctx.lineWidth = 2; ctx.strokeRect(canvas.width / 2 - 340, 80, 680, 45);
-    ctx.fillStyle = '#ffd54f'; ctx.font = 'bold 15px Courier New'; ctx.textAlign = 'center';
-    ctx.fillText(tutoInstructionMessage, canvas.width / 2, 108); ctx.restore();
+    ctx.save(); 
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.85)'; 
+    ctx.fillRect(canvas.width / 2 - 380, 75, 760, 55);
+    ctx.strokeStyle = '#ffd54f'; ctx.lineWidth = 2; ctx.strokeRect(canvas.width / 2 - 380, 75, 760, 55);
+    ctx.fillStyle = '#ffd54f'; ctx.font = 'bold 13px Courier New'; ctx.textAlign = 'center';
+    
+    // Découpage automatique du texte pour qu'il ne dépasse jamais de l'encadré
+    const maxLineLength = 70;
+    if (tutoInstructionMessage.length > maxLineLength) {
+      let spaceIdx = tutoInstructionMessage.lastIndexOf(' ', maxLineLength);
+      if (spaceIdx === -1) spaceIdx = maxLineLength;
+      const line1 = tutoInstructionMessage.substring(0, spaceIdx);
+      const line2 = tutoInstructionMessage.substring(spaceIdx + 1);
+      ctx.fillText(line1, canvas.width / 2, 97);
+      ctx.fillText(line2, canvas.width / 2, 117);
+    } else {
+      ctx.fillText(tutoInstructionMessage, canvas.width / 2, 107);
+    }
+    ctx.restore();
   }
 
   // MASQUE GRISÉ ET SURBRILLANCE
