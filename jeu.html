@@ -15,7 +15,6 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.7); border-radius: 12px; overflow: hidden; border: 4px solid #2e2e40; background: #000;
     }
     #game-container.desktop-fullscreen { width: 100vw !important; height: 100vh !important; max-width: 100vw !important; max-height: 100vh !important; border-radius: 0 !important; border: none !important; }
-    /* CORRECTION ICI : On retire les position: fixed / height: 100vh agressive pour laisser le container s'adapter proprement au ratio original du canvas */
     #game-container.mobile-fullscreen { width: 100vw !important; height: 56.25vw !important; max-width: 100vw !important; max-height: 100vh !important; border-radius: 0 !important; border: none !important; z-index: 999999 !important; }
 
     canvas { width: 100%; height: 100%; object-fit: contain; display: block; image-rendering: pixelated; }
@@ -88,7 +87,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.3-ORIGINAL-RATIO-FIX</div>
+  <div id="version-display">v13.5-FIX-SUPER-SAYEN-MUSIC</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -292,6 +291,25 @@ function updateGameOverSelection() {
   });
 }
 
+function updatePromptSelection(option) {
+  promptSelectedOption = option;
+  if (option === 'YES') {
+    promptYesBtn.style.backgroundColor = '#ffffff'; promptYesBtn.style.color = '#ff3333';
+    promptNoBtn.style.backgroundColor = '#ffd54f'; promptNoBtn.style.color = '#1a1a24';
+  } else {
+    promptNoBtn.style.backgroundColor = '#ffffff'; promptNoBtn.style.color = '#ff3333';
+    promptYesBtn.style.backgroundColor = '#ffd54f'; promptYesBtn.style.color = '#1a1a24';
+  }
+}
+
+function updateFormNavSelection() {
+  formNavElements.forEach((el, idx) => {
+    if (idx === formNavIdx) el.classList.add('nav-selected');
+    else el.classList.remove('nav-selected');
+  });
+  formNavElements[formNavIdx].focus();
+}
+
 const introVideo = document.getElementById('intro-video');
 const introMusic = new Audio('ecranintro.mp3'); introMusic.loop = true; introMusic.volume = 0.8;
 const bgMusic = new Audio('roger_8bitok.mp3'); bgMusic.loop = true; bgMusic.volume = 0.8; 
@@ -406,7 +424,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.3'; 
+const ASSET_VERSION = 'v13.5'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -773,6 +791,13 @@ function triggerSuperSayen() {
   if (superSayanTheme.readyState >= 2) superSayanTheme.currentTime = 0;
   superSayanTheme.volume = 1.0; superSayanTheme.play().catch(() => {});
   playSoundEffect(sounds.sayan); playSoundEffect(sounds.speedFly);
+}
+
+// CORRECTION ICI : Relance propre de la musique principale au terme de l'atterrissage Super-Sayen
+function transitionSuperSayanToNormal() {
+  superSayanTheme.pause();
+  bgMusic.muted = false;
+  if (bgMusic.paused) bgMusic.play().catch(() => {});
 }
 
 function triggerLetterFall(char, x, y) {
@@ -1212,10 +1237,14 @@ function update() {
       currentGameSpeed = effectiveBaseSpeed * 3.5; superSayen.timer++; score += 15; const flySpeed = 7; const maxFlyY = ENTITY_GROUND_Y - cat.height + 65; 
       if (flyUpPressed) cat.y = Math.max(30, cat.y - flySpeed); if (downPressed) cat.y = Math.min(maxFlyY, cat.y + flySpeed);
       if (superSayen.animTimer % 4 === 0) superSayen.flyFrame = (superSayen.flyFrame + 1) % 6;
-      if (superSayen.timer >= 450) { superSayen.state = 'LANDING'; obstacles = []; items = []; platforms = []; lastObstacleX = cat.x + 300; lastLetterX = cat.x + 300; transitionSuperSayanToNormal(); }
+      if (superSayen.timer >= 450) { superSayen.state = 'LANDING'; obstacles = []; items = []; platforms = []; lastObstacleX = cat.x + 300; lastLetterX = cat.x + 300; }
     } else if (superSayen.state === 'LANDING') {
       currentGameSpeed = effectiveBaseSpeed;
-      if (cat.y < ENTITY_GROUND_Y - cat.height) cat.y += 6; else { cat.y = ENTITY_GROUND_Y - cat.height; cat.isGrounded = true; cat.vy = 0; superSayen.active = false; superSayen.state = 'NONE'; lastObstacleX = cat.x + 300; lastLetterX = cat.x + 300; }
+      if (cat.y < ENTITY_GROUND_Y - cat.height) cat.y += 6; 
+      else { 
+        cat.y = ENTITY_GROUND_Y - cat.height; cat.isGrounded = true; cat.vy = 0; superSayen.active = false; superSayen.state = 'NONE'; lastObstacleX = cat.x + 300; lastLetterX = cat.x + 300; 
+        transitionSuperSayanToNormal();
+      }
     }
   } else currentGameSpeed = effectiveBaseSpeed;
 
