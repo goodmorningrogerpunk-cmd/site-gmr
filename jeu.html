@@ -47,6 +47,15 @@
       transform: translateZ(0);
     }
 
+    #game-container.desktop-fullscreen {
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: 100vw !important;
+      max-height: 100vh !important;
+      border-radius: 0 !important;
+      border: none !important;
+    }
+
     #game-container.mobile-fullscreen {
       position: fixed !important;
       top: 0 !important;
@@ -100,19 +109,19 @@
       position: absolute;
       top: 15px;
       left: 15px;
-      padding: 6px 12px;
-      font-size: 11px;
+      padding: 8px 14px;
+      font-size: 12px;
       color: #ffd54f;
-      background-color: rgba(26, 26, 36, 0.7);
-      border: 2px solid rgba(255, 213, 79, 0.5);
-      border-radius: 4px;
+      background-color: rgba(26, 26, 36, 0.85);
+      border: 2px solid #ffd54f;
+      box-shadow: 0 4px 0px #000;
       z-index: 30;
       display: none;
     }
 
     #desktop-fullscreen-btn:hover {
-      background-color: #1a1a24;
-      border-color: #ffd54f;
+      background-color: #ffd54f;
+      color: #1a1a24;
     }
 
     #start-main-btn {
@@ -786,14 +795,15 @@ document.addEventListener('fullscreenchange', handleFullscreenChange);
 document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
 
 function handleFullscreenChange() {
-  if (document.fullscreenElement || document.webkitFullscreenElement) {
+  const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement);
+  if (isFS) {
     if (isMobileDevice) {
       gameContainer.classList.add('mobile-fullscreen');
+    } else {
+      gameContainer.classList.add('desktop-fullscreen');
     }
   } else {
-    if (!isMobileDevice) {
-      gameContainer.classList.remove('mobile-fullscreen');
-    }
+    gameContainer.classList.remove('mobile-fullscreen', 'desktop-fullscreen');
   }
 }
 
@@ -1048,7 +1058,7 @@ function transitionSuperSayanToNormal() {
   }
 }
 
-const ASSET_VERSION = 'v18'; 
+const ASSET_VERSION = 'v19'; 
 
 function loadSmartImage(baseName) {
   const img = new Image();
@@ -1113,7 +1123,7 @@ const assets = {
     { type: 'plat', img: loadSmartImage('obstacle2'), targetH: 140 },
     { type: 'ground', img: loadSmartImage('obstacle4'), targetH: 75 },
     { type: 'ground', img: loadSmartImage('obstacle5'), targetH: 80 },
-    { type: 'air', img: loadSmartImage('obstacle6') }
+    { type: 'air', img: loadSmartImage('obstacle6'), targetH: 85 }
   ],
   letters: {
     R: Array.from({length: 8}, (_, i) => loadSmartImage(`R${i+1}`)),
@@ -1136,10 +1146,6 @@ function getObstacleDimensions(conf) {
     } else if (conf.targetW) {
       w = conf.targetW;
       h = w / ratio;
-    } else {
-      // Conservation stricte du ratio d'origine sans imposer de dimension fixe
-      w = sampleImg.naturalWidth;
-      h = sampleImg.naturalHeight;
     }
   }
   return { w, h };
@@ -1353,8 +1359,7 @@ function spawnWorldElements() {
 
       if (conf.type === 'air') {
         if (configIdx === 7) {
-          // Ajustement : positionnement permettant au chat d'être baissé en toute sécurité
-          obsY = ENTITY_GROUND_Y - dim.h - 65 - (Math.random() * 20);
+          obsY = ENTITY_GROUND_Y - dim.h - 60 - (Math.random() * 15);
         } else {
           obsY = ENTITY_GROUND_Y - (140 + Math.random() * 60);
         }
@@ -2019,7 +2024,7 @@ function update() {
         triggerSuperSayen();
       }
     }
-    return; // Arrêt complet de la logique de jeu (Bonus punk, obstacles, décors tout reste figé)
+    return;
   }
 
   bounceTimer += 0.08;
