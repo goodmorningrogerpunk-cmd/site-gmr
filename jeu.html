@@ -24,7 +24,6 @@
 
     #desktop-fullscreen-btn { position: absolute; top: 15px; left: 15px; padding: 8px 14px; font-size: 12px; color: #ffd54f; background-color: rgba(26, 26, 36, 0.85); border: 2px solid #ffd54f; box-shadow: 0 4px 0px #000; z-index: 30; display: none; }
 
-    /* BOUTONS D'ACCUEIL */
     #tuto-main-btn { position: absolute; top: 62%; left: 5%; transform: translateY(-50%); padding: 12px 24px; font-size: 18px; color: #ffffff; background-color: #2e2e40; border: 3px solid #ffd54f; box-shadow: 0 4px 0px #000; }
     #start-main-btn { position: absolute; top: 78%; left: 5%; transform: translateY(-50%); padding: 16px 28px; font-size: 20px; color: #1a1a24; background-color: #ffd54f; border: 4px solid #ffffff; box-shadow: 0 6px 0px #b29320; }
 
@@ -40,7 +39,6 @@
     .modal-content-scroll { flex: 1; overflow-y: auto; padding-right: 6px; margin-bottom: 12px; }
     .modal-close-btn { display: block; margin: 0 auto; padding: 10px 24px; background: #ffd54f; color: #1a1a24; border: 3px solid #ffffff; font-size: 15px; font-weight: bold; cursor: pointer; }
 
-    /* POPUP DU TUTORIEL SCRIPTÉ */
     #tuto-dialog-box {
       display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
       width: 85%; max-width: 520px; background: #111118; border: 4px solid #ffd54f; border-radius: 8px;
@@ -398,7 +396,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v26'; 
+const ASSET_VERSION = 'v27'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -490,7 +488,7 @@ tutoNextBtn.addEventListener('click', () => {
 
 function startTutorial() {
   resetGame();
-  isTutoMode = true;
+  isTutoMode = true; // DÉCLENCHEMENT DU MODE TUTORIEL
   tutoStep = 1;
   tutoTimer = 0;
   tutoSubState = 0;
@@ -536,7 +534,7 @@ function updateTutorialScript() {
       );
     }
   }
-  // ÉTAPE 3 : VALDATION MOUSSE/SAUTS
+  // ÉTAPE 3 : MANIPULATION SAUTS ET BAISSER
   else if (tutoStep === 3) {
     if (tutoSubState === 1) {
       tutoInstructionMessage = "Vas-y essaie de sauter loin";
@@ -588,7 +586,7 @@ function updateTutorialScript() {
       }
     }
   }
-  // ÉTAPE 5 : SÉRIE DES 4 OBSTACLES (COMPTEUR 1/4 À 4/4)
+  // ÉTAPE 5 : SÉRIE DE 4 OBSTACLES (COMPTEUR 1/4 À 4/4)
   else if (tutoStep === 5) {
     if (tutoSubState === 0) {
       if (obstacles.length === 0) {
