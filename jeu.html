@@ -39,7 +39,6 @@
     .modal-content-scroll { flex: 1; overflow-y: auto; padding-right: 6px; margin-bottom: 12px; }
     .modal-close-btn { display: block; margin: 0 auto; padding: 10px 24px; background: #ffd54f; color: #1a1a24; border: 3px solid #ffffff; font-size: 15px; font-weight: bold; cursor: pointer; }
 
-    /* POPUP D'EXPLICATION TUTORIEL */
     #tuto-dialog-box {
       display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
       width: 85%; max-width: 520px; background: #111118; border: 4px solid #ffd54f; border-radius: 8px;
@@ -93,7 +92,6 @@
     <button id="home-gameover-btn" class="pixel-btn">ACCUEIL</button>
   </div>
 
-  <!-- MODALE TUTORIEL -->
   <div id="tuto-dialog-box">
     <p id="tuto-dialog-text"></p>
     <button id="tuto-next-btn" class="pixel-btn">SUIVANT</button>
@@ -254,7 +252,6 @@ let formNavIdx = 0;
 const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 let konamiIndex = 0;
 
-// GESTION NIVEAU TUTORIEL DÉDIÉ
 let isTutoMode = false;
 let tutoStep = 0;
 let tutoTimer = 0;
@@ -398,7 +395,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v24'; 
+const ASSET_VERSION = 'v25'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -520,8 +517,8 @@ function updateTutorial() {
   else if (tutoStep === 2) {
     if (tutoTimer > 60) {
       const controlsText = isMobileDevice ?
-        "En appuyant sur le <b>CÔTÉ DROIT DE L'ÉCRAN</b>, Roger fait un saut avec son skate. Un appui court fait un petit saut, un appui long fait un grand saut.<br><br>En appuyant sur le <b>CÔTÉ GAUCHE DE L'ÉCRAN</b>, Roger se baisse.<br><br>Utilise les boutons en haut à droite pour mettre en pause ou quitter." :
-        "En appuyant sur <b>ESPACE</b>, Roger fait un saut avec son skate. Si tu fais un appui court, il fait un petit saut. Si tu fais un appui long, il fait un grand saut.<br><br>En appuyant sur la <b>FLÈCHE DU BAS</b>, Roger se baisse.<br><br>Pour mettre en pause appuie sur <b>ENTRÉE</b> et pour revenir à l'accueil appuie sur <b>ÉCHAP</b>.";
+        "En appuyant sur le <b>CÔTÉ DROIT DE L'ÉCRAN</b>, Roger fait un saut avec son skate. Si tu fais un appui court, il fait un petit saut. Si tu fais un appui long il fait un plus grand saut.<br><br>En appuyant sur le <b>CÔTÉ GAUCHE DE L'ÉCRAN</b>, Roger se baisse.<br><br>Pour mettre le jeu en pause, appuie sur <b>P</b> et pour revenir à l'écran principal appuie sur <b>R</b>." :
+        "En appuyant sur \"ESPACE\", Roger fait un saut avec son skate. Si tu fais un appui court, il fait un petit saut. Si tu fais un appui long il fait un plus grand saut.<br><br>En appuyant sur la \"FLÈCHE DU BAS\", Roger se baisse.<br><br>Pour mettre le jeu en pause, appuie sur \"ENTRÉE\" et pour revenir à l'écran principal appuie sur \"ÉCHAP\".";
 
       const isMobile = isMobileDevice;
       const hudW = isMobile ? 260 : 320;
@@ -537,19 +534,19 @@ function updateTutorial() {
   // ÉTAPE 3 : MANIPULATION SAUTS ET BAISSER
   else if (tutoStep === 3) {
     if (tutoSubState === 1) {
-      tutoInstructionMessage = isMobileDevice ? "Vas-y essaie de sauter loin ! (Appui long à droite)" : "Vas-y essaie de sauter loin ! (Appui long sur ESPACE)";
+      tutoInstructionMessage = "Vas-y essaie de sauter loin";
       if (!cat.isGrounded && cat.jumpTimer >= 10) { tutoSubState = 2; tutoTimer = 0; }
     } else if (tutoSubState === 2) {
-      tutoInstructionMessage = isMobileDevice ? "Maintenant baisse-toi ! (Appui à gauche)" : "Maintenant baisse-toi ! (Appui FLÈCHE BAS)";
+      tutoInstructionMessage = "Maintenant baisse toi";
       if (cat.isCrouching) { tutoSubState = 3; tutoTimer = 0; }
     } else if (tutoSubState === 3) {
-      tutoInstructionMessage = isMobileDevice ? "Et pour finir, fais un tout petit saut ! (Appui court à droite)" : "Et pour finir, fais un tout petit saut ! (Appui court)";
+      tutoInstructionMessage = "Et pour finir, fais un tout petit saut";
       if (cat.vy < 0 && cat.jumpTimer < 5 && !keys['Space'] && !keys['ArrowUp']) {
         tutoStep = 4; tutoTimer = 0; tutoSubState = 0; tutoInstructionMessage = "";
       }
     }
   }
-  // ÉTAPE 4 : PLATEFORMES (SCÉNARIOS SUR-MESURE)
+  // ÉTAPE 4 : PLATEFORMES
   else if (tutoStep === 4) {
     if (platforms.length === 0 && tutoSubState === 0) {
       platforms.push({ x: canvas.width + 100, y: ENTITY_GROUND_Y - 110, w: 260, h: 65, key: 'bleu_medium' });
@@ -560,7 +557,7 @@ function updateTutorial() {
       tutoSubState = 1;
       showTutoDialog(
         isMobileDevice ? 
-        "Ceci est une plateforme. Il en existe de différentes tailles. Tu peux sauter dessus mais aussi en descendre ou passer au travers en te baissant !" :
+        "Ceci est une plateforme, il en existe de différentes tailles et de différentes hauteurs. Tu peux sauter dessus mais aussi en descendre ou passer au travers en appuyant à GAUCHE." :
         "Ceci est une plateforme, il en existe de différentes tailles et de différentes hauteurs. Tu peux sauter dessus mais aussi en descendre ou passer au travers en appuyant sur \"FLÈCHE DU BAS\".",
         () => { tutoSubState = 2; },
         { x: plat.x - 10, y: plat.y - 10, w: plat.w + 20, h: plat.h + 20 }
@@ -572,7 +569,7 @@ function updateTutorial() {
       if (cat.isPlatformGrounded) { tutoSubState = 3; }
       else if (plat && plat.x + plat.w < cat.x) { plat.x = canvas.width + 100; }
     } else if (tutoSubState === 3) {
-      tutoInstructionMessage = "Saute sur la plateforme puis descends de la plateforme";
+      tutoInstructionMessage = "Saute sur la plateforme puis descend de la plateforme";
       if (plat && plat.x + plat.w < cat.x - 50) { plat.x = canvas.width + 100; tutoPlatActionState = 0; }
       if (tutoPlatActionState === 0 && cat.isPlatformGrounded) { tutoPlatActionState = 1; }
       else if (tutoPlatActionState === 1 && !cat.isPlatformGrounded && cat.isGrounded) {
@@ -586,7 +583,7 @@ function updateTutorial() {
       }
     }
   }
-  // ÉTAPE 5 : SÉRIE DE 4 OBSTACLES (COMPTEUR 1/4 À 4/4)
+  // ÉTAPE 5 : OBSTACLES (SÉRIE 4)
   else if (tutoStep === 5) {
     if (tutoSubState === 0) {
       if (obstacles.length === 0) {
@@ -638,7 +635,7 @@ function updateTutorial() {
       }
     }
   }
-  // ÉTAPE 6 : GROSSES LETTRES & CHOC FORCÉ
+  // ÉTAPE 6 : CHOC FORCÉ
   else if (tutoStep === 6) {
     if (tutoSubState === 0) {
       showTutoDialog(
@@ -652,12 +649,12 @@ function updateTutorial() {
         const conf = assets.obstaclesConfig[4]; const dim = getObstacleDimensions(conf);
         obstacles.push({ x: canvas.width + 100, y: ENTITY_GROUND_Y - dim.h + 25, w: dim.w, h: dim.h, configIdx: 4, frame: 0, animTimer: 0, flipX: false });
       }
-      if (completedWordsCount < 2) { // Il s'est pris l'obstacle et a perdu son O
+      if (completedWordsCount < 2) {
         tutoStep = 7; tutoSubState = 0; tutoTimer = 0; obstacles = []; tutoInstructionMessage = "";
       }
     }
   }
-  // ÉTAPE 7 : COLLECTE DU MOT ROGER
+  // ÉTAPE 7 : COLLECTE LETTRES
   else if (tutoStep === 7) {
     if (tutoSubState === 0) {
       if (items.length === 0) {
@@ -1200,7 +1197,7 @@ function update() {
       } else if (!superSayen.active && invulnerableTimer <= 0) {
         playSoundEffect(sounds.damage);
 
-        if (isTutoMode && tutoStep === 5) { // Reset uniquement la boucle des 4 obstacles du tuto sans perdre de vies
+        if (isTutoMode && tutoStep === 5) {
           obstacles = []; platforms = []; tutoObstacleCount = 0; tutoTimer = 0; invulnerableTimer = 60; return;
         }
 
@@ -1386,11 +1383,9 @@ function draw() {
 
   if (freezeForSequence) { ctx.save(); ctx.fillStyle = 'rgba(255, 213, 79, 0.35)'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.restore(); }
 
-  // SCORE HUD
   ctx.fillStyle = 'rgba(0,0,0,0.65)'; ctx.fillRect(20, 20, 220, 45);
   ctx.fillStyle = superSayen.active ? '#ffd54f' : '#fff'; ctx.font = 'bold 22px Courier New'; ctx.fillText(`SCORE: ${score}`, 32, 50);
 
-  // CONTRÔLES HAUT DROITE
   const isMobile = isMobileDevice; const hudWidth = isMobile ? 260 : 320; const hudXPos = isMobile ? canvas.width - 370 : canvas.width - 340;
   ctx.fillStyle = 'rgba(0, 0, 0, 0.65)'; ctx.fillRect(hudXPos, 20, hudWidth, 65);
   ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1; ctx.strokeRect(hudXPos, 20, hudWidth, 65);
@@ -1398,7 +1393,6 @@ function draw() {
   if (isMobile) { ctx.fillText("TAP DROITE : SAUTER", hudXPos + 15, 40); ctx.fillText("TAP GAUCHE : BAISSER", hudXPos + 15, 58); }
   else { ctx.fillText("ESPACE : SAUTER | BAS : BAISSER", hudXPos + 15, 40); ctx.fillText("ENTRÉE : PAUSE", hudXPos + 15, 58); ctx.fillText("ECHAP  : ACCUEIL", hudXPos + 15, 76); }
 
-  // ROGER BAS DROITE
   const hudX = canvas.width - 340; const hudY = canvas.height - 85;
   ctx.fillStyle = '#000000'; ctx.fillRect(hudX - 10, hudY - 10, 335, 80);
   ctx.strokeStyle = '#ffd54f'; ctx.lineWidth = 2; ctx.strokeRect(hudX - 10, hudY - 10, 335, 80);
@@ -1408,7 +1402,6 @@ function draw() {
     else { ctx.fillStyle = isCollected ? '#ffd54f' : '#555'; ctx.font = 'bold 36px Courier New'; ctx.fillText(char, slotX + 14, hudY + 44); }
   });
 
-  // VIES BAS GAUCHE
   const masterHudX = 20; const masterHudY = canvas.height - 115;
   rogerLetters.forEach((char, idx) => {
     const slotX = masterHudX + (idx * 95); const isWordCompleted = idx < completedWordsCount;
@@ -1445,7 +1438,6 @@ function draw() {
     ctx.strokeText('+1 000 PTS !', popupX, popupY); ctx.fillText('+1 000 PTS !', popupX, popupY); ctx.restore();
   }
 
-  // BANDEAU INSTRUCTION DU TUTORIEL
   if (isTutoMode && tutoInstructionMessage && !tutoHighlightedZone) {
     ctx.save(); ctx.fillStyle = 'rgba(0, 0, 0, 0.75)'; ctx.fillRect(canvas.width / 2 - 340, 80, 680, 45);
     ctx.strokeStyle = '#ffd54f'; ctx.lineWidth = 2; ctx.strokeRect(canvas.width / 2 - 340, 80, 680, 45);
@@ -1453,7 +1445,6 @@ function draw() {
     ctx.fillText(tutoInstructionMessage, canvas.width / 2, 108); ctx.restore();
   }
 
-  // MASQUE OMBRAGE TUTORIEL (HIGHLIGHT ZONE)
   if (isTutoMode && tutoHighlightedZone) {
     ctx.save(); ctx.fillStyle = 'rgba(0, 0, 0, 0.75)'; const z = tutoHighlightedZone;
     ctx.fillRect(0, 0, canvas.width, z.y);
