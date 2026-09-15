@@ -104,7 +104,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.23-FINAL</div>
+  <div id="version-display">v13.24-FINAL</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -444,7 +444,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.23'; 
+const ASSET_VERSION = 'v13.24'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -1322,12 +1322,6 @@ function update() {
     let obsBoxWidth = Math.max(10, o.w - 16); 
     let obsBoxY = o.type === 'air' ? o.y + 4 : o.y + 8; 
     let obsBoxHeight = o.type === 'air' ? Math.max(10, o.h - 8) : Math.max(10, o.h - 16);
-    if (o.configIdx === 3) {
-      obsBoxX = o.x + 12;
-      obsBoxWidth = Math.max(10, o.w - 24);
-      obsBoxY = o.y + 12;
-      obsBoxHeight = Math.max(10, o.h - 18);
-    }
 
     const isHit = (catBoxX < obsBoxX + obsBoxWidth && catBoxX + catBoxWidth > obsBoxX && catBoxY < obsBoxY + obsBoxHeight && catBoxY + catBoxHeight > obsBoxY);
 
@@ -1383,6 +1377,8 @@ function update() {
 
   items.forEach(it => {
     it.x -= currentGameSpeed; it.animTimer++; if (it.animTimer % 6 === 0) it.frame = (it.frame + 1) % 8;
+    
+    // HITBOX STANDARD DES LETTRES (identique au jeu principal)
     let hitW = it.w, hitH = it.h, hitX = it.x, hitY = it.y;
     if (superSayen.active && superSayen.state === 'FLY') { hitW = it.w + 60; hitH = it.h + 90; hitX = it.x - 30; hitY = it.y - 45; }
 
