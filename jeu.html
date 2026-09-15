@@ -349,7 +349,7 @@ let fadeInterval = null;
 let isPaused = false;
 
 const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
-                 || (window.matchMedia && window.matchMedia("(max-width: 900px) and (pointer: coarse)").matches);
+                     || (window.matchMedia && window.matchMedia("(max-width: 900px) and (pointer: coarse)").matches);
 
 if (isMobileDevice) {
   gameContainer.classList.add('mobile-fullscreen');
@@ -568,7 +568,7 @@ function updateTutorialScript() {
   if (tutoStep === 1) {
     if (tutoTimer > 60) {
       showTutoDialogBox(
-        "Ceci est ton score, le but est d'avoir le maximum de points. Plus tu avances loin, plus ton score augmente. Des bonus peuvent aussi te faire gagner des points.",
+        "Ceci est ton score. Le but est d'accumuler le maximum de points. Plus tu avances loin, plus ton score augmente. Des bonus peuvent aussi te faire gagner des points.",
         { x: 15, y: 15, w: 230, h: 55 },
         () => { tutoStep = 2; tutoTimer = 0; }
       );
@@ -578,7 +578,7 @@ function updateTutorialScript() {
     if (tutoTimer > 30) {
       const controlsText = isMobileDevice ?
         "En appuyant sur le <b>côté droit de l'écran (TAP DROIT)</b>, Roger fait un saut. Appui long = saut long ; Appui court = saut court. En appuyant sur le <b>côté gauche (TAP GAUCHE)</b>, Roger se baisse. Le bouton P sert à mettre le jeu en pause et le bouton R à revenir au menu." :
-        "En appuyant sur <b>ESPACE</b>, Roger fait un saut. Appui long = saut long ; Appui court = saut court. En appuyant sur la <b>FLÈCHE DU BAS</b>, Roger se baisse. Pour mettre le jeu en pause, appuie sur <b>ENTRÉE</b>.";
+        "En appuyant sur <b>ESPACE</b>, Roger fait un saut. Appui long = saut long ; Appui court = saut court. En appuyant sur la <b>FLÈCHE DU BAS</b>, Roger se baisse. Pour mettre le jeu en pause, appuie sur <b>ENTRÉE</b> et pour revenir au menu appuie sur <b>ECHAP</b>.";
 
       const hudX = isMobileDevice ? canvas.width - 370 : canvas.width - 340;
       showTutoDialogBox(
@@ -620,7 +620,7 @@ function updateTutorialScript() {
       tutoInstructionMessage = "Saute sur une plateforme";
       if (cat.isPlatformGrounded) { tutoSubState = 3; }
     } else if (tutoSubState === 3) {
-      tutoInstructionMessage = isMobileDevice ? "Très bien. Maintenant, saute sur la plateforme et descends quand tu es dessus (TAP DROIT puis une fois dessus TAP GAUCHE)" : "Très bien. Maintenant, saute sur la plateforme et descends quand tu es dessus (ESPACE puis une fois dessus FLÈCHE DU BAS)";
+      tutoInstructionMessage = isMobileDevice ? "OK. Maintenant, saute sur la plateforme et descends une fois dessus (TAP DROIT puis une fois dessus TAP GAUCHE)" : "OK. Maintenant, saute sur la plateforme et descends une fois dessus (ESPACE puis une fois dessus FLÈCHE BAS)";
       const pLong = platforms[0];
       if (pLong) {
         if (cat.isPlatformGrounded) pLong.wasOnPlat = true;
@@ -660,7 +660,17 @@ function updateTutorialScript() {
         }
       }
     } else if (tutoSubState === 2) {
-      tutoInstructionMessage = `Évite les obstacles ! (${tutoObstacleCount}/4)`;
+      // Gestion dynamique de la consigne selon l'obstacle actuel (0 à 3)
+      if (tutoObstacleCount === 0) {
+        tutoInstructionMessage = "Évite l'obstacle. SAUTE !";
+      } else if (tutoObstacleCount === 1) {
+        tutoInstructionMessage = "Évite l'obstacle. BAISSE-TOI !";
+      } else if (tutoObstacleCount === 2) {
+        tutoInstructionMessage = "Évite l'obstacle. SAUTE !";
+      } else if (tutoObstacleCount === 3) {
+        tutoInstructionMessage = "Évite l'obstacle. BAISSE-TOI !";
+      }
+
       if (obstacles.length === 0 && tutoTimer > 60) {
         tutoTimer = 0;
         let configIdx = 5;
@@ -768,14 +778,12 @@ function updateTutorialScript() {
         }
       }
 
-      // BOUCLE DE FIN DE SÉRIE : Si la série se termine et qu'il manque des lettres, on relance une boucle
       if (customLetterSpawnIndex === 5 && items.length === 0 && obstacles.length === 0) {
         customLetterSpawnIndex = 0;
         tutoTimer = 0;
       }
     } else if (tutoSubState === 2) {
       endSequenceTimer++;
-      // Attente de 2 secondes (120 frames à 60fps) puis déclenchement de la boîte de fin
       if (endSequenceTimer > 120) {
         tutoSubState = 3;
         showTutoDialogBox(
@@ -1037,7 +1045,7 @@ function updateRulesText() {
       <li>🎮 <b>Tap gauche</b> : Se baisser</li>
       <li><img src="R1.png" alt="R" class="rule-icon" style="width:22px;"> <b>Lettres ROGER</b> : Collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
       <li>❤️ <b>Système de vies</b> : Tu débutes avec les GROSSES lettres R et O ! Chaque GROSSE lettre te protège contre un choc. Si tu obtiens 5 GROSSES lettres R O G E R, alors Roger se transforme en Super-Chat pour un max de scoring !</li>
-      <li><img src="${punkBonusSrc}" alt="Bonus Punk" style="width:22px;"> <b>Bonus Punk</b> : Attrape cet item et devient invincible pendant 15 secondes. Tu peux dégommer tous les obstacles sur ton passage.</li>
+      <li><img src="${punkBonusSrc}" alt="Bonus Punk" style="width:22px;"> <b>Bonus Punk</b> : Attrape cet item et deviens invincible pendant 15 secondes. Tu peux dégommer tous les obstacles sur ton passage.</li>
       <li>⏸️ <b>Bouton P</b> : Mettre le jeu en pause / Reprendre le jeu</li>
       <li>🏠 <b>Bouton R</b> : Revenir à l'écran d'accueil</li>
     `;
@@ -1047,7 +1055,7 @@ function updateRulesText() {
       <li>🎮 <b>Flèche du bas</b> : Se baisser</li>
       <li><img src="R1.png" alt="R" style="width:22px;"> <b>Lettres ROGER</b> : Collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
       <li>❤️ <b>Système de vies</b> : Tu débutes avec les GROSSES lettres R et O ! Chaque GROSSE lettre te protège contre un choc. Si tu obtiens 5 GROSSES lettres R O G E R, alors Roger se transforme en Super-Chat pour un max de scoring !</li>
-      <li><img src="${punkBonusSrc}" alt="Bonus Punk" style="width:22px;"> <b>Bonus Punk</b> : Attrape cet item et devient invincible pendant 15 secondes. Tu peux dégommer tous les obstacles sur ton passage.</li>
+      <li><img src="${punkBonusSrc}" alt="Bonus Punk" style="width:22px;"> <b>Bonus Punk</b> : Attrape cet item et deviens invincible pendant 15 secondes. Tu peux dégommer tous les obstacles sur ton passage.</li>
       <li>⏸️ <b>Entrée</b> : Mettre le jeu en pause / Reprendre le jeu</li>
       <li>🏠 <b>Echap</b> : Revenir à l'écran d'accueil</li>
     `;
