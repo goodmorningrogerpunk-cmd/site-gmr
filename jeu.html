@@ -50,7 +50,7 @@
       display: none; position: absolute; width: 560px; max-width: 92%; min-height: auto; background: #111118; border: 4px solid #ffd54f; border-radius: 8px;
       padding: 22px 20px 18px 20px; z-index: 999999; text-align: center; box-shadow: 0 0 35px rgba(0,0,0,0.95);
     }
-    #tuto-dialog-text { font-size: 19px; line-height: 1.4; color: #ffffff; margin-bottom: 16px; text-align: left; display: block; }
+    #tuto-dialog-text { font-size: 17px; line-height: 1.4; color: #ffffff; margin-bottom: 16px; text-align: left; display: block; }
     #tuto-next-btn { padding: 8px 24px; font-size: 16px; color: #1a1a24; background-color: #ffd54f; border: 3px solid #ffffff; cursor: pointer; font-weight: bold; display: inline-block; }
 
     @media screen and (max-width: 900px) {
@@ -59,7 +59,7 @@
         max-width: 380px !important;
         padding: 10px 12px 8px 12px !important;
       }
-      #tuto-dialog-text { font-size: 13px !important; margin-bottom: 6px !important; }
+      #tuto-dialog-text { font-size: 12px !important; margin-bottom: 6px !important; }
       #tuto-next-btn { padding: 4px 12px !important; font-size: 11px !important; }
     }
 
@@ -104,7 +104,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.26-FINAL</div>
+  <div id="version-display">v13.27-FINAL</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -359,7 +359,7 @@ document.addEventListener('fullscreenchange', handleFullscreenChange);
 document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
 
 function handleFullscreenChange() {
-  const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement);
+  const isFS = !!(document.fullscreenElement || document.webkitfullscreenElement);
   if (isFS) {
     if (isMobileDevice) gameContainer.classList.add('mobile-fullscreen');
     else gameContainer.classList.add('desktop-fullscreen');
@@ -444,7 +444,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.26'; 
+const ASSET_VERSION = 'v13.27'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -660,7 +660,6 @@ function updateTutorialScript() {
         }
       }
     } else if (tutoSubState === 2) {
-      // Consignes dynamiques avec le compteur d'obstacles inclus
       if (tutoObstacleCount === 0) {
         tutoInstructionMessage = `Évite l'obstacle. SAUTE ! (${tutoObstacleCount}/4)`;
       } else if (tutoObstacleCount === 1) {
@@ -779,19 +778,64 @@ function updateTutorialScript() {
       }
 
       if (customLetterSpawnIndex === 5 && items.length === 0 && obstacles.length === 0) {
-        customLetterSpawnIndex = 0;
+        // Fin de l'étape 7: on passe à l'étape 8 avec 2 secondes de jeu en mouvement sans éléments
+        tutoStep = 8; tutoSubState = 0; tutoTimer = 0; customLetterSpawnIndex = 0;
+      }
+    }
+  }
+  else if (tutoStep === 8) {
+    if (tutoSubState === 0) {
+      // 2 secondes de jeu sans éléments à l'écran (~120 frames à 60fps)
+      tutoInstructionMessage = "";
+      if (tutoTimer > 120) {
+        // Faire apparaître le bonus punk
+        let targetH = 65, targetW = 65;
+        if (assets.punkBonus.complete && assets.punkBonus.naturalWidth > 0 && assets.punkBonus.naturalHeight > 0) {
+          const ratio = assets.punkBonus.naturalWidth / assets.punkBonus.naturalHeight; targetW = targetH * ratio;
+        }
+        punkBonus = { x: canvas.width + 50, baseY: 150, y: 150, w: targetW, h: targetH, time: 0, angle: 0, trail: [] };
+        tutoSubState = 1; // Prêt à freezer pour la fenêtre explicative
         tutoTimer = 0;
       }
-    } else if (tutoSubState === 2) {
-      endSequenceTimer++;
-      if (endSequenceTimer > 120) {
-        tutoSubState = 3;
+    } else if (tutoSubState === 1) {
+      // Dès que le bonus punk est généré ou s'approche, on freeze pour afficher la fenêtre explicative
+      if (punkBonus.x <= canvas.width - 250) {
+        tutoSubState = 2; // En attente que le joueur lise la popup
         showTutoDialogBox(
-          "Tu connais désormais les bases pour jouer à Good Morning Roger Sk8in' Cat. Lance-toi !",
-          null,
-          () => { returnToHome(); }
+          "Ça c'est le bonus punk. Il apparaît souvent dans le jeu et si tu l'attrapes, tu deviens invincible pendant une certaine durée. Tu peux alors dégommer tous les obstacles sur ton passage. Cerise sur le gâteau : chaque obstacle dégommé te rapporte des points !",
+          { x: punkBonus.x, y: punkBonus.y, w: punkBonus.w, h: punkBonus.h },
+          () => {
+            tutoSubState = 3; // Le joueur a cliqué suivant, le bonus continue sa course
+          }
         );
       }
+    } else if (tutoSubState === 3) {
+      tutoInstructionMessage = "Attrape le bonus punk !";
+      // Gestion de la boucle si le bonus sort de l'écran à gauche sans être attrapé
+      if (punkBonus && punkBonus.x + punkBonus.w < -50) {
+        punkBonus.x = canvas.width + 50; // Repop à droite
+      }
+      
+      // Si le joueur attrape le bonus punk, l'invincibilité s'active et on laisse passer le jeu normal
+      if (invincibleTimer > 0) {
+        tutoSubState = 4;
+        tutoTimer = 0;
+      }
+    } else if (tutoSubState === 4) {
+      tutoInstructionMessage = "Profite de ton invincibilité pour dégommer les obstacles !";
+      // Une fois l'effet du bonus terminé + 2 secondes de répit (~30 frames après la fin de invincibleTimer)
+      if (invincibleTimer === 0 && tutoTimer > 120) {
+        tutoStep = 9; tutoSubState = 0; tutoTimer = 0; tutoInstructionMessage = "";
+      }
+    }
+  }
+  else if (tutoStep === 9) {
+    if (tutoSubState === 0) {
+      showTutoDialogBox(
+        "Tu connais désormais les bases pour jouer à Good Morning Roger Sk8in' Cat. Lance-toi !",
+        null,
+        () => { returnToHome(); }
+      );
     }
   }
 }
@@ -885,7 +929,7 @@ function spawnWorldElements() {
 }
 
 function handleObstacleSpawned(obsX, obsY, obsW) {
-  if (isTutoMode || superSayen.state === 'LANDING' || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
+  if ((isTutoMode && tutoStep < 8) || superSayen.state === 'LANDING' || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
   obstacleCounter++; const spawnFrequency = 3 + (Math.floor(Math.random() * 3) - 1); 
   if (obstacleCounter % Math.max(2, spawnFrequency) === 0) {
     let letterX = obsX + obsW + 150 + (Math.random() * 100);
@@ -1221,7 +1265,7 @@ function update() {
   if (punkBonus) {
     punkBonus.time += 0.04; punkBonus.x -= 2.2 + Math.sin(punkBonus.time * 2.5) * 1.8; punkBonus.y = punkBonus.baseY + Math.sin(punkBonus.time * 1.5) * 25; punkBonus.angle = Math.sin(punkBonus.time * 3) * 0.15;
     punkBonus.trail.push({ x: punkBonus.x + punkBonus.w / 2 + (Math.random() * 14 - 7), y: punkBonus.y + punkBonus.h / 2 + (Math.random() * 14 - 7), size: Math.random() * 8 + 4, alpha: 1.0, color: Math.random() < 0.6 ? '#ffd54f' : '#ffffff' });
-    if (punkBonus.x + punkBonus.w < -100) punkBonus = null;
+    if (!isTutoMode && punkBonus.x + punkBonus.w < -100) punkBonus = null;
   }
 
   if (punkBonus) {
@@ -1401,10 +1445,16 @@ function update() {
       if (rogerCollected.every(val => val === true)) {
         score += 1000; bonusEffectTimer = 90; 
         if (isTutoMode) {
-          tutoSubState = 2;
-          endSequenceTimer = 0;
-          tutoInstructionMessage = "";
-          obstacles = []; platforms = []; items = [];
+          rogerCollected = [false, false, false, false, false];
+          if (completedWordsCount < 5) {
+            completedWordsCount++;
+            if (completedWordsCount === 5) {
+              tutoStep = 7.5; // Trigger sequence before step 8
+              freezeForSequence = true; 
+              sequenceCurrentLetterIndex = 0; 
+              sequenceAngle = 0;
+            }
+          }
         } else {
           rogerCollected = [false, false, false, false, false];
           if (completedWordsCount < 5) {
@@ -1423,7 +1473,7 @@ function update() {
 
   if (bonusEffectTimer > 0) bonusEffectTimer--;
   
-  if (!isTutoMode) {
+  if (!isTutoMode || tutoStep >= 8) {
     spawnWorldElements();
   }
   
