@@ -17,7 +17,10 @@
     #game-container.desktop-fullscreen { width: 100vw !important; height: 100vh !important; max-width: 100vw !important; max-height: 100vh !important; border-radius: 0 !important; border: none !important; }
     #game-container.mobile-fullscreen { width: 100vw !important; height: 56.25vw !important; max-width: 100vw !important; max-height: 100vh !important; border-radius: 0 !important; border: none !important; z-index: 999999 !important; }
 
-    canvas { width: 100%; height: 100%; object-fit: contain; display: block; image-rendering: pixelated; }
+    canvas { 
+      width: 100%; height: 100%; object-fit: contain; display: block; image-rendering: pixelated; 
+      transform: translateZ(0); -webkit-transform: translateZ(0); /* Optimisation GPU iOS */
+    }
 
     .pixel-btn { font-family: 'Courier New', Courier, monospace; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.1s ease; z-index: 25; }
     .pixel-btn.nav-selected, input.nav-selected { background-color: #ffffff !important; border-color: #ff3333 !important; color: #1a1a24 !important; transform: scale(1.04); box-shadow: 0 0 15px #ffd54f !important; }
@@ -107,7 +110,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.44-STABLE</div>
+  <div id="version-display">v1.0</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -408,14 +411,27 @@ function stopAllSounds() {
   Object.values(sounds).forEach(sound => { sound.pause(); if (sound.readyState >= 2) sound.currentTime = 0; });
 }
 
+let isRunningSoundActive = false;
+
 function playRunSound() {
   if (!audioUnlocked || !gameStarted || gameOver || isPaused || !cat.isGrounded || superSayen.active || tutoHighlightedZone) {
     stopRunSound(); return;
   }
-  if (sounds.run.paused) sounds.run.play().catch(() => {});
+  if (!isRunningSoundActive) {
+    isRunningSoundActive = true;
+    sounds.run.currentTime = 0;
+    sounds.run.play().catch(() => {});
+  }
 }
 
-function stopRunSound() { if (!sounds.run.paused) { sounds.run.pause(); if (sounds.run.readyState >= 2) sounds.run.currentTime = 0; } }
+function stopRunSound() { 
+  if (isRunningSoundActive) {
+    isRunningSoundActive = false;
+    sounds.run.pause();
+    if (sounds.run.readyState >= 2) sounds.run.currentTime = 0;
+  }
+}
+
 function playSoundEffect(sound) { if (audioUnlocked && !isPaused) { try { if (sound.readyState >= 2) sound.currentTime = 0; sound.play().catch(() => {}); } catch(e) {} } }
 
 function togglePause() {
@@ -446,7 +462,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.44'; 
+const ASSET_VERSION = 'v1.0'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -609,8 +625,8 @@ function updateTutorialScript() {
     if (plat && plat.x <= canvas.width - 350 && tutoSubState === 1 && !plat.shownPopup) {
       plat.shownPopup = true;
       const passText = isMobileDevice ? 
-        "Voici une plateforme. Tu peux sauter dessus ou la traverser en faisant TAP GAUCHE." :
-        "Voici une plateforme. Tu peux sauter dessus ou la traverser en appuyant sur la FLÈCHE DU BAS.";
+        "Voici une plateforme. Tu peux sauter dessus (TAP DROIT) ou la traverser en faisant TAP GAUCHE." :
+        "Voici une plateforme. Tu peux sauter dessus (ESPACE) ou la traverser en appuyant sur la FLÈCHE DU BAS.";
       showTutoDialogBox(
         passText,
         { x: plat.x, y: plat.y, w: plat.w, h: plat.h },
@@ -622,7 +638,7 @@ function updateTutorialScript() {
       tutoInstructionMessage = "Saute sur une plateforme";
       if (cat.isPlatformGrounded) { tutoSubState = 3; }
     } else if (tutoSubState === 3) {
-      tutoInstructionMessage = isMobileDevice ? "OK. Maintenant, saute sur la plateforme et descends une fois dessus (TAP DROIT puis une fois dessus TAP GAUCHE)" : "OK. Maintenant, saute sur la plateforme et descends une fois dessus (ESPACE puis une fois dessus FLÈCHE BAS)";
+      tutoInstructionMessage = isMobileDevice ? "Maintenant, saute sur la plateforme et descends une fois dessus (TAP DROIT puis une fois dessus TAP GAUCHE)" : "Maintenant, saute sur la plateforme et descends une fois dessus (ESPACE puis une fois dessus FLÈCHE BAS)";
       const pLong = platforms[0];
       if (pLong) {
         if (cat.isPlatformGrounded) pLong.wasOnPlat = true;
@@ -746,7 +762,7 @@ function updateTutorialScript() {
         () => { tutoSubState = 1; tutoTimer = 0; customLetterSpawnIndex = 0; completedWordsCount = 1; rogerCollected = [false, false, false, false, false]; }
       );
     } else if (tutoSubState === 1) {
-      tutoInstructionMessage = "Attrape toutes les lettres pour former R O G E R !";
+      tutoInstructionMessage = "Attrape les lettres pour former R O G E R !";
 
       if (items.length === 0 && obstacles.length === 0 && platforms.length === 0 && tutoTimer > 40) {
         tutoTimer = 0;
@@ -819,7 +835,7 @@ function updateTutorialScript() {
         tutoTimer = 0;
       }
     } else if (tutoSubState === 3) {
-      tutoInstructionMessage = "Profite de ton invincibilité pour dégommer les obstacles !";
+      tutoInstructionMessage = "Profite de ton invincibilité pour dégommer les obstacles et collecter des lettres !";
       
       if (items.length === 0 && obstacles.length === 0 && platforms.length === 0 && tutoTimer < 750) {
         spawnWorldElements();
