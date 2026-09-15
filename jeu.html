@@ -69,11 +69,18 @@
       border-radius: 4px; pointer-events: none; z-index: 30;
     }
 
-    #rotate-device-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #111118; z-index: 999999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
-    #rotate-device-overlay .rotate-icon { font-size: 60px; margin-bottom: 20px; animation: rotateAnim 2s infinite ease-in-out; }
-    #rotate-device-overlay p { color: #ffd54f; font-size: 20px; font-weight: bold; line-height: 1.4; }
+    /* FORÇAGE DE L'ÉCRAN DE ROTATION POUR SMARTPHONE EN MODE PORTRAIT */
+    #rotate-device-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background-color: #111118; z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px;
+    }
+    #rotate-device-overlay .rotate-icon { font-size: 70px; margin-bottom: 20px; animation: rotateAnim 2s infinite ease-in-out; }
+    #rotate-device-overlay p { color: #ffd54f; font-size: 20px; font-weight: bold; line-height: 1.5; font-family: 'Courier New', Courier, monospace; }
     @keyframes rotateAnim { 0%, 10% { transform: rotate(0deg); } 50%, 60% { transform: rotate(-90deg); } 100% { transform: rotate(0deg); } }
-    @media screen and (orientation: portrait) and (max-width: 900px) { #rotate-device-overlay { display: flex !important; } }
+    
+    @media screen and (max-width: 900px) and (orientation: portrait) {
+      #rotate-device-overlay { display: flex !important; }
+    }
   </style>
 </head>
 <body>
@@ -100,7 +107,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.43-STABLE</div>
+  <div id="version-display">v13.44-STABLE</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -439,7 +446,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.43'; 
+const ASSET_VERSION = 'v13.44'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -828,7 +835,6 @@ function updateTutorialScript() {
       platforms = []; obstacles = []; items = [];
       if (tutoTimer > 120) {
         tutoStep = 9; tutoSubState = 0; tutoTimer = 0; tutoInstructionMessage = "";
-        // Forçage direct de l'affichage de la fenêtre finale après 1 sec (60 frames) de freeze
         setTimeout(() => {
           showTutoDialogBox(
             "Tu connais désormais les bases pour jouer à Good Morning Roger Sk8in' Cat. À toi de jouer !",
