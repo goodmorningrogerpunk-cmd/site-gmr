@@ -283,6 +283,8 @@ let rightSideIdx = 0;
 const gameOverButtons = [restartBtn, homeGameOverBtn];
 let gameOverSelectedIdx = 0;
 
+let konamiButtonIdx = 0; // 0 pour "Carrément", 1 pour "Non, je garde le 8 bit"
+
 const formNavElements = [inputPseudo, inputEmail, cancelSaveBtn, saveBtn];
 let formNavIdx = 0;
 
@@ -316,6 +318,16 @@ function updateGameOverSelection() {
     if (idx === gameOverSelectedIdx) btn.classList.add('nav-selected');
     else btn.classList.remove('nav-selected');
   });
+}
+
+function updateKonamiSelection() {
+  if (konamiButtonIdx === 0) {
+    konamiYesBtn.classList.add('nav-selected');
+    konamiNoBtn.classList.remove('nav-selected');
+  } else {
+    konamiNoBtn.classList.add('nav-selected');
+    konamiYesBtn.classList.remove('nav-selected');
+  }
 }
 
 function updatePromptSelection(option) {
@@ -1032,12 +1044,25 @@ window.addEventListener('keydown', (e) => {
     return;
   }
 
+  if (konamiModal.style.display === 'flex') {
+    if (e.code === 'ArrowLeft' || e.code === 'ArrowRight') {
+      konamiButtonIdx = konamiButtonIdx === 0 ? 1 : 0;
+      updateKonamiSelection();
+    } else if (e.code === 'Enter' || e.code === 'Space') {
+      if (konamiButtonIdx === 0) konamiYesBtn.click();
+      else konamiNoBtn.click();
+    }
+    return;
+  }
+
   if (!gameStarted && rulesModal.style.display !== 'flex' && leaderboardModal.style.display !== 'flex' && aboutModal.style.display !== 'flex' && konamiModal.style.display !== 'flex') {
     const inputKey = e.key.length === 1 ? e.key.toLowerCase() : e.code; const targetKey = konamiCode[konamiIndex];
     if (inputKey === targetKey || e.code === targetKey) {
       konamiIndex++; 
       if (konamiIndex === konamiCode.length) { 
         konamiIndex = 0; 
+        konamiButtonIdx = 0;
+        updateKonamiSelection();
         konamiModal.style.display = 'flex'; 
       }
     } else {
@@ -1246,6 +1271,9 @@ konamiYesBtn.addEventListener('click', () => {
   startBgMusic(); 
   resetGame();
 });
+
+konamiYesBtn.addEventListener('mouseenter', () => { konamiButtonIdx = 0; updateKonamiSelection(); });
+konamiNoBtn.addEventListener('mouseenter', () => { konamiButtonIdx = 1; updateKonamiSelection(); });
 
 leaderboardBtn.addEventListener('click', () => { playIntroMusic(); fetchLeaderboard(); leaderboardModal.style.display = 'flex'; });
 closeLeaderboardBtn.addEventListener('click', () => { leaderboardModal.style.display = 'none'; });
