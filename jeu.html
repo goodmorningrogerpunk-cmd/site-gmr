@@ -100,7 +100,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.41-STABLE</div>
+  <div id="version-display">v13.42-STABLE</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -439,7 +439,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.41'; 
+const ASSET_VERSION = 'v13.42'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -833,6 +833,7 @@ function updateTutorialScript() {
   }
   else if (tutoStep === 9) {
     if (tutoSubState === 0) {
+      tutoSubState = 1; // Empêche de relancer en boucle
       showTutoDialogBox(
         "Tu connais désormais les bases pour jouer à Good Morning Roger Sk8in' Cat. À toi de jouer !",
         null,
