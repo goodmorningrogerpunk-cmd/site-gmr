@@ -100,7 +100,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.40-STABLE</div>
+  <div id="version-display">v13.41-STABLE</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -439,7 +439,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.40'; 
+const ASSET_VERSION = 'v13.41'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -779,7 +779,6 @@ function updateTutorialScript() {
   }
   else if (tutoStep === 8) {
     if (tutoSubState === 0) {
-      // 1. Le chat roule 2 sec (120 frames) dans le décor complètement vide
       tutoInstructionMessage = "";
       items = []; obstacles = []; platforms = [];
       if (tutoTimer > 120) {
@@ -792,7 +791,6 @@ function updateTutorialScript() {
         tutoTimer = 0;
       }
     } else if (tutoSubState === 1) {
-      // 2. Apparition du bonus punk, freeze et affichage de la fenêtre explicative avec "SUIVANT"
       if (punkBonus && punkBonus.x <= canvas.width - 150) {
         showTutoDialogBox(
           "Ça c'est le bonus punk. Si tu l'attrapes, tu deviens invincible pendant une courte durée et tu peux dégommer tous les obstacles sur ton passage pour engranger max de points !",
@@ -805,12 +803,10 @@ function updateTutorialScript() {
     } else if (tutoSubState === 2) {
       tutoInstructionMessage = "Attrape le bonus punk !";
       
-      // 3. S'il rate le bonus, on boucle pour qu'il réapparaisse
       if (punkBonus && punkBonus.x + punkBonus.w < -50) {
         punkBonus.x = canvas.width + 50; 
       }
       
-      // 4. Dès qu'il l'attrape (déclenchement de l'invincibilité)
       if (invincibleTimer > 0) {
         tutoSubState = 3;
         tutoTimer = 0;
@@ -818,19 +814,16 @@ function updateTutorialScript() {
     } else if (tutoSubState === 3) {
       tutoInstructionMessage = "Profite de ton invincibilité pour dégommer les obstacles !";
       
-      // Pendant l'invincibilité, spawn dynamique d'éléments sur le modèle du jeu
       if (items.length === 0 && obstacles.length === 0 && platforms.length === 0 && tutoTimer < 750) {
         spawnWorldElements();
       }
 
-      // Dès que l'invincibilité se termine, on nettoie tout
       if (invincibleTimer === 0) {
         platforms = []; obstacles = []; items = []; 
         tutoSubState = 4;
         tutoTimer = 0;
       }
     } else if (tutoSubState === 4) {
-      // Plus aucun élément, le chat roule 2 sec (120 frames) avant la fenêtre finale
       tutoInstructionMessage = "";
       platforms = []; obstacles = []; items = [];
       if (tutoTimer > 120) {
@@ -1479,7 +1472,6 @@ function update() {
 
   if (bonusEffectTimer > 0) bonusEffectTimer--;
   
-  // En mode tuto, on ne fait spawn les éléments généraux du monde que pendant la phase d'invincibilité de l'étape 8 (substate 3) ou hors tuto
   if (!isTutoMode || (tutoStep === 8 && tutoSubState === 3)) {
     spawnWorldElements();
   }
