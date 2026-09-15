@@ -104,7 +104,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.22-FINAL</div>
+  <div id="version-display">v13.23-FINAL</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -444,7 +444,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.22'; 
+const ASSET_VERSION = 'v13.23'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -737,6 +737,15 @@ function updateTutorialScript() {
     } else if (tutoSubState === 1) {
       tutoInstructionMessage = "Attrape toutes les lettres de R O G E R !";
       
+      // VÉRIFICATION CONTINUE : Dès que les 5 lettres sont collectées, on déclenche la fin !
+      if (rogerCollected.every(Boolean)) {
+        tutoSubState = 2;
+        endSequenceTimer = 0;
+        tutoInstructionMessage = "";
+        obstacles = []; platforms = []; items = [];
+        return;
+      }
+
       if (items.length === 0 && obstacles.length === 0 && platforms.length === 0 && tutoTimer > 40) {
         tutoTimer = 0;
         if (customLetterSpawnIndex === 0) {
@@ -768,23 +777,14 @@ function updateTutorialScript() {
         }
       }
 
-      // FIN DE BOUCLE : Si la série s'arrête
+      // BOUCLE DE FIN DE SÉRIE : Si la série se termine et qu'il manque des lettres, on relance une boucle
       if (customLetterSpawnIndex === 5 && items.length === 0 && obstacles.length === 0) {
-        if (!rogerCollected.every(Boolean)) {
-          // Si toutes les lettres ne sont pas collectées, on relance une boucle !
-          customLetterSpawnIndex = 0;
-          tutoTimer = 0;
-        } else {
-          // Tout est collecté ! On passe à l'attente de 2 secondes avant la fenêtre finale
-          tutoSubState = 2;
-          endSequenceTimer = 0;
-          tutoInstructionMessage = "";
-          obstacles = []; platforms = []; items = [];
-        }
+        customLetterSpawnIndex = 0;
+        tutoTimer = 0;
       }
     } else if (tutoSubState === 2) {
       endSequenceTimer++;
-      // Attente d'environ 2 secondes (120 frames à 60fps) puis déclenchement de la boîte de fin
+      // Attente de 2 secondes (120 frames à 60fps) puis déclenchement de la boîte de fin
       if (endSequenceTimer > 120) {
         tutoSubState = 3;
         showTutoDialogBox(
