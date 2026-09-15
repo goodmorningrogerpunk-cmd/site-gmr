@@ -45,7 +45,7 @@
     .modal-content-scroll { flex: 1; overflow-y: auto; padding-right: 6px; margin-bottom: 12px; }
     .modal-close-btn { display: block; margin: 0 auto; padding: 10px 24px; background: #ffd54f; color: #1a1a24; border: 3px solid #ffffff; font-size: 15px; font-weight: bold; cursor: pointer; }
 
-    /* FENÊTRES DE FREEZE : POSITIONNEMENT DYNAMIQUE GÉRÉ EN JS */
+    /* FENÊTRES DE FREEZE : PILOTÉ EN JS (HAUT PAR DÉFAUT, BAS SI SPÉCIFIÉ) */
     #tuto-dialog-box {
       display: none; position: absolute; width: 560px; max-width: 92%; min-height: auto; background: #111118; border: 4px solid #ffd54f; border-radius: 8px;
       padding: 22px 20px 18px 20px; z-index: 999999; text-align: center; box-shadow: 0 0 35px rgba(0,0,0,0.95);
@@ -104,7 +104,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.16-FIXED</div>
+  <div id="version-display">v13.18-FINAL</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -351,6 +351,11 @@ let isPaused = false;
 const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
                  || (window.matchMedia && window.matchMedia("(max-width: 900px) and (pointer: coarse)").matches);
 
+// APPLICATION IMMÉDIATE DU PLEIN ÉCRAN MOBILE POUR ÉVITER LE DÉCALAGE DU BOUTON TUTO AU CHARGEMENT
+if (isMobileDevice) {
+  gameContainer.classList.add('mobile-fullscreen');
+}
+
 document.addEventListener('fullscreenchange', handleFullscreenChange);
 document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
 
@@ -440,7 +445,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.16'; 
+const ASSET_VERSION = 'v13.18'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -520,16 +525,17 @@ function showTutoDialogBox(text, highlightRect, onNext) {
   tutoHighlightedZone = highlightRect;
   tutoNextCallback = onNext;
   
-  if (tutoStep === 1 || tutoStep === 2) {
+  // Étapes 1 & 2 (Score/Contrôles) + Étapes Grosses/Petites lettres (6 & 7) en BAS. Le reste en HAUT.
+  if (tutoStep === 1 || tutoStep === 2 || tutoStep === 6 || tutoStep === 7) {
     tutoDialogBox.style.top = 'auto';
-    tutoDialogBox.style.bottom = '40px';
+    tutoDialogBox.style.bottom = '35px';
     tutoDialogBox.style.left = '50%';
     tutoDialogBox.style.transform = 'translateX(-50%)';
   } else {
-    tutoDialogBox.style.top = '50%';
+    tutoDialogBox.style.top = '18px';
     tutoDialogBox.style.bottom = 'auto';
     tutoDialogBox.style.left = '50%';
-    tutoDialogBox.style.transform = 'translate(-50%, -50%)';
+    tutoDialogBox.style.transform = 'translateX(-50%)';
   }
 
   tutoDialogBox.style.display = 'block';
@@ -1144,8 +1150,7 @@ mobilePauseBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePau
 mobileHomeBtn.addEventListener('click', (e) => { e.stopPropagation(); returnToHome(); });
 
 window.addEventListener('load', () => {
-  if (isMobileDevice) gameContainer.classList.add('mobile-fullscreen'); 
-  else desktopFullscreenBtn.style.display = 'block';
+  if (!isMobileDevice) desktopFullscreenBtn.style.display = 'block';
   playIntroMusic(); updateRulesText(); updateMenuSelection();
 });
 document.addEventListener('click', () => { requestGameFullscreen(); if (!gameStarted) playIntroMusic(); }, { once: true });
