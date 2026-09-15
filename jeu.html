@@ -101,7 +101,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.33-FINAL</div>
+  <div id="version-display">v13.34-FINAL</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -441,7 +441,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.33'; 
+const ASSET_VERSION = 'v13.34'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -812,20 +812,21 @@ function updateTutorialScript() {
       if (invincibleTimer > 0) {
         tutoSubState = 4;
         tutoTimer = 0;
-        lastObstacleX = cat.x + 200;
-        lastLetterX = cat.x + 200;
+        // Empêche tout spawn parasite d'obstacles ou de lettres au démarrage de l'invincibilité
+        lastObstacleX = 999999;
+        lastLetterX = 999999;
+        platforms = []; obstacles = []; items = [];
       }
     } else if (tutoSubState === 4) {
       tutoInstructionMessage = "Profite de ton invincibilité pour dégommer les obstacles !";
-      // Dès que l'invincibilité s'arrête, on fige immédiatement la génération et on lance un timer de 2 secondes
       if (invincibleTimer === 0 && tutoSubState === 4) {
-        platforms = []; obstacles = []; items = []; // Nettoyage instantané
+        platforms = []; obstacles = []; items = [];
         tutoSubState = 5;
         tutoTimer = 0;
       }
     } else if (tutoSubState === 5) {
       tutoInstructionMessage = "";
-      // On attend 2 secondes (120 frames) avant de passer à l'étape finale
+      platforms = []; obstacles = []; items = [];
       if (tutoTimer > 120) {
         tutoStep = 9; tutoSubState = 0; tutoTimer = 0; tutoInstructionMessage = "";
       }
@@ -881,7 +882,6 @@ function isPositionNearLetter(targetX, targetW = 100, safeMargin = 180) {
 }
 
 function spawnWorldElements() {
-  // En mode tuto, on bloque strictement la génération hors de la phase d'invincibilité de l'étape 8
   if ((isTutoMode && (tutoStep < 8 || (tutoStep === 8 && (invincibleTimer === 0 || tutoSubState >= 5)))) || superSayen.state === 'LANDING' || freezeForSequence || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
 
   const lastPlat = platforms[platforms.length - 1]; const lastX = lastPlat ? lastPlat.x + lastPlat.w : 350;
@@ -1228,7 +1228,7 @@ function update() {
 
   if (isTutoMode) {
     updateTutorialScript();
-    if (tutoHighlightedZone) { stopRunSound(); return; }
+    if (tutoHighlightedZone || (isTutoMode && tutoStep === 8 && tutoSubState === 5)) { stopRunSound(); return; }
   }
 
   if (freezeForSequence) {
