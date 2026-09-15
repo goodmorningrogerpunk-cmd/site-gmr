@@ -100,7 +100,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.38-STABLE</div>
+  <div id="version-display">v13.39-STABLE</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -439,7 +439,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.38'; 
+const ASSET_VERSION = 'v13.39'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -1432,7 +1432,18 @@ function update() {
       score += 100;
       it.collected = true; playSoundEffect(sounds.coin);
 
-      const letterIndex = rogerLetters.indexOf(it.char);
+      // Gestion intelligente des 2 'R' (1er R en position 0, ou 2ème R en position 4 si le 1er est déjà pris)
+      let letterIndex = -1;
+      if (it.char === 'R') {
+        if (!rogerCollected[0]) {
+          letterIndex = 0;
+        } else if (!rogerCollected[4]) {
+          letterIndex = 4;
+        }
+      } else {
+        letterIndex = rogerLetters.indexOf(it.char);
+      }
+
       if (letterIndex !== -1 && !rogerCollected[letterIndex]) {
         rogerCollected[letterIndex] = true;
       }
