@@ -660,15 +660,15 @@ function updateTutorialScript() {
         }
       }
     } else if (tutoSubState === 2) {
-      // Gestion dynamique de la consigne selon l'obstacle actuel (0 à 3)
+      // Consignes dynamiques avec le compteur d'obstacles inclus
       if (tutoObstacleCount === 0) {
-        tutoInstructionMessage = "Évite l'obstacle. SAUTE !";
+        tutoInstructionMessage = `Évite l'obstacle. SAUTE ! (${tutoObstacleCount}/4)`;
       } else if (tutoObstacleCount === 1) {
-        tutoInstructionMessage = "Évite l'obstacle. BAISSE-TOI !";
+        tutoInstructionMessage = `Évite l'obstacle. BAISSE-TOI ! (${tutoObstacleCount}/4)`;
       } else if (tutoObstacleCount === 2) {
-        tutoInstructionMessage = "Évite l'obstacle. SAUTE !";
+        tutoInstructionMessage = `Évite l'obstacle. SAUTE ! (${tutoObstacleCount}/4)`;
       } else if (tutoObstacleCount === 3) {
-        tutoInstructionMessage = "Évite l'obstacle. BAISSE-TOI !";
+        tutoInstructionMessage = `Évite l'obstacle. BAISSE-TOI ! (${tutoObstacleCount}/4)`;
       }
 
       if (obstacles.length === 0 && tutoTimer > 60) {
