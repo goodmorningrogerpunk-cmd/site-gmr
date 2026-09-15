@@ -24,14 +24,19 @@
 
     #desktop-fullscreen-btn { position: absolute; top: 15px; left: 15px; padding: 8px 14px; font-size: 12px; color: #ffd54f; background-color: rgba(26, 26, 36, 0.85); border: 2px solid #ffd54f; box-shadow: 0 4px 0px #000; z-index: 30; display: none; }
 
-    /* Bouton TUTO bien remonté sur l'écran d'accueil pour ne plus être collé */
-    #tuto-main-btn { position: absolute; top: 56%; left: 5%; transform: translateY(-50%); padding: 12px 24px; font-size: 18px; color: #ffffff; background-color: #2e2e40; border: 3px solid #ffd54f; box-shadow: 0 4px 0px #000; }
-    #start-main-btn { position: absolute; top: 87%; left: 5%; transform: translateY(-50%); padding: 16px 28px; font-size: 20px; color: #1a1a24; background-color: #ffd54f; border: 4px solid #ffffff; box-shadow: 0 6px 0px #b29320; }
+    /* MENU ACCUEIL ORDINATEUR RESTAURÉ À L'IDENTIQUE */
+    #start-main-btn { position: absolute; top: 72%; left: 5%; transform: translateY(-50%); padding: 16px 28px; font-size: 20px; color: #1a1a24; background-color: #ffd54f; border: 4px solid #ffffff; box-shadow: 0 6px 0px #b29320; }
+    #tuto-main-btn { position: absolute; top: 57%; left: 5%; transform: translateY(-50%); padding: 12px 24px; font-size: 18px; color: #ffffff; background-color: #2e2e40; border: 3px solid #ffd54f; box-shadow: 0 4px 0px #000; }
 
-    /* Colonne de droite abaissée sur PC pour que QUITTER s'aligne en bas avec LANCER LA PARTIE */
-    .right-buttons-stack { position: absolute; top: 67.5%; right: 5%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 25; }
+    .right-buttons-stack { position: absolute; top: 50%; right: 5%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 25; }
     .secondary-btn { padding: 8px 16px; font-size: 13px; color: #ffd54f; background-color: #1a1a24; border: 3px solid #ffd54f; box-shadow: 0 4px 0px #000; text-align: center; }
     .quit-btn { color: #ff5252; border-color: #ff5252; }
+
+    /* Rédistribution des boutons sur smartphone pour éviter qu'ils ne se collent */
+    @media screen and (max-width: 900px) {
+      #start-main-btn { top: 76% !important; }
+      #tuto-main-btn { top: 56% !important; }
+    }
 
     .game-over-actions { display: none; position: absolute; top: 80%; left: 50%; transform: translate(-50%, -50%); flex-direction: row; gap: 16px; z-index: 20; }
     #restart-btn, #home-gameover-btn { padding: 14px 28px; font-size: 18px; color: #1a1a24; background-color: #ffd54f; border: 4px solid #ffffff; box-shadow: 0 6px 0px #b29320; }
@@ -42,11 +47,17 @@
     .modal-close-btn { display: block; margin: 0 auto; padding: 10px 24px; background: #ffd54f; color: #1a1a24; border: 3px solid #ffffff; font-size: 15px; font-weight: bold; cursor: pointer; }
 
     #tuto-dialog-box {
-      display: none; position: absolute; width: 560px; min-height: 220px; background: #111118; border: 4px solid #ffd54f; border-radius: 8px;
-      padding: 34px 24px 24px 24px; z-index: 65000; text-align: center; box-shadow: 0 0 35px rgba(0,0,0,0.95);
+      display: none; position: absolute; width: 560px; min-height: 180px; background: #111118; border: 4px solid #ffd54f; border-radius: 8px;
+      padding: 26px 24px 20px 24px; z-index: 65000; text-align: center; box-shadow: 0 0 35px rgba(0,0,0,0.95);
     }
-    #tuto-dialog-text { font-size: 21px; line-height: 1.45; color: #ffffff; margin-top: 5px; margin-bottom: 20px; text-align: left; display: block; }
-    #tuto-next-btn { padding: 10px 28px; font-size: 18px; color: #1a1a24; background-color: #ffd54f; border: 3px solid #ffffff; cursor: pointer; font-weight: bold; }
+    #tuto-dialog-text { font-size: 21px; line-height: 1.4; color: #ffffff; margin-top: 2px; margin-bottom: 16px; text-align: left; display: block; }
+    #tuto-next-btn { padding: 8px 24px; font-size: 16px; color: #1a1a24; background-color: #ffd54f; border: 3px solid #ffffff; cursor: pointer; font-weight: bold; }
+
+    @media screen and (max-width: 900px) {
+      #tuto-dialog-box { width: 92% !important; max-width: 500px !important; padding: 18px 16px 14px 16px !important; }
+      #tuto-dialog-text { font-size: 15px !important; margin-bottom: 12px !important; }
+      #tuto-next-btn { padding: 6px 20px !important; font-size: 14px !important; }
+    }
 
     #score-prompt-box, #save-score-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111118; border: 4px solid #ffd54f; border-radius: 8px; padding: 20px; z-index: 60000; text-align: center; }
     #mobile-hud-controls { display: none; position: absolute; top: 15px; right: 15px; gap: 8px; z-index: 40; }
@@ -89,7 +100,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.8-FIX-UI-EXACT</div>
+  <div id="version-display">v13.9-CLEAN-UI</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -426,7 +437,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.8'; 
+const ASSET_VERSION = 'v13.9'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -501,7 +512,7 @@ const cat = { x: 100, y: ENTITY_GROUND_Y - 110, width: 110, height: 110, vy: 0, 
 
 let platforms = []; let obstacles = []; let items = []; let lastObstacleX = -1000; let obstacleCounter = 0;
 
-// GESTION POSITIONNEMENT DIALOGUES TUTO (Fenêtre explicative STRICTEMENT AU-DESSUS pour ne pas masquer les éléments du focus)
+// GESTION POSITIONNEMENT DIALOGUES TUTO (Fenêtre explicative STRICTEMENT PLUS HAUT, sans masquer les éléments éclairés)
 function showTutoDialogSide(text, highlightRect, onNext, isCustomModal = false, customPlacementType = 'NONE') {
   tutoDialogText.innerHTML = text;
   tutoHighlightedZone = highlightRect;
@@ -516,19 +527,12 @@ function showTutoDialogSide(text, highlightRect, onNext, isCustomModal = false, 
     return;
   }
 
-  // Positionnements spécifiques mobile demandés (fenêtre AU-DESSUS des éléments)
+  // Positionnements spécifiques mobile (fenêtre haut/centre pour laisser libre les bas de l'écran)
   if (isMobileDevice && isCustomModal) {
-    if (customPlacementType === 'MASTER_LETTERS') {
-      // Grosses lettres R-O : fenetre au-dessus, bien positionnée en haut (top: 25px) pour laisser voir les lettres en bas
-      tutoDialogBox.style.left = '20px';
-      tutoDialogBox.style.top = '25px';
-      tutoDialogBox.style.transform = 'none';
-      return;
-    } else if (customPlacementType === 'ROGER_HUD') {
-      // Bloc R-O-G-E-R en bas à droite : fenetre au-dessus, positionnée à gauche (left: 30px) et tout en haut (top: 25px) pour ne pas cacher le HUD en bas à droite
-      tutoDialogBox.style.left = '30px';
-      tutoDialogBox.style.top = '25px';
-      tutoDialogBox.style.transform = 'none';
+    if (customPlacementType === 'MASTER_LETTERS' || customPlacementType === 'ROGER_HUD') {
+      tutoDialogBox.style.left = '50%';
+      tutoDialogBox.style.top = '15%';
+      tutoDialogBox.style.transform = 'translateX(-50%)';
       return;
     }
   }
@@ -537,11 +541,8 @@ function showTutoDialogSide(text, highlightRect, onNext, isCustomModal = false, 
   if (leftPos + 560 > canvas.width) leftPos = highlightRect.x - 580;
   if (leftPos < 20) leftPos = 20;
 
-  // Par défaut, positionnement au-dessus de la zone éclairée
-  let topPos = highlightRect.y - 230;
-  if (topPos < 20) topPos = highlightRect.y + highlightRect.h + 20;
-  if (topPos + 220 > canvas.height) topPos = canvas.height - 240;
-
+  // Positionnement haut dans l'écran pour être au-dessus des éléments
+  let topPos = 25;
   tutoDialogBox.style.left = leftPos + 'px';
   tutoDialogBox.style.top = topPos + 'px';
   tutoDialogBox.style.transform = 'none';
@@ -705,7 +706,7 @@ function updateTutorialScript() {
   }
   else if (tutoStep === 6) {
     if (tutoSubState === 0) {
-      // EXPLICATION GROSSES LETTRES (Fenêtre positionnée bien au-dessus, sans masquer les lettres)
+      // EXPLICATION GROSSES LETTRES (Fenêtre positionnée plus haut dans l'écran)
       showTutoDialogSide(
         "Ces grosses lettres R O G E R te protègent d'un choc avec un obstacle.",
         { x: 15, y: canvas.height - 130, w: 200, h: 110 },
@@ -742,7 +743,7 @@ function updateTutorialScript() {
   }
   else if (tutoStep === 7) {
     if (tutoSubState === 0) {
-      // EXPLICATION PETITES LETTRES EN BAS À DROITE (Fenêtre positionnée en haut à gauche, loin du HUD en bas à droite)
+      // EXPLICATION PETITES LETTRES EN BAS À DROITE (Fenêtre positionnée plus haut dans l'écran)
       showTutoDialogSide(
         "Collecte ces lettres pour reformer R O G E R en bas à droite et gagner une grosse lettre.",
         { x: canvas.width - 340, y: canvas.height - 95, w: 320, h: 85 },
