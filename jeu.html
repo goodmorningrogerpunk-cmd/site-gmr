@@ -577,8 +577,8 @@ function updateTutorialScript() {
   else if (tutoStep === 2) {
     if (tutoTimer > 30) {
       const controlsText = isMobileDevice ?
-        "En appuyant sur le <b>CÔTÉ DROIT DE L'ÉCRAN</b>, Roger fait un saut. En appuyant sur le <b>CÔTÉ GAUCHE</b>, Roger se baisse." :
-        "En appuyant sur <b>ESPACE</b>, Roger fait un saut. En appuyant sur la <b>FLÈCHE DU BAS</b>, Roger se baisse. Pour mettre le jeu en pause, appuie sur <b>ENTRÉE</b>.";
+        "En appuyant sur le <b>côté droit de l'écran (TAP DROIT)</b>, Roger fait un saut. Appui long = saut long ; Appui court = saut court. En appuyant sur le <b>côté gauche (TAP GAUCHE)</b>, Roger se baisse. Le bouton "P" sert à mettre le jeu en pause et le bouton "R" à revenir au menu." :
+        "En appuyant sur <b>ESPACE</b>, Roger fait un saut. Appui long = saut long ; Appui court = saut court. En appuyant sur la <b>FLÈCHE DU BAS</b>, Roger se baisse. Pour mettre le jeu en pause, appuie sur <b>ENTRÉE</b>.";
 
       const hudX = isMobileDevice ? canvas.width - 370 : canvas.width - 340;
       showTutoDialogBox(
@@ -590,13 +590,13 @@ function updateTutorialScript() {
   }
   else if (tutoStep === 3) {
     if (tutoSubState === 1) {
-      tutoInstructionMessage = isMobileDevice ? "Fais un long saut (maintiens le CÔTÉ DROIT)" : "Fais un long saut (appui long sur ESPACE)";
+      tutoInstructionMessage = isMobileDevice ? "Fais un long saut (TAP DROIT appui long)" : "Fais un long saut (appui long sur ESPACE)";
       if (!cat.isGrounded && cat.jumpTimer >= 10) { tutoSubState = 2; tutoTimer = 0; }
     } else if (tutoSubState === 2) {
-      tutoInstructionMessage = isMobileDevice ? "Maintenant, baisse-toi (touche le CÔTÉ GAUCHE)" : "Maintenant, baisse-toi (FLÈCHE DU BAS)";
+      tutoInstructionMessage = isMobileDevice ? "Maintenant, baisse-toi (TAP GAUCHE)" : "Maintenant, baisse-toi (FLÈCHE DU BAS)";
       if (cat.isCrouching) { tutoSubState = 3; tutoTimer = 0; }
     } else if (tutoSubState === 3) {
-      tutoInstructionMessage = isMobileDevice ? "Fais un petit saut (tap court sur le CÔTÉ DROIT)" : "Fais un petit saut (appui court sur ESPACE)";
+      tutoInstructionMessage = isMobileDevice ? "Fais un petit saut (TAP DROIT appui court)" : "Fais un petit saut (appui court sur ESPACE)";
       if (cat.vy < 0 && cat.jumpTimer < 5 && !keys['Space'] && !keys['ArrowUp']) {
         tutoStep = 4; tutoTimer = 0; tutoSubState = 1; tutoInstructionMessage = "";
       }
@@ -607,7 +607,7 @@ function updateTutorialScript() {
     if (plat && plat.x <= canvas.width - 350 && tutoSubState === 1 && !plat.shownPopup) {
       plat.shownPopup = true;
       const passText = isMobileDevice ? 
-        "Voici une plateforme. Tu peux sauter dessus ou la traverser en touchant le CÔTÉ GAUCHE." :
+        "Voici une plateforme. Tu peux sauter dessus ou la traverser en faisant TAP GAUCHE." :
         "Voici une plateforme. Tu peux sauter dessus ou la traverser en appuyant sur la FLÈCHE DU BAS.";
       showTutoDialogBox(
         passText,
@@ -620,7 +620,7 @@ function updateTutorialScript() {
       tutoInstructionMessage = "Saute sur une plateforme";
       if (cat.isPlatformGrounded) { tutoSubState = 3; }
     } else if (tutoSubState === 3) {
-      tutoInstructionMessage = isMobileDevice ? "Descends de la plateforme (touche le CÔTÉ GAUCHE)" : "Descends de la plateforme (FLÈCHE DU BAS)";
+      tutoInstructionMessage = isMobileDevice ? "Très bien. Maintenant, saute sur la plateforme et descends quand tu es dessus (TAP DROIT puis une fois dessus TAP GAUCHE)" : "Très bien. Maintenant, saute sur la plateforme et descends quand tu es dessus (ESPACE puis une fois dessus FLÈCHE DU BAS)";
       const pLong = platforms[0];
       if (pLong) {
         if (cat.isPlatformGrounded) pLong.wasOnPlat = true;
@@ -630,7 +630,7 @@ function updateTutorialScript() {
         if (pLong.descendedFromPlat && cat.isGrounded) { tutoSubState = 4; }
       }
     } else if (tutoSubState === 4) {
-      tutoInstructionMessage = isMobileDevice ? "Saute et passe au travers (DROITE puis GAUCHE)" : "Saute et passe au travers (ESPACE puis BAS)";
+      tutoInstructionMessage = isMobileDevice ? "Super ! Et enfin, saute en passant au travers de la plateforme (TAP DROIT puis tout de suite après TAP GAUCHE)" : "Super ! Et enfin, saute en passant au travers de la plateforme (ESPACE puis tout de suite après FLÈCHE DU BAS)";
       const pPass = platforms[0];
       if (pPass) {
         if (cat.isPlatformGrounded) { pPass.touchedPlatform = true; }
@@ -653,7 +653,7 @@ function updateTutorialScript() {
           obs.shownPopup = true;
           tutoSubState = 1;
           showTutoDialogBox(
-            "Ceci est un obstacle. Évite-le en sautant ou en te baissant.",
+            "Ceci est un obstacle. Tu peux les éviter en sautant ou en te baissant selon où ils sont placés.",
             { x: obs.x, y: obs.y, w: obs.w, h: obs.h },
             () => { tutoSubState = 2; tutoObstacleCount = 0; tutoTimer = 0; }
           );
@@ -703,7 +703,7 @@ function updateTutorialScript() {
         () => { tutoSubState = 1; }
       );
     } else if (tutoSubState === 1) {
-      tutoInstructionMessage = "Fonce sur un obstacle pour tester la protection !";
+      tutoInstructionMessage = "Pour le fun (mais à ne pas faire dans le jeu), fonce sur un obstacle pour tester cette protection !";
       if (obstacles.length === 0 && tutoTimer > 40) {
         const conf = assets.obstaclesConfig[5]; const dim = getObstacleDimensions(conf);
         obstacles.push({ x: canvas.width + 100, y: ENTITY_GROUND_Y - dim.h + 5, w: dim.w, h: dim.h, configIdx: 5, frame: 0, animTimer: 0 });
@@ -713,7 +713,7 @@ function updateTutorialScript() {
         tutoTimer = 0;
         obstacles = [];
         showTutoDialogBox(
-          "Tu vois, la lettre O t'a protégé ! S'il n'y a plus de lettres, c'est le Game Over !",
+          "La lettre O t'a protégé et va donc disparaître ! Il te reste encore le R. Mais attention : s'il n'y a plus de lettres, c'est le Game Over assuré !",
           { x: 15, y: canvas.height - 130, w: 105, h: 110 },
           () => {
             tutoSubState = 3;
@@ -730,12 +730,12 @@ function updateTutorialScript() {
   else if (tutoStep === 7) {
     if (tutoSubState === 0) {
       showTutoDialogBox(
-        "Collecte ces lettres pour reformer R O G E R en bas à droite. Tu as droit à 1 joker de protection R !",
+        "Pour récupérer une grosse lettre de protection, collecte les lettres sur ton chemin pour reformer R O G E R en bas à droite.",
         { x: canvas.width - 340, y: canvas.height - 95, w: 320, h: 85 },
         () => { tutoSubState = 1; tutoTimer = 0; customLetterSpawnIndex = 0; completedWordsCount = 1; rogerCollected = [false, false, false, false, false]; }
       );
     } else if (tutoSubState === 1) {
-      tutoInstructionMessage = "Attrape toutes les lettres de R O G E R !";
+      tutoInstructionMessage = "Attrape toutes les lettres pour former R O G E R !";
 
       if (items.length === 0 && obstacles.length === 0 && platforms.length === 0 && tutoTimer > 40) {
         tutoTimer = 0;
