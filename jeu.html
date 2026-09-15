@@ -77,7 +77,7 @@
     #rotate-device-overlay .rotate-icon { font-size: 60px; margin-bottom: 20px; animation: rotateAnim 2s infinite ease-in-out; }
     #rotate-device-overlay p { color: #ffd54f; font-size: 20px; font-weight: bold; line-height: 1.4; }
     @keyframes rotateAnim { 0%, 10% { transform: rotate(0deg); } 50%, 60% { transform: rotate(-90deg); } 100% { transform: rotate(0deg); } }
-    @media screen and (orientation: portrait) and (max-width: 900px) { #rotate-device-overlay { display: flex; } }
+    @media screen and (orientation: portrait) and (max-width: 900px) { #rotate-device-overlay { display: flex !important; } }
   </style>
 </head>
 <body>
@@ -104,7 +104,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.25-FINAL</div>
+  <div id="version-display">v13.26-FINAL</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -444,7 +444,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.25'; 
+const ASSET_VERSION = 'v13.26'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
