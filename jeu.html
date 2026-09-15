@@ -100,7 +100,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.36-FINAL</div>
+  <div id="version-display">v13.37-STABLE</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -282,7 +282,6 @@ let tutoSubState = 0;
 let tutoObstacleCount = 0;
 let tutoNextCallback = null;
 let customLetterSpawnIndex = 0;
-let endSequenceTimer = 0;
 
 function updateMenuSelection() {
   startMainBtn.classList.remove('nav-selected');
@@ -440,7 +439,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.36'; 
+const ASSET_VERSION = 'v13.37'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -814,15 +813,13 @@ function updateTutorialScript() {
       }
     } else if (tutoSubState === 4) {
       tutoInstructionMessage = "Profite de ton invincibilité pour dégommer les obstacles !";
-      // Dès que l'invincibilité se termine, on passe à l'état de transition de 2 sec
       if (invincibleTimer === 0 && tutoSubState === 4) {
-        platforms = []; obstacles = []; items = []; // Tout disparaît instantanément
+        platforms = []; obstacles = []; items = []; 
         tutoSubState = 5;
         tutoTimer = 0;
       }
     } else if (tutoSubState === 5) {
       tutoInstructionMessage = "";
-      // On laisse courir Roger seul pendant 2 secondes (120 frames), puis on fige complètement
       if (tutoTimer > 120) {
         tutoStep = 9; tutoSubState = 0; tutoTimer = 0; tutoInstructionMessage = "";
       }
@@ -878,7 +875,6 @@ function isPositionNearLetter(targetX, targetW = 100, safeMargin = 180) {
 }
 
 function spawnWorldElements() {
-  // En mode tuto, on bloque la génération si on est en phase de transition finale (tutoStep === 8 et tutoSubState >= 5)
   if ((isTutoMode && (tutoStep < 8 || (tutoStep === 8 && tutoSubState >= 5))) || superSayen.state === 'LANDING' || freezeForSequence || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
 
   const lastPlat = platforms[platforms.length - 1]; const lastX = lastPlat ? lastPlat.x + lastPlat.w : 350;
@@ -1223,7 +1219,6 @@ function resetGame() {
 function update() {
   if (!gameStarted || gameOver || isPaused) { stopRunSound(); return; }
 
-  // En état de freeze total à la fin du tuto (tutoStep === 9 ou tutoStep === 8 en sous-état 5 finis), on bloque les maj
   if (isTutoMode && tutoStep === 9) { stopRunSound(); return; }
 
   if (isTutoMode) {
@@ -1314,7 +1309,6 @@ function update() {
     }
   } else currentGameSpeed = effectiveBaseSpeed;
 
-  // Pendant les 2 secondes après l'invincibilité dans le tuto (tutoStep === 8 && tutoSubState === 5), on coupe le scrolling
   if (isTutoMode && tutoStep === 8 && tutoSubState === 5) {
     currentGameSpeed = 0;
   }
@@ -1438,40 +1432,21 @@ function update() {
       score += 100;
       it.collected = true; playSoundEffect(sounds.coin);
 
-      const targetIndices = []; 
-      rogerLetters.forEach((char, idx) => { 
-        if (char === it.char) targetIndices.push(idx); 
-      });
-
-      for (const idx of targetIndices) { 
-        if (!rogerCollected[idx]) { 
-          rogerCollected[idx] = true; 
-          break; 
-        } 
+      // CORRECTION : Collecte indépendante de la lettre touchée (peu importe l'ordre dans ROGER)
+      const letterIndex = rogerLetters.indexOf(it.char);
+      if (letterIndex !== -1 && !rogerCollected[letterIndex]) {
+        rogerCollected[letterIndex] = true;
       }
 
       if (rogerCollected.every(val => val === true)) {
         score += 1000; bonusEffectTimer = 90; 
-        if (isTutoMode) {
-          rogerCollected = [false, false, false, false, false];
-          if (completedWordsCount < 5) {
-            completedWordsCount++;
-            if (completedWordsCount === 5) {
-              tutoStep = 7.5; 
-              freezeForSequence = true; 
-              sequenceCurrentLetterIndex = 0; 
-              sequenceAngle = 0;
-            }
-          }
-        } else {
-          rogerCollected = [false, false, false, false, false];
-          if (completedWordsCount < 5) {
-            completedWordsCount++; 
-            if (completedWordsCount === 5) { 
-              freezeForSequence = true; 
-              sequenceCurrentLetterIndex = 0; 
-              sequenceAngle = 0; 
-            }
+        rogerCollected = [false, false, false, false, false];
+        if (completedWordsCount < 5) {
+          completedWordsCount++; 
+          if (completedWordsCount === 5) { 
+            freezeForSequence = true; 
+            sequenceCurrentLetterIndex = 0; 
+            sequenceAngle = 0; 
           }
         }
       }
