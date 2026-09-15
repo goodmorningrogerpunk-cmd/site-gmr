@@ -101,7 +101,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.30-FINAL</div>
+  <div id="version-display">v13.31-FINAL</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -441,7 +441,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.30'; 
+const ASSET_VERSION = 'v13.31'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -634,7 +634,6 @@ function updateTutorialScript() {
         const surfaceY = pPass.y + 14;
         if (!pPass.touchedPlatform && cat.isCrouching && cat.vy > 0 && cat.x + cat.width > pPass.x && cat.x < pPass.x + pPass.w && cat.y + cat.height >= surfaceY && cat.y < surfaceY) {
           tutoStep = 5; tutoTimer = 0; tutoSubState = 0; tutoInstructionMessage = "";
-          // On ne vide plus platforms ici pour qu'elle sorte tranquillement par la gauche !
         }
       }
     }
@@ -810,6 +809,7 @@ function updateTutorialScript() {
         punkBonus.x = canvas.width + 50; 
       }
       
+      // On vérifie que le chat a BIEN récupéré le bonus (invincibleTimer > 0)
       if (invincibleTimer > 0) {
         tutoSubState = 4;
         tutoTimer = 0;
@@ -873,7 +873,8 @@ function isPositionNearLetter(targetX, targetW = 100, safeMargin = 180) {
 }
 
 function spawnWorldElements() {
-  if ((isTutoMode && tutoStep < 8) || superSayen.state === 'LANDING' || freezeForSequence || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
+  // En mode tuto, on bloque la génération tant que le joueur n'est pas dans la phase post-bonus (étape 8 avec invincibilité)
+  if ((isTutoMode && (tutoStep < 8 || (tutoStep === 8 && invincibleTimer === 0))) || superSayen.state === 'LANDING' || freezeForSequence || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
 
   const lastPlat = platforms[platforms.length - 1]; const lastX = lastPlat ? lastPlat.x + lastPlat.w : 350;
   if (lastX < canvas.width + 300) {
@@ -923,7 +924,7 @@ function spawnWorldElements() {
 }
 
 function handleObstacleSpawned(obsX, obsY, obsW) {
-  if ((isTutoMode && tutoStep < 8) || superSayen.state === 'LANDING' || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
+  if ((isTutoMode && (tutoStep < 8 || (tutoStep === 8 && invincibleTimer === 0))) || superSayen.state === 'LANDING' || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
   obstacleCounter++; const spawnFrequency = 3 + (Math.floor(Math.random() * 3) - 1); 
   if (obstacleCounter % Math.max(2, spawnFrequency) === 0) {
     let letterX = obsX + obsW + 150 + (Math.random() * 100);
