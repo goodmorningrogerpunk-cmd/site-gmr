@@ -100,7 +100,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.39-STABLE</div>
+  <div id="version-display">v13.40-STABLE</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -439,7 +439,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.39'; 
+const ASSET_VERSION = 'v13.40'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -744,7 +744,7 @@ function updateTutorialScript() {
       if (items.length === 0 && obstacles.length === 0 && platforms.length === 0 && tutoTimer > 40) {
         tutoTimer = 0;
         if (customLetterSpawnIndex >= 5) {
-          customLetterSpawnIndex = 0; // Boucle infinie tant que le mot complet ROGER n'est pas validé !
+          customLetterSpawnIndex = 0; 
         }
 
         if (customLetterSpawnIndex === 0) {
@@ -779,47 +779,60 @@ function updateTutorialScript() {
   }
   else if (tutoStep === 8) {
     if (tutoSubState === 0) {
+      // 1. Le chat roule 2 sec (120 frames) dans le décor complètement vide
       tutoInstructionMessage = "";
+      items = []; obstacles = []; platforms = [];
       if (tutoTimer > 120) {
-        platforms = []; obstacles = []; items = [];
         let targetH = 65, targetW = 65;
         if (assets.punkBonus.complete && assets.punkBonus.naturalWidth > 0 && assets.punkBonus.naturalHeight > 0) {
           const ratio = assets.punkBonus.naturalWidth / assets.punkBonus.naturalHeight; targetW = targetH * ratio;
         }
-        punkBonus = { x: canvas.width + 50, baseY: 150, y: 150, w: targetW, h: targetH, time: 0, angle: 0, trail: [] };
+        punkBonus = { x: canvas.width + 50, baseY: 180, y: 180, w: targetW, h: targetH, time: 0, angle: 0, trail: [] };
         tutoSubState = 1; 
         tutoTimer = 0;
       }
     } else if (tutoSubState === 1) {
-      if (punkBonus.x <= canvas.width - 80) {
-        tutoSubState = 2; 
+      // 2. Apparition du bonus punk, freeze et affichage de la fenêtre explicative avec "SUIVANT"
+      if (punkBonus && punkBonus.x <= canvas.width - 150) {
         showTutoDialogBox(
-          "Ça c'est le bonus punk. Il apparaît souvent dans le jeu et si tu l'attrapes, tu deviens invincible pendant une certaine durée. Tu peux alors dégommer tous les obstacles sur ton passage. Cerise sur le gâteau : chaque obstacle dégommé te rapporte des points !",
+          "Ça c'est le bonus punk. Si tu l'attrapes, tu deviens invincible pendant une courte durée et tu peux dégommer tous les obstacles sur ton passage pour engranger max de points !",
           { x: punkBonus.x, y: punkBonus.y, w: punkBonus.w, h: punkBonus.h },
           () => {
-            tutoSubState = 3; 
+            tutoSubState = 2; 
           }
         );
       }
-    } else if (tutoSubState === 3) {
+    } else if (tutoSubState === 2) {
       tutoInstructionMessage = "Attrape le bonus punk !";
+      
+      // 3. S'il rate le bonus, on boucle pour qu'il réapparaisse
       if (punkBonus && punkBonus.x + punkBonus.w < -50) {
         punkBonus.x = canvas.width + 50; 
       }
       
+      // 4. Dès qu'il l'attrape (déclenchement de l'invincibilité)
       if (invincibleTimer > 0) {
+        tutoSubState = 3;
+        tutoTimer = 0;
+      }
+    } else if (tutoSubState === 3) {
+      tutoInstructionMessage = "Profite de ton invincibilité pour dégommer les obstacles !";
+      
+      // Pendant l'invincibilité, spawn dynamique d'éléments sur le modèle du jeu
+      if (items.length === 0 && obstacles.length === 0 && platforms.length === 0 && tutoTimer < 750) {
+        spawnWorldElements();
+      }
+
+      // Dès que l'invincibilité se termine, on nettoie tout
+      if (invincibleTimer === 0) {
+        platforms = []; obstacles = []; items = []; 
         tutoSubState = 4;
         tutoTimer = 0;
       }
     } else if (tutoSubState === 4) {
-      tutoInstructionMessage = "Profite de ton invincibilité pour dégommer les obstacles !";
-      if (invincibleTimer === 0 && tutoSubState === 4) {
-        platforms = []; obstacles = []; items = []; 
-        tutoSubState = 5;
-        tutoTimer = 0;
-      }
-    } else if (tutoSubState === 5) {
+      // Plus aucun élément, le chat roule 2 sec (120 frames) avant la fenêtre finale
       tutoInstructionMessage = "";
+      platforms = []; obstacles = []; items = [];
       if (tutoTimer > 120) {
         tutoStep = 9; tutoSubState = 0; tutoTimer = 0; tutoInstructionMessage = "";
       }
@@ -828,7 +841,7 @@ function updateTutorialScript() {
   else if (tutoStep === 9) {
     if (tutoSubState === 0) {
       showTutoDialogBox(
-        "Tu connais désormais les bases pour jouer à Good Morning Roger Sk8in' Cat. Lance-toi !",
+        "Tu connais désormais les bases pour jouer à Good Morning Roger Sk8in' Cat. À toi de jouer !",
         null,
         () => { returnToHome(); }
       );
@@ -1309,10 +1322,6 @@ function update() {
     }
   } else currentGameSpeed = effectiveBaseSpeed;
 
-  if (isTutoMode && tutoStep === 8 && tutoSubState === 5) {
-    currentGameSpeed = 0;
-  }
-
   bgX -= currentGameSpeed * 0.4; lastObstacleX -= currentGameSpeed; lastLetterX -= currentGameSpeed;
 
   updatePlatformStream();
@@ -1432,7 +1441,6 @@ function update() {
       score += 100;
       it.collected = true; playSoundEffect(sounds.coin);
 
-      // Gestion intelligente des 2 'R' (1er R en position 0, ou 2ème R en position 4 si le 1er est déjà pris)
       let letterIndex = -1;
       if (it.char === 'R') {
         if (!rogerCollected[0]) {
@@ -1471,7 +1479,8 @@ function update() {
 
   if (bonusEffectTimer > 0) bonusEffectTimer--;
   
-  if (!isTutoMode || tutoStep >= 8) {
+  // En mode tuto, on ne fait spawn les éléments généraux du monde que pendant la phase d'invincibilité de l'étape 8 (substate 3) ou hors tuto
+  if (!isTutoMode || (tutoStep === 8 && tutoSubState === 3)) {
     spawnWorldElements();
   }
   
