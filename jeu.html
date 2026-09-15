@@ -24,7 +24,6 @@
 
     #desktop-fullscreen-btn { position: absolute; top: 15px; left: 15px; padding: 8px 14px; font-size: 12px; color: #ffd54f; background-color: rgba(26, 26, 36, 0.85); border: 2px solid #ffd54f; box-shadow: 0 4px 0px #000; z-index: 30; display: none; }
 
-    /* ACCUEIL ORDINATEUR & MOBILE */
     #start-main-btn { position: absolute; top: 72%; left: 5%; transform: translateY(-50%); padding: 16px 28px; font-size: 20px; color: #1a1a24; background-color: #ffd54f; border: 4px solid #ffffff; box-shadow: 0 6px 0px #b29320; }
     #tuto-main-btn { position: absolute; top: 57%; left: 5%; transform: translateY(-50%); padding: 12px 24px; font-size: 18px; color: #ffffff; background-color: #2e2e40; border: 3px solid #ffd54f; box-shadow: 0 4px 0px #000; }
 
@@ -101,7 +100,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.34-FINAL</div>
+  <div id="version-display">v13.35-FINAL</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -441,7 +440,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.34'; 
+const ASSET_VERSION = 'v13.35'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -812,22 +811,19 @@ function updateTutorialScript() {
       if (invincibleTimer > 0) {
         tutoSubState = 4;
         tutoTimer = 0;
-        // Empêche tout spawn parasite d'obstacles ou de lettres au démarrage de l'invincibilité
-        lastObstacleX = 999999;
-        lastLetterX = 999999;
-        platforms = []; obstacles = []; items = [];
       }
     } else if (tutoSubState === 4) {
       tutoInstructionMessage = "Profite de ton invincibilité pour dégommer les obstacles !";
+      // À la fin de l'invincibilité, on attend 2 sec en jeu normal avant de nettoyer l'écran et de figer
       if (invincibleTimer === 0 && tutoSubState === 4) {
-        platforms = []; obstacles = []; items = [];
         tutoSubState = 5;
         tutoTimer = 0;
       }
     } else if (tutoSubState === 5) {
       tutoInstructionMessage = "";
-      platforms = []; obstacles = []; items = [];
+      // On laisse défiler/jouer le jeu normalement pendant 2 secondes (120 frames) après la fin de l'invincibilité
       if (tutoTimer > 120) {
+        platforms = []; obstacles = []; items = []; // Nettoyage total
         tutoStep = 9; tutoSubState = 0; tutoTimer = 0; tutoInstructionMessage = "";
       }
     }
@@ -882,7 +878,8 @@ function isPositionNearLetter(targetX, targetW = 100, safeMargin = 180) {
 }
 
 function spawnWorldElements() {
-  if ((isTutoMode && (tutoStep < 8 || (tutoStep === 8 && (invincibleTimer === 0 || tutoSubState >= 5)))) || superSayen.state === 'LANDING' || freezeForSequence || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
+  // En mode tuto, on génère normalement pendant l'étape 8 (invincibilité), et on bloque après l'étape 5 de fin
+  if ((isTutoMode && (tutoStep < 8 || (tutoStep === 8 && tutoSubState >= 5))) || superSayen.state === 'LANDING' || freezeForSequence || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
 
   const lastPlat = platforms[platforms.length - 1]; const lastX = lastPlat ? lastPlat.x + lastPlat.w : 350;
   if (lastX < canvas.width + 300) {
@@ -932,7 +929,7 @@ function spawnWorldElements() {
 }
 
 function handleObstacleSpawned(obsX, obsY, obsW) {
-  if ((isTutoMode && (tutoStep < 8 || (tutoStep === 8 && (invincibleTimer === 0 || tutoSubState >= 5)))) || superSayen.state === 'LANDING' || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
+  if ((isTutoMode && (tutoStep < 8 || (tutoStep === 8 && tutoSubState >= 5))) || superSayen.state === 'LANDING' || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
   obstacleCounter++; const spawnFrequency = 3 + (Math.floor(Math.random() * 3) - 1); 
   if (obstacleCounter % Math.max(2, spawnFrequency) === 0) {
     let letterX = obsX + obsW + 150 + (Math.random() * 100);
@@ -1228,7 +1225,7 @@ function update() {
 
   if (isTutoMode) {
     updateTutorialScript();
-    if (tutoHighlightedZone || (isTutoMode && tutoStep === 8 && tutoSubState === 5)) { stopRunSound(); return; }
+    if (tutoHighlightedZone) { stopRunSound(); return; }
   }
 
   if (freezeForSequence) {
@@ -1718,7 +1715,7 @@ function draw() {
   }
 
   if (isPaused) {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.75)'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.75);'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.textAlign = 'center';
     ctx.fillStyle = '#ffd54f'; ctx.font = '900 48px Courier New'; ctx.fillText("PARTIE EN PAUSE", canvas.width / 2, canvas.height / 2 - 20);
     ctx.fillStyle = '#ffffff'; ctx.font = 'bold 20px Courier New';
     if (isMobileDevice) ctx.fillText("Appuyer de nouveau sur l'écran pour reprendre", canvas.width / 2, canvas.height / 2 + 40);
