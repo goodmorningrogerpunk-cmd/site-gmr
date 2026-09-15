@@ -104,7 +104,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.21-FINAL</div>
+  <div id="version-display">v13.22-FINAL</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -444,7 +444,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.21'; 
+const ASSET_VERSION = 'v13.22'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -784,14 +784,14 @@ function updateTutorialScript() {
       }
     } else if (tutoSubState === 2) {
       endSequenceTimer++;
-      // Attente d'environ 2 secondes (120 frames à 60fps)
+      // Attente d'environ 2 secondes (120 frames à 60fps) puis déclenchement de la boîte de fin
       if (endSequenceTimer > 120) {
+        tutoSubState = 3;
         showTutoDialogBox(
           "Tu connais désormais les bases pour jouer à Good Morning Roger Sk8in' Cat. Lance-toi !",
           null,
           () => { returnToHome(); }
         );
-        tutoSubState = 3;
       }
     }
   }
@@ -1318,7 +1318,6 @@ function update() {
     if (o.type === 'air' && o.configIdx !== 7) { o.floatPhase += 0.05; const amp = 12; o.y = o.baseY + Math.sin(o.floatPhase) * amp; }
     else { o.animTimer++; if (o.animTimer % 10 === 0) o.frame = (o.frame + 1) % 3; }
 
-    // CORRECTION DE LA HITBOX DE L'OBSTACLE 1 (configIdx === 3)
     let obsBoxX = o.x + 8; 
     let obsBoxWidth = Math.max(10, o.w - 16); 
     let obsBoxY = o.type === 'air' ? o.y + 4 : o.y + 8; 
