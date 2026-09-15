@@ -24,19 +24,14 @@
 
     #desktop-fullscreen-btn { position: absolute; top: 15px; left: 15px; padding: 8px 14px; font-size: 12px; color: #ffd54f; background-color: rgba(26, 26, 36, 0.85); border: 2px solid #ffd54f; box-shadow: 0 4px 0px #000; z-index: 30; display: none; }
 
-    /* MENU ACCUEIL ORDINATEUR RESTAURÉ À L'IDENTIQUE */
+    /* COLONNE DE GAUCHE (TUTO / LANCER) : INTACTE ET FIGÉE COMME AVANT */
     #start-main-btn { position: absolute; top: 72%; left: 5%; transform: translateY(-50%); padding: 16px 28px; font-size: 20px; color: #1a1a24; background-color: #ffd54f; border: 4px solid #ffffff; box-shadow: 0 6px 0px #b29320; }
     #tuto-main-btn { position: absolute; top: 57%; left: 5%; transform: translateY(-50%); padding: 12px 24px; font-size: 18px; color: #ffffff; background-color: #2e2e40; border: 3px solid #ffd54f; box-shadow: 0 4px 0px #000; }
 
-    .right-buttons-stack { position: absolute; top: 50%; right: 5%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 25; }
+    /* COLONNE DE DROITE : DESCENDUE SUR ORDINATEUR */
+    .right-buttons-stack { position: absolute; top: 58%; right: 5%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 25; }
     .secondary-btn { padding: 8px 16px; font-size: 13px; color: #ffd54f; background-color: #1a1a24; border: 3px solid #ffd54f; box-shadow: 0 4px 0px #000; text-align: center; }
     .quit-btn { color: #ff5252; border-color: #ff5252; }
-
-    /* Rédistribution des boutons sur smartphone pour éviter qu'ils ne se collent */
-    @media screen and (max-width: 900px) {
-      #start-main-btn { top: 76% !important; }
-      #tuto-main-btn { top: 56% !important; }
-    }
 
     .game-over-actions { display: none; position: absolute; top: 80%; left: 50%; transform: translate(-50%, -50%); flex-direction: row; gap: 16px; z-index: 20; }
     #restart-btn, #home-gameover-btn { padding: 14px 28px; font-size: 18px; color: #1a1a24; background-color: #ffd54f; border: 4px solid #ffffff; box-shadow: 0 6px 0px #b29320; }
@@ -46,17 +41,18 @@
     .modal-content-scroll { flex: 1; overflow-y: auto; padding-right: 6px; margin-bottom: 12px; }
     .modal-close-btn { display: block; margin: 0 auto; padding: 10px 24px; background: #ffd54f; color: #1a1a24; border: 3px solid #ffffff; font-size: 15px; font-weight: bold; cursor: pointer; }
 
+    /* FENÊTRES EXPLICATIVES DE FREEZE : ORDINATEUR (HAUT) / SMARTPHONE (CENTRE, COMPACTES, SANS VIDE) */
     #tuto-dialog-box {
-      display: none; position: absolute; width: 560px; min-height: 180px; background: #111118; border: 4px solid #ffd54f; border-radius: 8px;
-      padding: 26px 24px 20px 24px; z-index: 65000; text-align: center; box-shadow: 0 0 35px rgba(0,0,0,0.95);
+      display: none; position: absolute; top: 18px; left: 50%; transform: translateX(-50%); width: 560px; max-width: 92%; min-height: auto; background: #111118; border: 4px solid #ffd54f; border-radius: 8px;
+      padding: 22px 20px 18px 20px; z-index: 65000; text-align: center; box-shadow: 0 0 35px rgba(0,0,0,0.95);
     }
-    #tuto-dialog-text { font-size: 21px; line-height: 1.4; color: #ffffff; margin-top: 2px; margin-bottom: 16px; text-align: left; display: block; }
-    #tuto-next-btn { padding: 8px 24px; font-size: 16px; color: #1a1a24; background-color: #ffd54f; border: 3px solid #ffffff; cursor: pointer; font-weight: bold; }
+    #tuto-dialog-text { font-size: 19px; line-height: 1.4; color: #ffffff; margin-bottom: 16px; text-align: left; display: block; }
+    #tuto-next-btn { padding: 8px 24px; font-size: 16px; color: #1a1a24; background-color: #ffd54f; border: 3px solid #ffffff; cursor: pointer; font-weight: bold; display: inline-block; }
 
     @media screen and (max-width: 900px) {
-      #tuto-dialog-box { width: 92% !important; max-width: 500px !important; padding: 18px 16px 14px 16px !important; }
-      #tuto-dialog-text { font-size: 15px !important; margin-bottom: 12px !important; }
-      #tuto-next-btn { padding: 6px 20px !important; font-size: 14px !important; }
+      #tuto-dialog-box { top: 50% !important; transform: translate(-50%, -50%) !important; width: 86% !important; max-width: 440px !important; padding: 12px 14px 10px 14px !important; }
+      #tuto-dialog-text { font-size: 13px !important; margin-bottom: 8px !important; }
+      #tuto-next-btn { padding: 4px 14px !important; font-size: 12px !important; }
     }
 
     #score-prompt-box, #save-score-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111118; border: 4px solid #ffd54f; border-radius: 8px; padding: 20px; z-index: 60000; text-align: center; }
@@ -100,7 +96,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.9-CLEAN-UI</div>
+  <div id="version-display">v13.11-STABLE-UI</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -273,7 +269,6 @@ let formNavIdx = 0;
 const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 let konamiIndex = 0;
 
-// VARIABLES MOTEUR TUTORIEL DÉDIÉ
 let isTutoMode = false;
 let tutoStep = 0;
 let tutoTimer = 0;
@@ -437,7 +432,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.9'; 
+const ASSET_VERSION = 'v13.11'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -512,40 +507,11 @@ const cat = { x: 100, y: ENTITY_GROUND_Y - 110, width: 110, height: 110, vy: 0, 
 
 let platforms = []; let obstacles = []; let items = []; let lastObstacleX = -1000; let obstacleCounter = 0;
 
-// GESTION POSITIONNEMENT DIALOGUES TUTO (Fenêtre explicative STRICTEMENT PLUS HAUT, sans masquer les éléments éclairés)
-function showTutoDialogSide(text, highlightRect, onNext, isCustomModal = false, customPlacementType = 'NONE') {
+function showTutoDialogBox(text, highlightRect, onNext) {
   tutoDialogText.innerHTML = text;
   tutoHighlightedZone = highlightRect;
   tutoNextCallback = onNext;
-  
   tutoDialogBox.style.display = 'block';
-
-  if (!highlightRect) {
-    tutoDialogBox.style.left = '50%';
-    tutoDialogBox.style.top = '50%';
-    tutoDialogBox.style.transform = 'translate(-50%, -50%)';
-    return;
-  }
-
-  // Positionnements spécifiques mobile (fenêtre haut/centre pour laisser libre les bas de l'écran)
-  if (isMobileDevice && isCustomModal) {
-    if (customPlacementType === 'MASTER_LETTERS' || customPlacementType === 'ROGER_HUD') {
-      tutoDialogBox.style.left = '50%';
-      tutoDialogBox.style.top = '15%';
-      tutoDialogBox.style.transform = 'translateX(-50%)';
-      return;
-    }
-  }
-
-  let leftPos = highlightRect.x + highlightRect.w + 20;
-  if (leftPos + 560 > canvas.width) leftPos = highlightRect.x - 580;
-  if (leftPos < 20) leftPos = 20;
-
-  // Positionnement haut dans l'écran pour être au-dessus des éléments
-  let topPos = 25;
-  tutoDialogBox.style.left = leftPos + 'px';
-  tutoDialogBox.style.top = topPos + 'px';
-  tutoDialogBox.style.transform = 'none';
 }
 
 tutoNextBtn.addEventListener('click', () => {
@@ -576,7 +542,7 @@ function updateTutorialScript() {
 
   if (tutoStep === 1) {
     if (tutoTimer > 60) {
-      showTutoDialogSide(
+      showTutoDialogBox(
         "Ceci est ton score, le but est d'avoir le maximum de points. Plus tu avances loin, plus ton score augmente. Des bonus peuvent aussi te faire gagner des points.",
         { x: 15, y: 15, w: 230, h: 55 },
         () => { tutoStep = 2; tutoTimer = 0; }
@@ -590,7 +556,7 @@ function updateTutorialScript() {
         "En appuyant sur <b>ESPACE</b>, Roger fait un saut. En appuyant sur la <b>FLÈCHE DU BAS</b>, Roger se baisse. Pour mettre le jeu en pause, appuie sur <b>ENTRÉE</b>.";
 
       const hudX = isMobileDevice ? canvas.width - 370 : canvas.width - 340;
-      showTutoDialogSide(
+      showTutoDialogBox(
         controlsText,
         { x: hudX, y: 15, w: 320, h: 80 },
         () => { tutoStep = 3; tutoSubState = 1; tutoTimer = 0; }
@@ -618,7 +584,7 @@ function updateTutorialScript() {
       const passText = isMobileDevice ? 
         "Voici une plateforme. Tu peux sauter dessus ou la traverser en touchant le CÔTÉ GAUCHE." :
         "Voici une plateforme. Tu peux sauter dessus ou la traverser en appuyant sur la FLÈCHE DU BAS.";
-      showTutoDialogSide(
+      showTutoDialogBox(
         passText,
         { x: plat.x, y: plat.y, w: plat.w, h: plat.h },
         () => { tutoSubState = 2; }
@@ -661,7 +627,7 @@ function updateTutorialScript() {
         if (obs && obs.x <= canvas.width - 350 && !obs.shownPopup) {
           obs.shownPopup = true;
           tutoSubState = 1;
-          showTutoDialogSide(
+          showTutoDialogBox(
             "Ceci est un obstacle. Évite-le en sautant ou en te baissant.",
             { x: obs.x, y: obs.y, w: obs.w, h: obs.h },
             () => { tutoSubState = 2; tutoObstacleCount = 0; tutoTimer = 0; }
@@ -706,13 +672,10 @@ function updateTutorialScript() {
   }
   else if (tutoStep === 6) {
     if (tutoSubState === 0) {
-      // EXPLICATION GROSSES LETTRES (Fenêtre positionnée plus haut dans l'écran)
-      showTutoDialogSide(
+      showTutoDialogBox(
         "Ces grosses lettres R O G E R te protègent d'un choc avec un obstacle.",
         { x: 15, y: canvas.height - 130, w: 200, h: 110 },
-        () => { tutoSubState = 1; },
-        true,
-        'MASTER_LETTERS'
+        () => { tutoSubState = 1; }
       );
     } else if (tutoSubState === 1) {
       tutoInstructionMessage = "Fonce sur un obstacle pour tester la protection !";
@@ -724,15 +687,13 @@ function updateTutorialScript() {
         tutoSubState = 2;
         tutoTimer = 0;
         obstacles = [];
-        showTutoDialogSide(
+        showTutoDialogBox(
           "Tu vois, la lettre O t'a protégé ! S'il n'y a plus de lettres, c'est le Game Over !",
           { x: 15, y: canvas.height - 130, w: 105, h: 110 },
           () => {
             tutoSubState = 3;
             tutoTimer = 0;
-          },
-          true,
-          'MASTER_LETTERS'
+          }
         );
       }
     } else if (tutoSubState === 3) {
@@ -743,13 +704,10 @@ function updateTutorialScript() {
   }
   else if (tutoStep === 7) {
     if (tutoSubState === 0) {
-      // EXPLICATION PETITES LETTRES EN BAS À DROITE (Fenêtre positionnée plus haut dans l'écran)
-      showTutoDialogSide(
+      showTutoDialogBox(
         "Collecte ces lettres pour reformer R O G E R en bas à droite et gagner une grosse lettre.",
         { x: canvas.width - 340, y: canvas.height - 95, w: 320, h: 85 },
-        () => { tutoSubState = 1; tutoTimer = 0; customLetterSpawnIndex = 0; },
-        true,
-        'ROGER_HUD'
+        () => { tutoSubState = 1; tutoTimer = 0; customLetterSpawnIndex = 0; }
       );
     } else if (tutoSubState === 1) {
       tutoInstructionMessage = "Attrape toutes les lettres de R O G E R !";
@@ -794,7 +752,7 @@ function updateTutorialScript() {
     } else if (tutoSubState === 2) {
       endSequenceTimer++;
       if (endSequenceTimer > 120) {
-        showTutoDialogSide(
+        showTutoDialogBox(
           "Tu connais désormais les bases pour jouer à Good Morning Roger Sk8in' Cat. Lance-toi !",
           null,
           () => { returnToHome(); }
