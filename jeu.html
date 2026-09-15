@@ -192,12 +192,17 @@
     <button id="close-about-btn" class="pixel-btn modal-close-btn">FERMER</button>
   </div>
 
-  <div id="konami-modal" class="game-modal">
-    <h2>SECRET DÉBLOQUÉ !</h2>
-    <div class="modal-content-scroll">
-      <p style="text-align: center; margin: 30px 0; font-size: 20px; color: #ffd54f; font-weight: bold;">Bravo tu as fait le code Konami</p>
+  <div id="konami-modal" class="game-modal" style="text-align: center; max-width: 520px;">
+    <h2 style="color:#ffd54f; margin-bottom: 14px;">SECRET DÉBLOQUÉ !</h2>
+    <div class="modal-content-scroll" style="overflow: visible;">
+      <p style="font-size: 15px; line-height: 1.6; color: #fff; margin-bottom: 22px;">
+        Le Konami code... toi tu es un vrai geek ! Pour te récompenser, qu'est-ce que tu dirais de faire une partie avec de la vraie musique et non pas de la musique 8 bit ?
+      </p>
+      <div style="display: flex; justify-content: center; gap: 15px;">
+        <button id="konami-yes-btn" class="pixel-btn" style="padding: 10px 20px; background: #ffd54f; color: #1a1a24; border: 3px solid #fff;">Carrément</button>
+        <button id="konami-no-btn" class="pixel-btn" style="padding: 10px 20px; background: #2e2e40; color: #fff; border: 3px solid #ffd54f;">Non, je garde le 8 bit</button>
+      </div>
     </div>
-    <button id="close-konami-btn" class="pixel-btn modal-close-btn">FERMER</button>
   </div>
 </div>
 
@@ -247,7 +252,8 @@ const closeLeaderboardBtn = document.getElementById('close-leaderboard-btn');
 const aboutModal = document.getElementById('about-modal');
 const closeAboutBtn = document.getElementById('close-about-btn');
 const konamiModal = document.getElementById('konami-modal');
-const closeKonamiBtn = document.getElementById('close-konami-btn');
+const konamiYesBtn = document.getElementById('konami-yes-btn');
+const konamiNoBtn = document.getElementById('konami-no-btn');
 
 const tutoDialogBox = document.getElementById('tuto-dialog-box');
 const tutoDialogText = document.getElementById('tuto-dialog-text');
@@ -334,6 +340,9 @@ function updateFormNavSelection() {
 const introVideo = document.getElementById('intro-video');
 const introMusic = new Audio('ecranintro.mp3'); introMusic.loop = true; introMusic.volume = 0.8;
 const bgMusic = new Audio('roger_8bitok.mp3'); bgMusic.loop = true; bgMusic.volume = 0.8; 
+const konamiMusic = new Audio('rogerlechat.mp3'); konamiMusic.loop = true; konamiMusic.volume = 0.8;
+let useRealMusicForNextGame = false;
+
 const marioInvMusic = new Audio('marioinv.mp3'); marioInvMusic.loop = true; marioInvMusic.volume = 1.0;
 const superSayanTheme = new Audio('supersayantheme.mp3'); superSayanTheme.volume = 1.0;
 
@@ -403,11 +412,27 @@ function unlockAudio() {
 
 function playIntroMusic() { unlockAudio(); if (introMusic.paused && !gameStarted) introMusic.play().catch(() => {}); }
 function stopIntroMusic() { introMusic.pause(); if (introMusic.readyState >= 2) introMusic.currentTime = 0; }
-function startBgMusic() { unlockAudio(); stopIntroMusic(); marioInvMusic.pause(); bgMusic.muted = false; bgMusic.volume = 0.8; if (bgMusic.readyState >= 2) bgMusic.currentTime = 0; bgMusic.play().catch(() => {}); }
+
+function startBgMusic() { 
+  unlockAudio(); 
+  stopIntroMusic(); 
+  marioInvMusic.pause(); 
+  
+  const activeBgMusic = useRealMusicForNextGame ? konamiMusic : bgMusic;
+  const otherMusic = useRealMusicForNextGame ? bgMusic : konamiMusic;
+  
+  otherMusic.pause();
+  if (otherMusic.readyState >= 2) otherMusic.currentTime = 0;
+
+  activeBgMusic.muted = false; 
+  activeBgMusic.volume = 0.8; 
+  if (activeBgMusic.readyState >= 2) activeBgMusic.currentTime = 0; 
+  activeBgMusic.play().catch(() => {}); 
+}
 
 function stopAllSounds() {
   if (fadeInterval) clearInterval(fadeInterval);
-  stopIntroMusic(); bgMusic.pause(); marioInvMusic.pause(); superSayanTheme.pause();
+  stopIntroMusic(); bgMusic.pause(); konamiMusic.pause(); marioInvMusic.pause(); superSayanTheme.pause();
   Object.values(sounds).forEach(sound => { sound.pause(); if (sound.readyState >= 2) sound.currentTime = 0; });
 }
 
@@ -438,11 +463,14 @@ function togglePause() {
   if (!gameStarted || gameOver || isTutoMode && tutoHighlightedZone) return;
   isPaused = !isPaused;
   if (isPaused) {
-    stopRunSound(); if (!bgMusic.paused) bgMusic.pause(); if (!marioInvMusic.paused) marioInvMusic.pause(); if (!superSayanTheme.paused) superSayanTheme.pause();
+    stopRunSound(); if (!bgMusic.paused) bgMusic.pause(); if (!konamiMusic.paused) konamiMusic.pause(); if (!marioInvMusic.paused) marioInvMusic.pause(); if (!superSayanTheme.paused) superSayanTheme.pause();
   } else {
     if (superSayen.active) superSayanTheme.play().catch(() => {});
     else if (invincibleTimer > 0) marioInvMusic.play().catch(() => {});
-    else bgMusic.play().catch(() => {});
+    else {
+      const activeBgMusic = useRealMusicForNextGame ? konamiMusic : bgMusic;
+      activeBgMusic.play().catch(() => {});
+    }
   }
 }
 
@@ -875,7 +903,8 @@ function triggerSuperSayen() {
   superSayen.active = true; superSayen.state = 'TRANSFORM'; superSayen.timer = 0;
   superSayen.transformFrame = 0; superSayen.flyFrame = 0; superSayen.animTimer = 0;
   cat.vy = 0; cat.isGrounded = false; cat.isPlatformGrounded = false; stopRunSound();
-  marioInvMusic.pause(); bgMusic.muted = true;
+  marioInvMusic.pause(); 
+  if (useRealMusicForNextGame) konamiMusic.pause(); else bgMusic.muted = true;
   if (superSayanTheme.readyState >= 2) superSayanTheme.currentTime = 0;
   superSayanTheme.volume = 1.0; superSayanTheme.play().catch(() => {});
   playSoundEffect(sounds.sayan); playSoundEffect(sounds.speedFly);
@@ -883,8 +912,12 @@ function triggerSuperSayen() {
 
 function transitionSuperSayanToNormal() {
   superSayanTheme.pause();
-  bgMusic.muted = false;
-  if (bgMusic.paused) bgMusic.play().catch(() => {});
+  if (useRealMusicForNextGame) {
+    konamiMusic.play().catch(() => {});
+  } else {
+    bgMusic.muted = false;
+    if (bgMusic.paused) bgMusic.play().catch(() => {});
+  }
 }
 
 function triggerLetterFall(char, x, y) {
@@ -999,11 +1032,17 @@ window.addEventListener('keydown', (e) => {
     return;
   }
 
-  if (!gameStarted && rulesModal.style.display !== 'flex' && leaderboardModal.style.display !== 'flex' && aboutModal.style.display !== 'flex') {
+  if (!gameStarted && rulesModal.style.display !== 'flex' && leaderboardModal.style.display !== 'flex' && aboutModal.style.display !== 'flex' && konamiModal.style.display !== 'flex') {
     const inputKey = e.key.length === 1 ? e.key.toLowerCase() : e.code; const targetKey = konamiCode[konamiIndex];
     if (inputKey === targetKey || e.code === targetKey) {
-      konamiIndex++; if (konamiIndex === konamiCode.length) { konamiIndex = 0; konamiModal.style.display = 'flex'; }
-    } else konamiIndex = (inputKey === konamiCode[0] || e.code === konamiCode[0]) ? 1 : 0;
+      konamiIndex++; 
+      if (konamiIndex === konamiCode.length) { 
+        konamiIndex = 0; 
+        konamiModal.style.display = 'flex'; 
+      }
+    } else {
+      konamiIndex = (inputKey === konamiCode[0] || e.code === konamiCode[0]) ? 1 : 0;
+    }
   }
 
   if (saveScoreModal.style.display === 'block') {
@@ -1071,7 +1110,7 @@ window.addEventListener('keyup', (e) => {
 });
 
 function handleTouchAction(e, isTouchActive) {
-  if (!gameStarted || rulesModal.style.display === 'flex' || leaderboardModal.style.display === 'flex' || aboutModal.style.display === 'flex' || scorePromptBox.style.display === 'block' || saveScoreModal.style.display === 'block') return;
+  if (!gameStarted || rulesModal.style.display === 'flex' || leaderboardModal.style.display === 'flex' || aboutModal.style.display === 'flex' || scorePromptBox.style.display === 'block' || saveScoreModal.style.display === 'block' || konamiModal.style.display === 'flex') return;
   if (isPaused) { if (isTouchActive) togglePause(); return; }
   
   if (!isTouchActive || e.touches.length === 0) {
@@ -1185,7 +1224,29 @@ tutoMainBtn.addEventListener('click', () => {
 desktopFullscreenBtn.addEventListener('click', () => toggleDesktopFullscreen());
 rulesBtn.addEventListener('click', () => { playIntroMusic(); updateRulesText(); rulesModal.style.display = 'flex'; });
 closeRulesBtn.addEventListener('click', () => { rulesModal.style.display = 'none'; });
-closeKonamiBtn.addEventListener('click', () => { konamiModal.style.display = 'none'; });
+
+konamiNoBtn.addEventListener('click', () => {
+  useRealMusicForNextGame = false;
+  konamiModal.style.display = 'none';
+});
+
+konamiYesBtn.addEventListener('click', () => {
+  useRealMusicForNextGame = true;
+  konamiModal.style.display = 'none';
+  
+  requestGameFullscreen(); 
+  if (introVideo) { introVideo.pause(); introVideo.currentTime = 0; }
+  startMainBtn.style.display = 'none'; 
+  tutoMainBtn.style.display = 'none'; 
+  desktopFullscreenBtn.style.display = 'none';
+  rightStack.style.display = 'none'; 
+  versionDisplay.style.display = 'none'; 
+  if (isMobileDevice) mobileHudControls.style.display = 'flex';
+  
+  startBgMusic(); 
+  resetGame();
+});
+
 leaderboardBtn.addEventListener('click', () => { playIntroMusic(); fetchLeaderboard(); leaderboardModal.style.display = 'flex'; });
 closeLeaderboardBtn.addEventListener('click', () => { leaderboardModal.style.display = 'none'; });
 aboutBtn.addEventListener('click', () => { playIntroMusic(); aboutModal.style.display = 'flex'; });
@@ -1269,7 +1330,15 @@ function update() {
     if (invincibleTimer === 120 && !debonusPlayed) { playSoundEffect(sounds.debonus); debonusPlayed = true; }
     if (invincibleTimer === 60 && !debonusEndPlayed) { playSoundEffect(sounds.debonusend); debonusEndPlayed = true; }
     if (invincibleTimer === 0) {
-      marioInvMusic.pause(); if (!superSayen.active) { bgMusic.muted = false; if (bgMusic.paused) bgMusic.play().catch(() => {}); }
+      marioInvMusic.pause(); 
+      if (!superSayen.active) {
+        if (useRealMusicForNextGame) {
+          konamiMusic.play().catch(() => {});
+        } else {
+          bgMusic.muted = false; 
+          if (bgMusic.paused) bgMusic.play().catch(() => {});
+        }
+      }
       debonusPlayed = false; debonusEndPlayed = false;
     }
   }
@@ -1355,7 +1424,10 @@ function update() {
   if (punkBonus) {
     if (catBoxX < punkBonus.x + punkBonus.w && catBoxX + catBoxWidth > punkBonus.x && catBoxY < punkBonus.y + punkBonus.h && catBoxY + catBoxHeight > punkBonus.y) {
       playSoundEffect(sounds.punkbonus); invincibleTimer = 900; debonusPlayed = false; debonusEndPlayed = false; punkBonus = null;
-      if (!superSayen.active) { bgMusic.pause(); if (marioInvMusic.readyState >= 2) marioInvMusic.currentTime = 0; marioInvMusic.play().catch(() => {}); }
+      if (!superSayen.active) {
+        if (useRealMusicForNextGame) konamiMusic.pause(); else bgMusic.pause();
+        if (marioInvMusic.readyState >= 2) marioInvMusic.currentTime = 0; marioInvMusic.play().catch(() => {});
+      }
     }
   }
 
