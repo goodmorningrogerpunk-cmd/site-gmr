@@ -100,7 +100,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.35-FINAL</div>
+  <div id="version-display">v13.36-FINAL</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -440,7 +440,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.35'; 
+const ASSET_VERSION = 'v13.36'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -814,16 +814,16 @@ function updateTutorialScript() {
       }
     } else if (tutoSubState === 4) {
       tutoInstructionMessage = "Profite de ton invincibilité pour dégommer les obstacles !";
-      // À la fin de l'invincibilité, on attend 2 sec en jeu normal avant de nettoyer l'écran et de figer
+      // Dès que l'invincibilité se termine, on passe à l'état de transition de 2 sec
       if (invincibleTimer === 0 && tutoSubState === 4) {
+        platforms = []; obstacles = []; items = []; // Tout disparaît instantanément
         tutoSubState = 5;
         tutoTimer = 0;
       }
     } else if (tutoSubState === 5) {
       tutoInstructionMessage = "";
-      // On laisse défiler/jouer le jeu normalement pendant 2 secondes (120 frames) après la fin de l'invincibilité
+      // On laisse courir Roger seul pendant 2 secondes (120 frames), puis on fige complètement
       if (tutoTimer > 120) {
-        platforms = []; obstacles = []; items = []; // Nettoyage total
         tutoStep = 9; tutoSubState = 0; tutoTimer = 0; tutoInstructionMessage = "";
       }
     }
@@ -878,7 +878,7 @@ function isPositionNearLetter(targetX, targetW = 100, safeMargin = 180) {
 }
 
 function spawnWorldElements() {
-  // En mode tuto, on génère normalement pendant l'étape 8 (invincibilité), et on bloque après l'étape 5 de fin
+  // En mode tuto, on bloque la génération si on est en phase de transition finale (tutoStep === 8 et tutoSubState >= 5)
   if ((isTutoMode && (tutoStep < 8 || (tutoStep === 8 && tutoSubState >= 5))) || superSayen.state === 'LANDING' || freezeForSequence || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
 
   const lastPlat = platforms[platforms.length - 1]; const lastX = lastPlat ? lastPlat.x + lastPlat.w : 350;
@@ -1223,6 +1223,9 @@ function resetGame() {
 function update() {
   if (!gameStarted || gameOver || isPaused) { stopRunSound(); return; }
 
+  // En état de freeze total à la fin du tuto (tutoStep === 9 ou tutoStep === 8 en sous-état 5 finis), on bloque les maj
+  if (isTutoMode && tutoStep === 9) { stopRunSound(); return; }
+
   if (isTutoMode) {
     updateTutorialScript();
     if (tutoHighlightedZone) { stopRunSound(); return; }
@@ -1310,6 +1313,11 @@ function update() {
       }
     }
   } else currentGameSpeed = effectiveBaseSpeed;
+
+  // Pendant les 2 secondes après l'invincibilité dans le tuto (tutoStep === 8 && tutoSubState === 5), on coupe le scrolling
+  if (isTutoMode && tutoStep === 8 && tutoSubState === 5) {
+    currentGameSpeed = 0;
+  }
 
   bgX -= currentGameSpeed * 0.4; lastObstacleX -= currentGameSpeed; lastLetterX -= currentGameSpeed;
 
@@ -1715,7 +1723,7 @@ function draw() {
   }
 
   if (isPaused) {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.75);'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.75)'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.textAlign = 'center';
     ctx.fillStyle = '#ffd54f'; ctx.font = '900 48px Courier New'; ctx.fillText("PARTIE EN PAUSE", canvas.width / 2, canvas.height / 2 - 20);
     ctx.fillStyle = '#ffffff'; ctx.font = 'bold 20px Courier New';
     if (isMobileDevice) ctx.fillText("Appuyer de nouveau sur l'écran pour reprendre", canvas.width / 2, canvas.height / 2 + 40);
