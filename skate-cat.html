@@ -91,49 +91,41 @@ nav a:hover {
     transform: scale(1.2) rotate(-2deg);
 }
 
+/* CONTENEUR IMAGE POCHETTE */
 .game-container {
     max-width: 800px;
-    margin: 60px auto 40px auto; 
-    padding: 40px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 12px;
-    border: 1px solid #333;
+    margin: 40px auto; 
+    padding: 20px;
     text-align: center;
 }
 
-h1 { 
-    font-family: 'Bebas Neue', sans-serif; 
-    font-size: 3.5rem; 
-    color: #12C3FF; 
-    margin-bottom: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
+.pochette-link {
+    display: inline-block;
+    width: 100%;
+    max-width: 800px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 3px solid #12C3FF;
+    box-shadow: 0 0 20px rgba(18, 195, 255, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.btn-launch-game {
-    background: #FFD700;
-    color: #1a1a24;
-    font-family: 'Bebas Neue', cursive;
-    font-size: 2rem;
-    padding: 18px 36px;
-    border: 3px solid #ffffff;
-    border-radius: 10px;
+.pochette-img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1754 / 1240;
+    display: block;
     cursor: pointer;
-    box-shadow: 0 6px 0px #b29320, 0 10px 20px rgba(0,0,0,0.8);
-    transition: all 0.2s ease;
-    margin-top: 25px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
 }
-.btn-launch-game:hover {
-    background: #ffe082;
-    transform: scale(1.05);
+
+.pochette-link:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 30px rgba(18, 195, 255, 0.7);
 }
 
 @media (max-width: 800px) {
-    h1 { font-size: 2.2rem; }
     .logo-wrapper { max-width: 320px; }
-    .btn-launch-game { font-size: 1.5rem; padding: 14px 24px; }
+    .game-container { padding: 10px; margin: 20px auto; }
 }
     </style>
 </head>
@@ -156,13 +148,9 @@ h1 {
     </nav>
 
     <div class="game-container">
-        <h1>SECRET UNLOCKED : <br>Good Morning Roger Sk8in' Cat <br>🛹🐱</h1>
-        <p style="font-size: 1.2rem; color: #e0e0e0;">
-            Prêt à aider Roger à faire le meilleur score en skate ?
-        </p>
-        <button class="btn-launch-game" onclick="window.location.href='jeu.html'">
-            JOUER à Good Morning Roger Sk8in' Cat
-        </button>
+        <a href="jeu.html" class="pochette-link">
+            <img src="pochette_sk8.jpg" width="1754" height="1240" class="pochette-img" alt="Good Morning Roger Sk8in' Cat">
+        </a>
     </div>
 
     <footer style="padding: 40px 0; text-align: center;">
