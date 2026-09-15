@@ -24,10 +24,12 @@
 
     #desktop-fullscreen-btn { position: absolute; top: 15px; left: 15px; padding: 8px 14px; font-size: 12px; color: #ffd54f; background-color: rgba(26, 26, 36, 0.85); border: 2px solid #ffd54f; box-shadow: 0 4px 0px #000; z-index: 30; display: none; }
 
-    #tuto-main-btn { position: absolute; top: 62%; left: 5%; transform: translateY(-50%); padding: 12px 24px; font-size: 18px; color: #ffffff; background-color: #2e2e40; border: 3px solid #ffd54f; box-shadow: 0 4px 0px #000; }
-    #start-main-btn { position: absolute; top: 78%; left: 5%; transform: translateY(-50%); padding: 16px 28px; font-size: 20px; color: #1a1a24; background-color: #ffd54f; border: 4px solid #ffffff; box-shadow: 0 6px 0px #b29320; }
+    /* Ajustement position bouton Tuto sur écran d'accueil (plus haut que Lancer la partie) */
+    #tuto-main-btn { position: absolute; top: 72%; left: 5%; transform: translateY(-50%); padding: 12px 24px; font-size: 18px; color: #ffffff; background-color: #2e2e40; border: 3px solid #ffd54f; box-shadow: 0 4px 0px #000; }
+    #start-main-btn { position: absolute; top: 87%; left: 5%; transform: translateY(-50%); padding: 16px 28px; font-size: 20px; color: #1a1a24; background-color: #ffd54f; border: 4px solid #ffffff; box-shadow: 0 6px 0px #b29320; }
 
-    .right-buttons-stack { position: absolute; top: 60%; right: 5%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 25; }
+    /* Alignement du bloc de droite sur PC pour que QUITTER s'aligne en bas avec LANCER LA PARTIE */
+    .right-buttons-stack { position: absolute; top: 62.5%; right: 5%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 25; }
     .secondary-btn { padding: 8px 16px; font-size: 13px; color: #ffd54f; background-color: #1a1a24; border: 3px solid #ffd54f; box-shadow: 0 4px 0px #000; text-align: center; }
     .quit-btn { color: #ff5252; border-color: #ff5252; }
 
@@ -87,7 +89,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.6-FIX-BG-MUSIC-RESET</div>
+  <div id="version-display">v13.7-FIX-UI-POSITIONS</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -378,17 +380,7 @@ function unlockAudio() {
 
 function playIntroMusic() { unlockAudio(); if (introMusic.paused && !gameStarted) introMusic.play().catch(() => {}); }
 function stopIntroMusic() { introMusic.pause(); if (introMusic.readyState >= 2) introMusic.currentTime = 0; }
-
-// CORRECTION : La musique du jeu repart de 0 à chaque lancement / recommencement
-function startBgMusic() { 
-  unlockAudio(); 
-  stopIntroMusic(); 
-  marioInvMusic.pause(); 
-  bgMusic.muted = false; 
-  bgMusic.volume = 0.8; 
-  if (bgMusic.readyState >= 2) bgMusic.currentTime = 0;
-  bgMusic.play().catch(() => {}); 
-}
+function startBgMusic() { unlockAudio(); stopIntroMusic(); marioInvMusic.pause(); bgMusic.muted = false; bgMusic.volume = 0.8; if (bgMusic.readyState >= 2) bgMusic.currentTime = 0; bgMusic.play().catch(() => {}); }
 
 function stopAllSounds() {
   if (fadeInterval) clearInterval(fadeInterval);
@@ -434,7 +426,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.6'; 
+const ASSET_VERSION = 'v13.7'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -509,7 +501,8 @@ const cat = { x: 100, y: ENTITY_GROUND_Y - 110, width: 110, height: 110, vy: 0, 
 
 let platforms = []; let obstacles = []; let items = []; let lastObstacleX = -1000; let obstacleCounter = 0;
 
-function showTutoDialogSide(text, highlightRect, onNext) {
+// GESTION DU POSITIONNEMENT DES DIALOGUES TUTO (Demande spécifique smartphone / superposition)
+function showTutoDialogSide(text, highlightRect, onNext, isCustomModal = false, customPlacementType = 'NONE') {
   tutoDialogText.innerHTML = text;
   tutoHighlightedZone = highlightRect;
   tutoNextCallback = onNext;
@@ -521,6 +514,23 @@ function showTutoDialogSide(text, highlightRect, onNext) {
     tutoDialogBox.style.top = '50%';
     tutoDialogBox.style.transform = 'translate(-50%, -50%)';
     return;
+  }
+
+  // Positionnement spécifique mobile demandé
+  if (isMobileDevice && isCustomModal) {
+    if (customPlacementType === 'MASTER_LETTERS') {
+      // Au-dessus des grosses lettres en bas à gauche
+      tutoDialogBox.style.left = '20px';
+      tutoDialogBox.style.top = Math.max(10, highlightRect.y - 255) + 'px';
+      tutoDialogBox.style.transform = 'none';
+      return;
+    } else if (customPlacementType === 'ROGER_HUD') {
+      // À droite au-dessus des lettres ROGER en bas à droite
+      tutoDialogBox.style.left = Math.max(10, highlightRect.x - 340) + 'px';
+      tutoDialogBox.style.top = Math.max(10, highlightRect.y - 255) + 'px';
+      tutoDialogBox.style.transform = 'none';
+      return;
+    }
   }
 
   let leftPos = highlightRect.x + highlightRect.w + 20;
@@ -694,10 +704,13 @@ function updateTutorialScript() {
   }
   else if (tutoStep === 6) {
     if (tutoSubState === 0) {
+      // EXPLICATION GROSSES LETTRES (Position personnalisée au-dessus sur mobile)
       showTutoDialogSide(
         "Ces grosses lettres R O G E R te protègent d'un choc avec un obstacle.",
         { x: 15, y: canvas.height - 130, w: 200, h: 110 },
-        () => { tutoSubState = 1; }
+        () => { tutoSubState = 1; },
+        true,
+        'MASTER_LETTERS'
       );
     } else if (tutoSubState === 1) {
       tutoInstructionMessage = "Fonce sur un obstacle pour tester la protection !";
@@ -715,7 +728,9 @@ function updateTutorialScript() {
           () => {
             tutoSubState = 3;
             tutoTimer = 0;
-          }
+          },
+          true,
+          'MASTER_LETTERS'
         );
       }
     } else if (tutoSubState === 3) {
@@ -726,10 +741,13 @@ function updateTutorialScript() {
   }
   else if (tutoStep === 7) {
     if (tutoSubState === 0) {
+      // EXPLICATION LETTRES ROGER EN BAS À DROITE (Position personnalisée au-dessus à droite sur mobile)
       showTutoDialogSide(
         "Collecte ces lettres pour reformer R O G E R en bas à droite et gagner une grosse lettre.",
         { x: canvas.width - 340, y: canvas.height - 95, w: 320, h: 85 },
-        () => { tutoSubState = 1; tutoTimer = 0; customLetterSpawnIndex = 0; }
+        () => { tutoSubState = 1; tutoTimer = 0; customLetterSpawnIndex = 0; },
+        true,
+        'ROGER_HUD'
       );
     } else if (tutoSubState === 1) {
       tutoInstructionMessage = "Attrape toutes les lettres de R O G E R !";
