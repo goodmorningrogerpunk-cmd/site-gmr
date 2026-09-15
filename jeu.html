@@ -100,7 +100,7 @@
     <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
   </div>
 
-  <div id="version-display">v13.37-STABLE</div>
+  <div id="version-display">v13.38-STABLE</div>
 
   <div id="mobile-hud-controls">
     <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
@@ -439,7 +439,7 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-const ASSET_VERSION = 'v13.37'; 
+const ASSET_VERSION = 'v13.38'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
   img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
@@ -743,6 +743,10 @@ function updateTutorialScript() {
 
       if (items.length === 0 && obstacles.length === 0 && platforms.length === 0 && tutoTimer > 40) {
         tutoTimer = 0;
+        if (customLetterSpawnIndex >= 5) {
+          customLetterSpawnIndex = 0; // Boucle infinie tant que le mot complet ROGER n'est pas validé !
+        }
+
         if (customLetterSpawnIndex === 0) {
           items.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 120, w: 65, h: 75, char: 'R', frame: 0, animTimer: 0 });
           const conf = assets.obstaclesConfig[5]; const dim = getObstacleDimensions(conf);
@@ -770,10 +774,6 @@ function updateTutorialScript() {
           platforms.push({ x: canvas.width + 270, y: ENTITY_GROUND_Y - 130, w: 260, h: 65, key: 'bleu_medium' });
           customLetterSpawnIndex = 5;
         }
-      }
-
-      if (customLetterSpawnIndex === 5 && items.length === 0 && obstacles.length === 0) {
-        tutoStep = 8; tutoSubState = 0; tutoTimer = 0; customLetterSpawnIndex = 0;
       }
     }
   }
@@ -1432,7 +1432,6 @@ function update() {
       score += 100;
       it.collected = true; playSoundEffect(sounds.coin);
 
-      // CORRECTION : Collecte indépendante de la lettre touchée (peu importe l'ordre dans ROGER)
       const letterIndex = rogerLetters.indexOf(it.char);
       if (letterIndex !== -1 && !rogerCollected[letterIndex]) {
         rogerCollected[letterIndex] = true;
@@ -1441,9 +1440,14 @@ function update() {
       if (rogerCollected.every(val => val === true)) {
         score += 1000; bonusEffectTimer = 90; 
         rogerCollected = [false, false, false, false, false];
+        
         if (completedWordsCount < 5) {
           completedWordsCount++; 
-          if (completedWordsCount === 5) { 
+          
+          if (isTutoMode && tutoStep === 7) {
+            tutoStep = 8; tutoSubState = 0; tutoTimer = 0; customLetterSpawnIndex = 0;
+            items = []; obstacles = []; platforms = [];
+          } else if (completedWordsCount === 5) { 
             freezeForSequence = true; 
             sequenceCurrentLetterIndex = 0; 
             sequenceAngle = 0; 
