@@ -19,7 +19,7 @@
 
     canvas { 
       width: 100%; height: 100%; object-fit: contain; display: block; image-rendering: pixelated; 
-      transform: translateZ(0); -webkit-transform: translateZ(0); /* Optimisation GPU iOS */
+      transform: translateZ(0); -webkit-transform: translateZ(0);
     }
 
     .pixel-btn { font-family: 'Courier New', Courier, monospace; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.1s ease; z-index: 25; }
@@ -72,7 +72,6 @@
       border-radius: 4px; pointer-events: none; z-index: 30;
     }
 
-    /* FORÇAGE DE L'ÉCRAN DE ROTATION POUR SMARTPHONE EN MODE PORTRAIT */
     #rotate-device-overlay {
       display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background-color: #111118; z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px;
@@ -283,7 +282,7 @@ let rightSideIdx = 0;
 const gameOverButtons = [restartBtn, homeGameOverBtn];
 let gameOverSelectedIdx = 0;
 
-let konamiButtonIdx = 0; // 0 pour "Carrément", 1 pour "Non, je garde le 8 bit"
+let konamiButtonIdx = 0;
 
 const formNavElements = [inputPseudo, inputEmail, cancelSaveBtn, saveBtn];
 let formNavIdx = 0;
@@ -343,10 +342,13 @@ function updatePromptSelection(option) {
 
 function updateFormNavSelection() {
   formNavElements.forEach((el, idx) => {
-    if (idx === formNavIdx) el.classList.add('nav-selected');
-    else el.classList.remove('nav-selected');
+    if (idx === formNavIdx) {
+      el.classList.add('nav-selected');
+      if (idx <= 1) el.focus();
+    } else {
+      el.classList.remove('nav-selected');
+    }
   });
-  formNavElements[formNavIdx].focus();
 }
 
 const introVideo = document.getElementById('intro-video');
@@ -1055,6 +1057,21 @@ window.addEventListener('keydown', (e) => {
     return;
   }
 
+  if (saveScoreModal.style.display === 'block') {
+    if (e.code === 'ArrowDown' || e.code === 'ArrowRight') {
+      formNavIdx = (formNavIdx + 1) % formNavElements.length;
+      updateFormNavSelection();
+    } else if (e.code === 'ArrowUp' || e.code === 'ArrowLeft') {
+      formNavIdx = (formNavIdx - 1 + formNavElements.length) % formNavElements.length;
+      updateFormNavSelection();
+    } else if (e.code === 'Enter' || e.code === 'Space') {
+      e.preventDefault();
+      if (formNavIdx === 2) cancelSaveBtn.click();
+      else if (formNavIdx === 3) saveScoreForm.requestSubmit();
+    }
+    return;
+  }
+
   if (!gameStarted && rulesModal.style.display !== 'flex' && leaderboardModal.style.display !== 'flex' && aboutModal.style.display !== 'flex' && konamiModal.style.display !== 'flex') {
     const inputKey = e.key.length === 1 ? e.key.toLowerCase() : e.code; const targetKey = konamiCode[konamiIndex];
     if (inputKey === targetKey || e.code === targetKey) {
@@ -1068,13 +1085,6 @@ window.addEventListener('keydown', (e) => {
     } else {
       konamiIndex = (inputKey === konamiCode[0] || e.code === konamiCode[0]) ? 1 : 0;
     }
-  }
-
-  if (saveScoreModal.style.display === 'block') {
-    if (e.code === 'ArrowDown') { formNavIdx = (formNavIdx + 1) % formNavElements.length; updateFormNavSelection(); }
-    else if (e.code === 'ArrowUp') { formNavIdx = (formNavIdx - 1 + formNavElements.length) % formNavElements.length; updateFormNavSelection(); }
-    else if (e.code === 'Enter') { if (formNavIdx === 2) cancelSaveBtn.click(); else if (formNavIdx === 3) saveScoreForm.requestSubmit(); }
-    return;
   }
 
   if (!gameStarted && gameOverStack.style.display !== 'flex' && scorePromptBox.style.display !== 'block' && saveScoreModal.style.display !== 'block' && konamiModal.style.display !== 'flex') {
@@ -1295,6 +1305,8 @@ startMainBtn.addEventListener('mouseenter', () => { menuFocusArea = 'START'; mai
 tutoMainBtn.addEventListener('mouseenter', () => { menuFocusArea = 'START'; mainButtonIdx = 0; updateMenuSelection(); });
 rightSideButtons.forEach((btn, idx) => { btn.addEventListener('mouseenter', () => { menuFocusArea = 'RIGHT'; rightSideIdx = idx; updateMenuSelection(); }); });
 gameOverButtons.forEach((btn, idx) => { btn.addEventListener('mouseenter', () => { gameOverSelectedIdx = idx; updateGameOverSelection(); }); });
+cancelSaveBtn.addEventListener('mouseenter', () => { formNavIdx = 2; updateFormNavSelection(); });
+saveBtn.addEventListener('mouseenter', () => { formNavIdx = 3; updateFormNavSelection(); });
 
 cancelSaveBtn.addEventListener('click', () => { saveScoreModal.style.display = 'none'; gameOverStack.style.display = 'flex'; gameOverSelectedIdx = 0; updateGameOverSelection(); });
 
