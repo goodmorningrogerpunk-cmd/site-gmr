@@ -432,6 +432,8 @@ function startBgMusic() {
   stopIntroMusic(); 
   marioInvMusic.pause(); 
   
+  if (superSayen.active || invincibleTimer > 0) return;
+
   const activeBgMusic = useRealMusicForNextGame ? konamiMusic : bgMusic;
   const otherMusic = useRealMusicForNextGame ? bgMusic : konamiMusic;
   
@@ -917,8 +919,16 @@ function triggerSuperSayen() {
   superSayen.active = true; superSayen.state = 'TRANSFORM'; superSayen.timer = 0;
   superSayen.transformFrame = 0; superSayen.flyFrame = 0; superSayen.animTimer = 0;
   cat.vy = 0; cat.isGrounded = false; cat.isPlatformGrounded = false; stopRunSound();
-  marioInvMusic.pause(); 
-  if (useRealMusicForNextGame) konamiMusic.pause(); else bgMusic.muted = true;
+  
+  bgMusic.pause();
+  konamiMusic.pause();
+  
+  if (invincibleTimer > 0) {
+    marioInvMusic.muted = true;
+  } else {
+    marioInvMusic.pause();
+  }
+  
   if (superSayanTheme.readyState >= 2) superSayanTheme.currentTime = 0;
   superSayanTheme.volume = 1.0; superSayanTheme.play().catch(() => {});
   playSoundEffect(sounds.sayan); playSoundEffect(sounds.speedFly);
@@ -926,6 +936,14 @@ function triggerSuperSayen() {
 
 function transitionSuperSayanToNormal() {
   superSayanTheme.pause();
+  
+  if (invincibleTimer > 0) {
+    marioInvMusic.muted = false;
+    marioInvMusic.play().catch(() => {});
+    return;
+  }
+
+  marioInvMusic.muted = false;
   if (useRealMusicForNextGame) {
     konamiMusic.play().catch(() => {});
   } else {
@@ -1464,9 +1482,17 @@ function update() {
   if (punkBonus) {
     if (catBoxX < punkBonus.x + punkBonus.w && catBoxX + catBoxWidth > punkBonus.x && catBoxY < punkBonus.y + punkBonus.h && catBoxY + catBoxHeight > punkBonus.y) {
       playSoundEffect(sounds.punkbonus); invincibleTimer = 900; debonusPlayed = false; debonusEndPlayed = false; punkBonus = null;
-      if (!superSayen.active) {
-        if (useRealMusicForNextGame) konamiMusic.pause(); else bgMusic.pause();
-        if (marioInvMusic.readyState >= 2) marioInvMusic.currentTime = 0; marioInvMusic.play().catch(() => {});
+      
+      if (marioInvMusic.readyState >= 2) marioInvMusic.currentTime = 0;
+
+      if (superSayen.active) {
+        marioInvMusic.muted = true;
+        marioInvMusic.play().catch(() => {});
+      } else {
+        bgMusic.pause();
+        konamiMusic.pause();
+        marioInvMusic.muted = false;
+        marioInvMusic.play().catch(() => {});
       }
     }
   }
