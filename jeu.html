@@ -494,7 +494,7 @@ function returnToHome() {
   gameStarted = false; gameOver = false; isPaused = false; isTutoMode = false;
   tutoHighlightedZone = null; tutoInstructionMessage = ""; tutoDialogBox.style.display = 'none';
   superSayen.active = false; invincibleTimer = 0;
-  debonusPlayed = false; debonusEndPlayed = false; punkBonus = null; ejectedObstacles = [];
+  debonusPlayed = false; debonusEndPlayed = false; punkBonus = null; ejectedObstacles = []; spikes = [];
   startMainBtn.style.display = 'block'; tutoMainBtn.style.display = 'block';
   if (!isMobileDevice) desktopFullscreenBtn.style.display = 'block';
   rightStack.style.display = 'flex'; versionDisplay.style.display = 'block'; mobileHudControls.style.display = 'none'; gameOverStack.style.display = 'none';
@@ -538,6 +538,11 @@ const assets = {
     { type: 'ground', img: loadSmartImage('obstacle5'), targetH: 80 },
     { type: 'air', img: loadSmartImage('obstacle6'), targetH: 85 }
   ],
+  spikes: {
+    court: loadSmartImage('pic-court'),
+    moyen: loadSmartImage('pic-moyen'),
+    long: loadSmartImage('pic-long')
+  },
   letters: {
     R: Array.from({length: 8}, (_, i) => loadSmartImage(`R${i+1}`)),
     O: Array.from({length: 8}, (_, i) => loadSmartImage(`O${i+1}`)),
@@ -575,6 +580,7 @@ let nextSpawnLetterIndex = 0; let lastLetterX = -1000; let lastLetterHeightLevel
 let invulnerableTimer = 0; let fallingLetters = [];
 let freezeForSequence = false; let sequenceCurrentLetterIndex = 0; let sequenceAngle = 0; let bounceTimer = 0; let jumpKeyReleased = true;
 let invincibleTimer = 0; let debonusPlayed = false; let debonusEndPlayed = false; let punkBonusTimer = 0; let punkBonus = null; let ejectedObstacles = [];
+let spikes = []; let obstacleSpawnCountSinceSpike = 0;
 
 const superSayen = { active: false, state: 'NONE', timer: 0, transformFrame: 0, flyFrame: 0, animTimer: 0, targetY: 180 };
 const cat = { x: 100, y: ENTITY_GROUND_Y - 110, width: 110, height: 110, vy: 0, isGrounded: true, wasGrounded: true, isPlatformGrounded: false, isCrouching: false, isRun4Pose: false, jumpTimer: 0, isJumping: false, animFrame: 0, animTimer: 0, crouchFrame: 0, crouchTimer: 0, state: 'RUN', damageFlashTimer: 0 };
@@ -619,7 +625,7 @@ function startTutorial() {
   tutoInstructionMessage = "";
   tutoHighlightedZone = null;
   completedWordsCount = 2;
-  platforms = []; obstacles = []; items = [];
+  platforms = []; obstacles = []; items = []; spikes = [];
   cat.y = ENTITY_GROUND_Y - cat.height; cat.vy = 0; cat.isGrounded = true;
 }
 
@@ -847,7 +853,7 @@ function updateTutorialScript() {
   else if (tutoStep === 8) {
     if (tutoSubState === 0) {
       tutoInstructionMessage = "";
-      items = []; obstacles = []; platforms = [];
+      items = []; obstacles = []; platforms = []; spikes = [];
       if (tutoTimer > 120) {
         let targetH = 65, targetW = 65;
         if (assets.punkBonus.complete && assets.punkBonus.naturalWidth > 0 && assets.punkBonus.naturalHeight > 0) {
@@ -886,13 +892,13 @@ function updateTutorialScript() {
       }
 
       if (invincibleTimer === 0) {
-        platforms = []; obstacles = []; items = []; 
+        platforms = []; obstacles = []; items = []; spikes = [];
         tutoSubState = 4;
         tutoTimer = 0;
       }
     } else if (tutoSubState === 4) {
       tutoInstructionMessage = "";
-      platforms = []; obstacles = []; items = [];
+      platforms = []; obstacles = []; items = []; spikes = [];
       if (tutoTimer > 120) {
         tutoStep = 9; tutoSubState = 0; tutoTimer = 0; tutoInstructionMessage = "";
         setTimeout(() => {
@@ -958,6 +964,7 @@ function triggerLetterFall(char, x, y) {
 
 function isPositionNearObstacle(targetX, targetW = 65, safeMargin = 180) {
   for (let obs of obstacles) { if (targetX + targetW + safeMargin > obs.x && targetX < obs.x + obs.w + safeMargin) return true; }
+  for (let sp of spikes) { if (targetX + targetW + safeMargin > sp.x && targetX < sp.x + sp.w + safeMargin) return true; }
   return false;
 }
 
@@ -997,28 +1004,48 @@ function spawnWorldElements() {
 
   const minSpacing = 180 + Math.random() * 120; const freeSpawnChance = 0.50 + Math.random() * 0.40;
   if ((canvas.width + 100 - lastObstacleX) > minSpacing && Math.random() < freeSpawnChance) {
-    const freeIndices = [0, 1, 2, 5, 6, 7]; const configIdx = freeIndices[Math.floor(Math.random() * freeIndices.length)];
-    const conf = assets.obstaclesConfig[configIdx]; const dim = getObstacleDimensions(conf);
-    const obsX = canvas.width + 100 + Math.random() * 150;
-    if (!isPositionNearLetter(obsX, dim.w, 180)) {
-      const flipX = Math.random() < 0.5; let obsY;
-      if (conf.type === 'air') {
-        if (configIdx === 7) obsY = ENTITY_GROUND_Y - dim.h - 60 - (Math.random() * 15);
-        else obsY = ENTITY_GROUND_Y - (140 + Math.random() * 60);
-        obstacles.push({ x: obsX, baseY: obsY, y: obsY, w: dim.w, h: dim.h, configIdx, type: 'air', floatPhase: Math.random() * Math.PI * 2, flipX });
-      } else {
-        const extraOffset = (configIdx === 0 || configIdx === 1) ? 5 : 0;
-        obsY = ENTITY_GROUND_Y - dim.h + extraOffset;
-        obstacles.push({ x: obsX, y: obsY, w: dim.w, h: dim.h, configIdx, frame: 0, animTimer: 0, flipX });
+    const threshold = score >= 50000 ? 7 : 10;
+    if (obstacleSpawnCountSinceSpike >= threshold) {
+      obstacleSpawnCountSinceSpike = 0;
+      const spikeTypes = ['court', 'moyen', 'long'];
+      const chosenType = spikeTypes[Math.floor(Math.random() * spikeTypes.length)];
+      const spikeImg = assets.spikes[chosenType];
+      let spikeW = 100, spikeH = 50;
+      if (spikeImg && spikeImg.complete && spikeImg.naturalWidth > 0 && spikeImg.naturalHeight > 0) {
+        const ratio = spikeImg.naturalWidth / spikeImg.naturalHeight;
+        spikeH = 55; spikeW = spikeH * ratio;
       }
-      lastObstacleX = obsX + dim.w; handleObstacleSpawned(obsX, obsY, dim.w);
+      const spikeX = canvas.width + 100;
+      const spikeY = ENTITY_GROUND_Y - spikeH + 8;
+      if (!isPositionNearObstacle(spikeX, spikeW, 200)) {
+        spikes.push({ x: spikeX, y: spikeY, w: spikeW, h: spikeH, type: chosenType });
+        lastObstacleX = spikeX + spikeW;
+      }
+    } else {
+      const freeIndices = [0, 1, 2, 5, 6, 7]; const configIdx = freeIndices[Math.floor(Math.random() * freeIndices.length)];
+      const conf = assets.obstaclesConfig[configIdx]; const dim = getObstacleDimensions(conf);
+      const obsX = canvas.width + 100 + Math.random() * 150;
+      if (!isPositionNearLetter(obsX, dim.w, 180)) {
+        const flipX = Math.random() < 0.5; let obsY;
+        if (conf.type === 'air') {
+          if (configIdx === 7) obsY = ENTITY_GROUND_Y - dim.h - 60 - (Math.random() * 15);
+          else obsY = ENTITY_GROUND_Y - (140 + Math.random() * 60);
+          obstacles.push({ x: obsX, baseY: obsY, y: obsY, w: dim.w, h: dim.h, configIdx, type: 'air', floatPhase: Math.random() * Math.PI * 2, flipX });
+        } else {
+          const extraOffset = (configIdx === 0 || configIdx === 1) ? 5 : 0;
+          obsY = ENTITY_GROUND_Y - dim.h + extraOffset;
+          obstacles.push({ x: obsX, y: obsY, w: dim.w, h: dim.h, configIdx, frame: 0, animTimer: 0, flipX });
+        }
+        lastObstacleX = obsX + dim.w; handleObstacleSpawned(obsX, obsY, dim.w);
+      }
     }
   }
 }
 
 function handleObstacleSpawned(obsX, obsY, obsW) {
   if ((isTutoMode && (tutoStep < 8 || (tutoStep === 8 && tutoSubState >= 5))) || superSayen.state === 'LANDING' || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
-  obstacleCounter++; const spawnFrequency = 3 + (Math.floor(Math.random() * 3) - 1); 
+  obstacleCounter++; obstacleSpawnCountSinceSpike++;
+  const spawnFrequency = 3 + (Math.floor(Math.random() * 3) - 1); 
   if (obstacleCounter % Math.max(2, spawnFrequency) === 0) {
     let letterX = obsX + obsW + 150 + (Math.random() * 100);
     if (letterX - lastLetterX < 260) return;
@@ -1205,6 +1232,7 @@ function updateRulesText() {
       <li><img src="R1.png" alt="R" class="rule-icon" style="width:22px;"> <b>Lettres ROGER</b> : Collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
       <li>❤️ <b>Système de vies</b> : Tu débutes avec les GROSSES lettres R et O ! Chaque GROSSE lettre te protège contre un choc. Si tu obtiens 5 GROSSES lettres R O G E R, alors Roger se transforme en Super-Chat pour un max de scoring !</li>
       <li><img src="${punkBonusSrc}" alt="Bonus Punk" style="width:22px;"> <b>Bonus Punk</b> : Attrape cet item et deviens invincible pendant 15 secondes. Tu peux dégommer tous les obstacles sur ton passage.</li>
+      <li>⚠️ <b>Pics au sol</b> : Saute par-dessus pour éviter de perdre une vie !</li>
       <li>⏸️ <b>Bouton P</b> : Mettre le jeu en pause / Reprendre le jeu</li>
       <li>🏠 <b>Bouton R</b> : Revenir à l'écran d'accueil</li>
     `;
@@ -1215,6 +1243,7 @@ function updateRulesText() {
       <li><img src="R1.png" alt="R" style="width:22px;"> <b>Lettres ROGER</b> : Collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
       <li>❤️ <b>Système de vies</b> : Tu débutes avec les GROSSES lettres R et O ! Chaque GROSSE lettre te protège contre un choc. Si tu obtiens 5 GROSSES lettres R O G E R, alors Roger se transforme en Super-Chat pour un max de scoring !</li>
       <li><img src="${punkBonusSrc}" alt="Bonus Punk" style="width:22px;"> <b>Bonus Punk</b> : Attrape cet item et deviens invincible pendant 15 secondes. Tu peux dégommer tous les obstacles sur ton passage.</li>
+      <li>⚠️ <b>Pics au sol</b> : Saute par-dessus pour éviter de perdre une vie !</li>
       <li>⏸️ <b>Entrée</b> : Mettre le jeu en pause / Reprendre le jeu</li>
       <li>🏠 <b>Echap</b> : Revenir à l'écran d'accueil</li>
     `;
@@ -1355,6 +1384,7 @@ function resetGame() {
   superSayen.active = false; superSayen.state = 'NONE'; freezeForSequence = false; sequenceCurrentLetterIndex = 0; sequenceAngle = 0;
   baseSpeedMultiplier = 1.0; currentGameSpeed = BASE_GAME_SPEED; jumpKeyReleased = true; lastSpecialSoundIsWilhem = false;
   invincibleTimer = 0; debonusPlayed = false; debonusEndPlayed = false; punkBonusTimer = 0; punkBonus = null; ejectedObstacles = [];
+  spikes = []; obstacleSpawnCountSinceSpike = 0;
 
   marioInvMusic.pause(); cat.y = ENTITY_GROUND_Y - cat.height; cat.vy = 0; cat.isGrounded = true; cat.wasGrounded = true;
   cat.isPlatformGrounded = false; cat.isRun4Pose = false; cat.isJumping = false; cat.jumpTimer = 0; cat.crouchFrame = 0; cat.crouchTimer = 0; cat.state = 'RUN';
@@ -1450,7 +1480,7 @@ function update() {
       currentGameSpeed = effectiveBaseSpeed * 3.5; superSayen.timer++; score += 15; const flySpeed = 7; const maxFlyY = ENTITY_GROUND_Y - cat.height + 65; 
       if (flyUpPressed) cat.y = Math.max(30, cat.y - flySpeed); if (downPressed) cat.y = Math.min(maxFlyY, cat.y + flySpeed);
       if (superSayen.animTimer % 4 === 0) superSayen.flyFrame = (superSayen.flyFrame + 1) % 6;
-      if (superSayen.timer >= 450) { superSayen.state = 'LANDING'; obstacles = []; items = []; platforms = []; lastObstacleX = cat.x + 300; lastLetterX = cat.x + 300; }
+      if (superSayen.timer >= 450) { superSayen.state = 'LANDING'; obstacles = []; items = []; platforms = []; spikes = []; lastObstacleX = cat.x + 300; lastLetterX = cat.x + 300; }
     } else if (superSayen.state === 'LANDING') {
       currentGameSpeed = effectiveBaseSpeed;
       if (cat.y < ENTITY_GROUND_Y - cat.height) cat.y += 6; 
@@ -1511,8 +1541,36 @@ function update() {
   }
 
   platforms.forEach(p => p.x -= currentGameSpeed);
+  spikes.forEach(s => s.x -= currentGameSpeed);
   if (!superSayen.active) { if (!cat.wasGrounded && cat.isGrounded) playSoundEffect(sounds.reception); if (cat.isGrounded) playRunSound(); else stopRunSound(); }
   platforms = platforms.filter(p => p.x + p.w > -100);
+
+  spikes.forEach(s => {
+    let spikeBoxX = s.x + 6; let spikeBoxW = s.w - 12; let spikeBoxY = s.y + 12; let spikeBoxH = s.h - 12;
+    const isSpikeHit = (catBoxX < spikeBoxX + spikeBoxW && catBoxX + catBoxWidth > spikeBoxX && catBoxY < spikeBoxY + spikeBoxH && catBoxY + catBoxHeight > spikeBoxY);
+
+    if (isSpikeHit) {
+      if (invincibleTimer > 0) {
+        playSoundEffect(sounds.degom);
+        score += 80;
+        s.ejected = true;
+      } else if (!superSayen.active && invulnerableTimer <= 0 && cat.damageFlashTimer === 0) {
+        playSoundEffect(sounds.damage);
+        cat.damageFlashTimer = 30;
+
+        if (completedWordsCount > 0) {
+          completedWordsCount--; invulnerableTimer = 90; const masterHudX = 20; const masterHudY = canvas.height - 115;
+          const lostChar = rogerLetters[completedWordsCount]; const lostX = masterHudX + (completedWordsCount * 95);
+          triggerLetterFall(lostChar, lostX, masterHudY);
+        } else {
+          gameOver = true; cat.state = 'FAIL'; stopRunSound(); stopAllSounds();
+          if (!isTutoMode && score >= 3000) { updatePromptSelection('YES'); scorePromptBox.style.display = 'block'; }
+          else { gameOverStack.style.display = 'flex'; gameOverSelectedIdx = 0; updateGameOverSelection(); }
+        }
+      }
+    }
+  });
+  spikes = spikes.filter(s => !s.ejected && s.x + s.w > -100);
 
   obstacles.forEach(o => {
     o.x -= currentGameSpeed;
@@ -1543,7 +1601,7 @@ function update() {
 
         if (isTutoMode) {
           if (tutoStep === 5) {
-            tutoObstacleCount = 0; obstacles = []; platforms = []; tutoTimer = 0; return;
+            tutoObstacleCount = 0; obstacles = []; platforms = []; spikes = []; tutoTimer = 0; return;
           } else if (tutoStep === 6) {
             completedWordsCount = 1; 
             const masterHudX = 20; const masterHudY = canvas.height - 115;
@@ -1557,7 +1615,7 @@ function update() {
               o.ejected = true;
               return;
             } else {
-              obstacles = []; platforms = []; items = [];
+              obstacles = []; platforms = []; items = []; spikes = [];
               customLetterSpawnIndex = 0; rogerCollected = [false, false, false, false, false];
               completedWordsCount = 1; tutoTimer = 0;
               return;
@@ -1615,7 +1673,7 @@ function update() {
           
           if (isTutoMode && tutoStep === 7) {
             tutoStep = 8; tutoSubState = 0; tutoTimer = 0; customLetterSpawnIndex = 0;
-            items = []; obstacles = []; platforms = [];
+            items = []; obstacles = []; platforms = []; spikes = [];
           } else if (completedWordsCount === 5) { 
             freezeForSequence = true; 
             sequenceCurrentLetterIndex = 0; 
@@ -1666,6 +1724,17 @@ function draw() {
     const img = assets.platforms[p.key]; const px = Math.round(p.x), py = Math.round(p.y), pw = Math.round(p.w), ph = Math.round(p.h);
     if (img && img.complete && img.naturalWidth > 0) ctx.drawImage(img, px, py, pw, ph);
     else { ctx.fillStyle = p.key.includes('bleu') ? '#4fc3f7' : p.key.includes('rouge') ? '#e57373' : '#81c784'; ctx.fillRect(px, py, pw, ph); }
+  });
+
+  spikes.forEach(s => {
+    const spikeImg = assets.spikes[s.type];
+    const sx = Math.round(s.x), sy = Math.round(s.y), sw = Math.round(s.w), sh = Math.round(s.h);
+    drawShadow(sx + sw / 2, sy + sh - 2, sw * 0.4, 4, 0.3);
+    if (spikeImg && spikeImg.complete && spikeImg.naturalWidth > 0) {
+      ctx.drawImage(spikeImg, sx, sy, sw, sh);
+    } else {
+      ctx.fillStyle = '#b0bec5'; ctx.fillRect(sx, sy, sw, sh);
+    }
   });
 
   let shadowTargetY = ENTITY_GROUND_Y;
