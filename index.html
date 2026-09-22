@@ -1,964 +1,1977 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Skate Cat - Roger Bonus Game</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    html, body { width: 100%; height: 100%; background-color: #000; font-family: 'Courier New', Courier, monospace; color: #fff; overflow: hidden; touch-action: none !important; }
+    body { display: flex; flex-direction: column; align-items: center; justify-content: center; }
     
-    <title>Good Morning Roger | Punk/Rock Cover</title>
-    <meta name="description" content="Good Morning Roger, c'est des tubes des années 90-2000 et des génériques de dessins animés, revus à la sauce punk/rock avec une bonne dose de fun.">
+    #game-container {
+      position: relative; width: 100%; max-width: 960px; height: 100%; max-height: 540px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.7); border-radius: 12px; overflow: hidden; border: 4px solid #2e2e40; background: #000;
+    }
+    #game-container.desktop-fullscreen { width: 100vw !important; height: 100vh !important; max-width: 100vw !important; max-height: 100vh !important; border-radius: 0 !important; border: none !important; }
+    #game-container.mobile-fullscreen { width: 100vw !important; height: 56.25vw !important; max-width: 100vw !important; max-height: 100vh !important; border-radius: 0 !important; border: none !important; z-index: 999999 !important; }
 
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://goodmorningroger.fr/">
-    <meta property="og:title" content="Good Morning Roger | Punk Cover">
-    <meta property="og:description" content="Good Morning Roger, c'est des tubes des années 90-2000 et des génériques de dessins animés, revus à la sauce punk/rock avec une bonne dose de fun.">
-    <meta property="og:image" content="https://goodmorningroger.fr/photo-groupe-punk-rock-good-morning-roger.jpg">
+    canvas { 
+      width: 100%; height: 100%; object-fit: contain; display: block; image-rendering: pixelated; 
+      transform: translateZ(0); -webkit-transform: translateZ(0);
+    }
 
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://goodmorningroger.fr/">
-    <meta name="twitter:title" content="Good Morning Roger | Punk Cover TV 📺">
-    <meta name="twitter:image" content="https://goodmorningroger.fr/photo-groupe-punk-rock-good-morning-roger.jpg">
+    .pixel-btn { font-family: 'Courier New', Courier, monospace; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.1s ease; z-index: 25; }
+    .pixel-btn.nav-selected, input.nav-selected { background-color: #ffffff !important; border-color: #ff3333 !important; color: #1a1a24 !important; transform: scale(1.04); box-shadow: 0 0 15px #ffd54f !important; }
 
-<link rel="icon" type="image/png" href="/chat_tete.png">
-<link rel="apple-touch-icon" href="/chat_tete.png">
-<style>
-/* 1. POLICES LOCALES CORRIGÉES (v16 et v51) */
-@font-face {
-  font-family: 'Bebas Neue';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('fonts/bebas-neue-v16-latin-regular.woff2') format('woff2');
-}
+    #desktop-fullscreen-btn { position: absolute; top: 15px; left: 15px; padding: 8px 14px; font-size: 12px; color: #ffd54f; background-color: rgba(26, 26, 36, 0.85); border: 2px solid #ffd54f; box-shadow: 0 4px 0px #000; z-index: 30; display: none; }
 
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('fonts/robotov51-latin-regular.woff2') format('woff2');
-}
+    #start-main-btn { position: absolute; top: 72%; left: 5%; transform: translateY(-50%); padding: 16px 28px; font-size: 20px; color: #1a1a24; background-color: #ffd54f; border: 4px solid #ffffff; box-shadow: 0 6px 0px #b29320; }
+    #tuto-main-btn { position: absolute; top: 57%; left: 5%; transform: translateY(-50%); padding: 12px 24px; font-size: 18px; color: #ffffff; background-color: #2e2e40; border: 3px solid #ffd54f; box-shadow: 0 4px 0px #000; }
 
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('fonts/robotov51-latin-700.woff2') format('woff2');
-}
+    .right-buttons-stack { position: absolute; top: 68%; right: 5%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 25; }
+    .secondary-btn { padding: 8px 16px; font-size: 13px; color: #ffd54f; background-color: #1a1a24; border: 3px solid #ffd54f; box-shadow: 0 4px 0px #000; text-align: center; }
+    .quit-btn { color: #ff5252; border-color: #ff5252; }
 
-/* 2. STYLE GLOBAL */
-body {
-    background-color: #0a0a0a;
-    color: #ffffff;
-    margin: 0;
-    padding: 0;
-    font-family: 'Roboto', Helvetica, Arial, sans-serif;
-    line-height: 1.6;
-}
+    @media screen and (max-width: 900px) {
+      #start-main-btn { top: auto !important; bottom: 32% !important; left: 5% !important; transform: none !important; }
+      #tuto-main-btn { top: auto !important; bottom: 48% !important; left: 5% !important; transform: none !important; }
+    }
 
-/* Application Bebas Neue partout où c'est nécessaire */
-nav a, h2, h3, .date-day, .date-month, .concert-lieu, .streaming-title, .past-summary, .past-date {
-    font-family: 'Bebas Neue', Impact, 'Arial Narrow Bold', sans-serif !important;
-}
+    .game-over-actions { display: none; position: absolute; top: 80%; left: 50%; transform: translate(-50%, -50%); flex-direction: row; gap: 16px; z-index: 20; }
+    #restart-btn, #home-gameover-btn { padding: 14px 28px; font-size: 18px; color: #1a1a24; background-color: #ffd54f; border: 4px solid #ffffff; box-shadow: 0 6px 0px #b29320; }
+    #home-gameover-btn { background-color: #2e2e40; color: #ffffff; border-color: #ffd54f; box-shadow: 0 6px 0px #000000; }
 
-/* 3. LOGO, MASCOTTE POP & NAV */
-.logo-wrapper {
-    position: relative;
-    max-width: 450px;
-    margin: 40px auto;
-    cursor: pointer;
-}
-.logo-groupe-principal {
-    display: block;
-    width: 100%;
-    height: auto;
-    filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.4));
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    position: relative;
-    z-index: 2;
-}
-.mascotte-pop {
-    position: absolute;
-    top: -60px;
-    left: 60%;
-    width: 140px;
-    height: auto;
-    transform: rotate(-15deg) scale(0); 
-    opacity: 0;
-    z-index: 1;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    filter: drop-shadow(0px 0px 15px rgba(18, 195, 255, 0.5));
-}
-.logo-wrapper:hover .logo-groupe-principal {
-    transform: scale(1.08) rotate(3deg);
-    filter: drop-shadow(0px 0px 25px rgba(18, 195, 255, 0.7));
-}
-.logo-wrapper:hover .mascotte-pop {
-    opacity: 1;
-    transform: rotate(15deg) scale(1);
-}
+    .game-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 680px; max-height: 85vh; background: #111118; border: 4px solid #ffd54f; border-radius: 8px; padding: 16px; z-index: 50000; color: #fff; flex-direction: column; }
+    .modal-content-scroll { flex: 1; overflow-y: auto; padding-right: 6px; margin-bottom: 12px; }
+    .modal-close-btn { display: block; margin: 0 auto; padding: 10px 24px; background: #ffd54f; color: #1a1a24; border: 3px solid #ffffff; font-size: 15px; font-weight: bold; cursor: pointer; }
 
-/* --- NAVIGATION --- */
-nav {
-    background: rgba(0, 0, 0, 0.9);
-    padding: 15px;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    border-bottom: 2px solid #12C3FF;
-    text-align: center;
-}
-nav a {
-    color: #fff;
-    text-decoration: none;
-    margin: 0 15px;
-    font-size: 1.4rem;
-    transition: 0.3s;
-    display: inline-block;
-}
-nav a:hover {
-    color: #12C3FF;
-    text-shadow: 0px 0px 10px rgba(18, 195, 255, 0.7);
-    transform: scale(1.2) rotate(-2deg);
-}
+    #tuto-dialog-box {
+      display: none; position: absolute; width: 560px; max-width: 92%; min-height: auto; background: #111118; border: 4px solid #ffd54f; border-radius: 8px;
+      padding: 22px 20px 18px 20px; z-index: 999999; text-align: center; box-shadow: 0 0 35px rgba(0,0,0,0.95);
+    }
+    #tuto-dialog-text { font-size: 17px; line-height: 1.4; color: #ffffff; margin-bottom: 16px; text-align: left; display: block; }
+    #tuto-next-btn { padding: 8px 24px; font-size: 16px; color: #1a1a24; background-color: #ffd54f; border: 3px solid #ffffff; cursor: pointer; font-weight: bold; display: inline-block; }
 
-/* 4. ARTICLES & GRILLES */
-.article-presentation, .article-actus {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 40px;
-    max-width: 1000px;
-    margin: 40px auto;
-    padding: 0 20px;
-}
-.article-video, .actus-photo { 
-    flex: 0 0 280px; 
-    max-width: 280px; 
-}
+    @media screen and (max-width: 900px) {
+      #tuto-dialog-box {
+        width: 85% !important; max-width: 380px !important; padding: 10px 12px 8px 12px !important;
+      }
+      #tuto-dialog-text { font-size: 12px !important; margin-bottom: 6px !important; }
+      #tuto-next-btn { padding: 4px 12px !important; font-size: 11px !important; }
+    }
 
-.actus-photo img {
-    width: 100%;
-    height: auto;
-    border-radius: 5px;
-    border: 1px solid #333;
-    display: block;
-}
+    #score-prompt-box, #save-score-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111118; border: 4px solid #ffd54f; border-radius: 8px; padding: 20px; z-index: 60000; text-align: center; }
+    #mobile-hud-controls { display: none; position: absolute; top: 15px; right: 15px; gap: 8px; z-index: 40; }
+    .hud-touch-btn { width: 42px; height: 42px; background: rgba(0, 0, 0, 0.7); border: 2px solid #ffd54f; color: #ffd54f; font-weight: bold; font-size: 18px; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
 
-.article-content, .actus-content { flex: 1; color: #ffffff; text-align: left; }
-.article-content h3, .actus-content h3 {
-    font-size: 2.5rem;
-    margin: 0 0 10px 0;
-}
-.presentation-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    max-width: 1100px;
-    margin: 40px auto;
-}
+    #version-display {
+      position: absolute; bottom: 12px; right: 15px; font-size: 13px; font-weight: bold;
+      color: #ffd54f; background: rgba(0, 0, 0, 0.75); padding: 4px 8px; border: 1px solid #ffd54f;
+      border-radius: 4px; pointer-events: none; z-index: 30;
+    }
 
-.presentation-item { overflow: hidden; border-radius: 5px; border: 1px solid #333; }
-.presentation-item img { width: 100%; transition: transform 0.3s ease; cursor: pointer; display: block; }
-.presentation-item:hover img { transform: scale(1.08); }
-
-/* 5. SECTION CONCERTS */
-.concert-list { max-width: 900px; margin: 40px auto; padding: 0 20px; }
-
-.concert-row-link {
-    text-decoration: none !important;
-    display: block;
-    color: #ffffff !important;
-}
-
-.concert-row {
-    display: flex;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.03);
-    margin-bottom: 15px;
-    padding: 15px;
-    border-radius: 8px;
-    border-left: 4px solid #333;
-    transition: 0.3s;
-}
-
-.concert-row-link:hover .concert-row {
-    background: rgba(18, 195, 255, 0.07);
-    border-left-color: #12C3FF;
-    transform: translateX(10px);
-}
-
-.concert-date-box {
-    flex: 0 0 80px;
-    text-align: center;
-    border-right: 1px solid #444;
-    margin-right: 25px;
-    padding-right: 15px;
-}
-
-.date-day { font-size: 2.2rem; line-height: 1; color: #12C3FF; display: block; }
-.date-month { font-size: 1rem; color: #fff; display: block; }
-
-.concert-info { flex: 1; text-align: left; }
-.concert-lieu { 
-    font-size: 1.5rem; 
-    display: block; 
-    color: #ffffff;
-}
-.concert-ville { color: #12C3FF; font-size: 0.95rem; font-weight: bold; }
-
-/* STYLE DES CONCERTS PASSÉS (1 SEULE LIGNE COMPACTE) */
-.concert-row-past {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(255, 255, 255, 0.02);
-    margin-bottom: 8px;
-    padding: 10px 15px;
-    border-radius: 6px;
-    border-left: 3px solid #555;
-    opacity: 0.75;
-    transition: 0.3s;
-}
-.concert-row-link:hover .concert-row-past {
-    background: rgba(18, 195, 255, 0.08);
-    border-left-color: #12C3FF;
-    opacity: 1;
-    transform: translateX(5px);
-}
-.past-date {
-    font-size: 1.2rem;
-    color: #12C3FF;
-    flex: 0 0 140px;
-    letter-spacing: 1px;
-}
-.past-info {
-    flex: 1;
-    text-align: right;
-    font-size: 0.95rem;
-    color: #dddddd;
-}
-.past-lieu-text {
-    font-weight: bold;
-    color: #ffffff;
-}
-.past-ville-text {
-    color: #12C3FF;
-    margin-left: 6px;
-}
-
-/* ACCORDÉONS ANNEES (SOUS-MENU PASSÉS) */
-.past-year-details {
-    margin: 15px 0;
-    text-align: left;
-}
-.past-summary {
-    font-size: 1.3rem;
-    color: #ffffff;
-    cursor: pointer;
-    padding: 8px 15px;
-    border: 1px solid #444;
-    border-radius: 5px;
-    background: rgba(255, 255, 255, 0.05);
-    transition: 0.3s;
-    letter-spacing: 1px;
-    list-style: none;
-}
-.past-summary::-webkit-details-marker {
-    display: none;
-}
-.past-summary:hover {
-    border-color: #12C3FF;
-    color: #12C3FF;
-    background: rgba(18, 195, 255, 0.1);
-}
-
-/* 6. TITRES H2 */
-h2 { 
-    font-size: 4.5rem; 
-    color: #12C3FF; 
-    text-align: center; 
-    margin: 80px 0 40px 0; 
-    letter-spacing: 5px; 
-    text-transform: uppercase; 
-    text-shadow: 0 0 15px rgba(18, 195, 255, 0.4); 
-}
-
-/* 7. BLOC STREAMING */
-.streaming-box {
-    background-color: #000000;
-    border: 1px solid #333;
-    border-radius: 12px;
-    padding: 30px;
-    max-width: 600px;
-    margin: 40px auto;
-    text-align: center;
-}
-
-/* 8. LOGOS SOCIAUX & MAIL */
-.logo-social {
-    width: 40px;
-    height: auto;
-    margin: 0 10px;
-    transition: 0.3s;
-}
-.logo-social:hover { transform: scale(1.1); filter: drop-shadow(0px 0px 8px #12C3FF); }
-
-img.img-mail {
-    width: 70px !important;
-    max-width: 70px !important;
-    height: auto !important;
-    display: block !important;
-    margin: 30px auto !important;
-    transition: all 0.3s ease-in-out !important;
-    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8)) !important;
-}
-img.img-mail:hover {
-    filter: drop-shadow(0 0 15px #12C3FF) !important;
-    transform: scale(1.1) !important;
-}
-.mobile-only { display: none !important; }
-.desktop-only { display: block; }
-
-@media (max-width: 800px) {
-    .desktop-only { display: none !important; }
-    .mobile-only { display: block !important; }
-    .article-video { width: 100%; max-width: 320px; margin: 0 auto 20px auto; }
-}
-@media (max-width: 800px) {
-    h2 { font-size: 2.8rem; }
-    .article-presentation, .article-actus { flex-direction: column; align-items: center; text-align: center; }
-    .concert-row { flex-direction: column; text-align: center; }
-    .concert-date-box { border-right: none; margin-right: 0; margin-bottom: 10px; }
-    .concert-info { text-align: center; }
-    .concert-row-past { flex-direction: column; text-align: center; gap: 5px; }
-    .past-date { flex: none; }
-    .past-info { text-align: center; }
-}
-
-/* LIGHTBOX */
-#lightbox {
-    display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.9); align-items: center; justify-content: center;
-}
-#lightbox img { max-width: 90%; max-height: 80%; border: 3px solid #12C3FF; }
-
-html {
-    scroll-behavior: smooth;
-    scroll-padding-top: 120px;
-}
-
-.reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.8s ease-out;
-}
-
-.reveal.active {
-    opacity: 1;
-    transform: translateY(0);
-}
-    #musiques p, #contact p {
-    font-family: 'Bebas Neue', Impact, sans-serif !important;
-    font-size: 1.6rem; /* On augmente un peu car Bebas écrit petit */
-    letter-spacing: 1px;
-}
-    h1 {
-    margin: 0;
-    padding: 0;
-    line-height: 0;
-}
-    .article-subtitle {
-    display: block; /* Pour qu'il prenne toute la ligne */
-    font-family: 'Bebas Neue', sans-serif !important;
-    font-size: 1.8rem;
-    color: #12C3FF; /* Ton bleu signature */
-    margin-bottom: 20px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-}
-/* Style des boutons spéciaux dans le menu */
-.nav-btn-pro {
-    color: #FFD700 !important;
-    border: 1px solid #FFD700;
-    padding: 4px 10px;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-}
-
-.nav-btn-pro:hover {
-    background: rgba(255, 215, 0, 0.2);
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-}
-
-.nav-btn-90s {
-    color: #00FF00 !important; /* Vert néon 90s */
-    border: 1px solid #00FF00;
-    padding: 4px 10px;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-}
-
-.nav-btn-90s:hover {
-    background: rgba(0, 255, 0, 0.2);
-    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
-}    
-</style>
+    #rotate-device-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background-color: #111118; z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px;
+    }
+    #rotate-device-overlay .rotate-icon { font-size: 70px; margin-bottom: 20px; animation: rotateAnim 2s infinite ease-in-out; }
+    #rotate-device-overlay p { color: #ffd54f; font-size: 20px; font-weight: bold; line-height: 1.5; font-family: 'Courier New', Courier, monospace; }
+    @keyframes rotateAnim { 0%, 10% { transform: rotate(0deg); } 50%, 60% { transform: rotate(-90deg); } 100% { transform: rotate(0deg); } }
+    
+    @media screen and (max-width: 900px) and (orientation: portrait) {
+      #rotate-device-overlay { display: flex !important; }
+    }
+  </style>
 </head>
 <body>
-    <div id="lightbox" onclick="this.style.display='none'"><img src="" alt="Agrandissement"></div>
-    <div class="logo-wrapper">
-    <h1>
-        <img src="Goodmorningrogerlogo.png" class="logo-groupe-principal" alt="Good Morning Roger - Groupe de Punk Rock Covers">
-    </h1>
-    <img src="rogerchat.png" class="mascotte-pop" alt="Roger le Chat">
+
+<div id="rotate-device-overlay">
+  <div class="rotate-icon">📱</div>
+  <p>MERCI DE TOURNER VOTRE ÉCRAN<br>EN MODE HORIZONTAL POUR JOUER</p>
 </div>
 
-    <nav>
-        <a href="#presentation">Présentation</a>
-        <a href="#actus">Actus</a>
-        <a href="#concerts">Concerts</a>
-        <a href="#musiques">Musiques</a>
-        <a href="#contact">Contact</a>
-        <a href="pro.html" style="color: #FFD700; border: 1px solid #FFD700; padding: 5px 10px; border-radius: 5px;">Espace Pro</a>
-        <a href="index1998.html" class="nav-btn-90s">Site version 90's 💾</a>        
-    </nav>
+<div id="game-container">
+  <video id="intro-video" src="video_intro_gmr_skate.mp4" loop muted playsinline hidden></video>
 
-<section id="presentation" class="reveal">
-    <h2>PRÉSENTATION</h2>
-    <div class="article-presentation">
-   <div class="article-video">
-    <div class="presentation-item-video"> 
-        <div class="video-container desktop-only" style="position: relative; padding-bottom: 177.77%; height: 0; overflow: hidden; border-radius: 8px;">
-            <video autoplay loop muted playsinline controls preload="auto" poster="photo5.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background: #000;">
-                <source src="https://goodmorningrogerpunk-cmd.github.io/site-gmr/teasergmrok.mp4" type="video/mp4">
-            </video>
-        </div>
-        <div class="video-container mobile-only" style="position: relative; padding-bottom: 177.77%; height: 0; overflow: hidden; border-radius: 8px; border: 2px solid #12C3FF;">
-            <iframe 
-                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
-                src="https://www.youtube.com/embed/aU68X9G9wcE" 
-                title="YouTube video player" 
-                frameborder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                allowfullscreen>
-            </iframe>
-        </div>
+  <canvas id="gameCanvas" width="960" height="540"></canvas>
+  
+  <button id="desktop-fullscreen-btn" class="pixel-btn">⛶ PLEIN ÉCRAN</button>
+
+  <button id="tuto-main-btn" class="pixel-btn">TUTO</button>
+  <button id="start-main-btn" class="pixel-btn">LANCER LA PARTIE</button>
+  
+  <div class="right-buttons-stack" id="right-stack">
+    <button id="rules-btn" class="pixel-btn secondary-btn">RÈGLES & CONTRÔLES</button>
+    <button id="leaderboard-btn" class="pixel-btn secondary-btn">MEILLEURS SCORES</button>
+    <button id="about-btn" class="pixel-btn secondary-btn">EN SAVOIR PLUS</button>
+    <button id="quit-btn" class="pixel-btn secondary-btn quit-btn">QUITTER</button>
+  </div>
+
+  <div id="version-display">v1.0</div>
+
+  <div id="mobile-hud-controls">
+    <button id="mobile-pause-btn" class="hud-touch-btn">P</button>
+    <button id="mobile-home-btn" class="hud-touch-btn">R</button>
+  </div>
+  
+  <div class="game-over-actions" id="game-over-stack">
+    <button id="restart-btn" class="pixel-btn">RECOMMENCER</button>
+    <button id="home-gameover-btn" class="pixel-btn">ACCUEIL</button>
+  </div>
+
+  <div id="tuto-dialog-box">
+    <p id="tuto-dialog-text"></p>
+    <button id="tuto-next-btn" class="pixel-btn">SUIVANT</button>
+  </div>
+
+  <div id="score-prompt-box">
+    <p style="font-size: 18px; line-height: 1.4; color: #fff;">Veux-tu enregistrer ce score au<br><b style="color:#ffd54f;">Good Morning Classement</b> ?</p>
+    <div style="display:flex; justify-content:center; gap:20px; margin-top:18px;">
+      <button id="prompt-yes-btn" class="pixel-btn" style="padding:10px 24px; font-size:18px; background:#ffd54f; color:#1a1a24;">OUI</button>
+      <button id="prompt-no-btn" class="pixel-btn" style="padding:10px 24px; font-size:18px; background:#ffd54f; color:#1a1a24;">NON</button>
     </div>
+  </div>
+
+  <div id="save-score-modal" style="width: 92%; max-width: 500px;">
+    <h2 id="score-modal-title" style="color:#ffd54f; margin-bottom:8px; font-size:16px;">ENREGISTRER TON SCORE</h2>
+    <div id="gift-notice" style="background: rgba(255, 213, 79, 0.15); border: 1px dashed #ffd54f; border-radius: 4px; padding: 6px; margin-bottom: 8px;">
+      <p style="font-size: 11px; color: #ffffff; font-weight: bold; margin: 0;">🎁 Pense à ajouter ton adresse mail pour que Roger te contacte s'il a envie de te donner des cadeaux !</p>
+    </div>
+    <form id="save-score-form">
+      <div style="display:flex; flex-direction:column; gap:4px; margin:8px 0; text-align:left;">
+        <label for="player-pseudo" style="font-size:11px; color:#ffd54f;">PSEUDO :</label>
+        <input type="text" id="player-pseudo" name="pseudo" required maxlength="15" autocomplete="off" style="padding:8px; font-size:16px; background:#1a1a24; border:2px solid #ffd54f; color:#fff;">
+      </div>
+      <div style="display:flex; flex-direction:column; gap:4px; margin:8px 0; text-align:left;">
+        <label for="player-email" style="font-size:11px; color:#ffd54f;">ADRESSE MAIL :</label>
+        <input type="email" id="player-email" name="email" required autocomplete="off" style="padding:8px; font-size:16px; background:#1a1a24; border:2px solid #ffd54f; color:#fff;">
+      </div>
+      <div style="display:flex; justify-content:center; gap:12px; margin-top:10px;">
+        <button type="button" id="cancel-save-btn" class="pixel-btn" style="background:#2e2e40; color:#fff; border:3px solid #ffd54f; padding:8px 16px;">RETOUR</button>
+        <button type="submit" id="save-btn" class="pixel-btn" style="background:#ffd54f; color:#1a1a24; border:3px solid #fff; padding:8px 20px;">SAVE</button>
+      </div>
+    </form>
+  </div>
+  
+  <div id="rules-modal" class="game-modal">
+    <h2 style="color:#ffd54f; text-align:center; margin-bottom:12px;">RÈGLES ET CONTRÔLES</h2>
+    <div class="modal-content-scroll">
+      <ul id="rules-list" style="list-style:none; font-size:13px; line-height:1.4;"></ul>
+    </div>
+    <button id="close-rules-btn" class="pixel-btn modal-close-btn">FERMER</button>
+  </div>
+
+  <div id="leaderboard-modal" class="game-modal">
+    <h2 style="color:#ffd54f; text-align:center; margin-bottom:12px;">TOP 10 SCORES</h2>
+    <div class="modal-content-scroll">
+      <table style="width:100%; border-collapse:collapse; margin-top:10px;">
+        <thead>
+          <tr style="color:#ffd54f; border-bottom:2px solid #ffd54f;">
+            <th style="padding:8px; text-align:left;">#</th>
+            <th style="padding:8px; text-align:left;">PSEUDO</th>
+            <th style="padding:8px; text-align:left;">SCORE</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-body">
+          <tr><td colspan="3" style="text-align:center;">Chargement...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <button id="close-leaderboard-btn" class="pixel-btn modal-close-btn">FERMER</button>
+  </div>
+
+  <div id="about-modal" class="game-modal">
+    <h2 style="color:#ffd54f; text-align:center; margin-bottom:12px;">EN SAVOIR PLUS</h2>
+    <div class="modal-content-scroll" style="font-size: 14px; line-height: 1.5; color: #e0e0e0;">
+      <p style="margin-bottom: 12px; font-weight: bold; color: #ffd54f;">Bienvenue dans Good Morning Roger Sk8in’ Cat !</p>
+      <p style="margin-bottom: 12px;">Ce jeu accompagne la sortie de notre CD “Club Roger 2”. Fais le meilleur score et tente de gagner des cadeaux !</p>
+    </div>
+    <button id="close-about-btn" class="pixel-btn modal-close-btn">FERMER</button>
+  </div>
+
+  <div id="konami-modal" class="game-modal" style="text-align: center; max-width: 520px;">
+    <h2 style="color:#ffd54f; margin-bottom: 14px;">SECRET DÉBLOQUÉ !</h2>
+    <div class="modal-content-scroll" style="overflow: visible;">
+      <p style="font-size: 15px; line-height: 1.6; color: #fff; margin-bottom: 22px;">
+        Le Konami code... toi tu es un vrai geek ! Pour te récompenser, qu'est-ce que tu dirais de faire une partie avec de la vraie musique et non pas de la musique 8 bit ?
+      </p>
+      <div style="display: flex; justify-content: center; gap: 15px;">
+        <button id="konami-yes-btn" class="pixel-btn" style="padding: 10px 20px; background: #ffd54f; color: #1a1a24; border: 3px solid #fff;">Carrément</button>
+        <button id="konami-no-btn" class="pixel-btn" style="padding: 10px 20px; background: #2e2e40; color: #fff; border: 3px solid #ffd54f;">Non, je garde le 8 bit</button>
+      </div>
+    </div>
+  </div>
 </div>
-        <div class="article-content">
-    <h3>Good Morning Roger, <br>le groupe qui réveille tes souvenirs</h3>
-    <p class="article-subtitle">Des punk covers, des tubes, des dessins animés et du fun</p>
-            <div class="article-text">
-                <p><strong>Good Morning Roger</strong>, c’est le groupe qui a eu la (mauvaise ?) idée de mélanger le punk-rock avec tout ce que tu n’assumais pas d’écouter quand tu étais ado.</p>
-                <p>Au programme : des tubes légendaires comme <em>La Tribu de Dana, Les Rois du Monde, Moi Lolita</em> et même des génériques culte genre <em>Denver le dernier dinosaure</em> ou les classiques du <em>Club Dorothée</em>... le tout à la sauce punk-rock déjanté.</p>
-                <p> Le groupe, originaire de Clisson dans le Vignoble Nantais, est composé de Marc au chant et Jean-Louis à la guitare. Sur scène, il sont rejoints par un PC multi-instrumentiste et une sublime TV cathodique afin d'offrir un show décalé qui envoie du lourd ! </p>
-                <p>C’est énergique, festif, nostalgique et totalement décomplexé, c'est Good Morning Roger !</p>
-            </div>
-        </div>
-    </div>
-    <div class="presentation-grid">
-        <div class="presentation-item"><img src="photo9.jpg" alt="Marc - chanteur de Good Morning Roger"></div>
-        <div class="presentation-item"><img src="photo1.jpg" alt="Good Morning Roger - groupe de musique punk rock TV 1"></div>
-        <div class="presentation-item"><img src="photo4.jpg" alt="Good Morning Roger - groupe de musique punk rock TAG 1"></div>
-        <div class="presentation-item"><img src="photo5.jpg" alt="Good Morning Roger - groupe de musique punk rock CONCERT 1"></div>
-        <div class="presentation-item"><img src="photo10.jpg" alt="Jean-Louis - guitariste de Good Morning Roger"></div>
-    </div>
-</section>
-
-<section id="actus" class="reveal">
-    <h2>ACTUS</h2>
-    <div class="article-actus">
-        <div class="actus-photo"><img src="photo7.jpg" alt="Good Morning Roger - groupe de musique punk rock CHILL 1"></div>
-        <div class="actus-content">
-            <h3>On prépare un nouvel album</h3>
-            <div class="actus-text">
-                <p>Dans notre premier album "Club Roger" sorti en 2025 on reprenait des génériques de dessins animés.</p>
-                <p>Sauf qu'on s'est rendu compte, après coup, qu'on avait pas fait TOUS les génériques qui existaient, du coup ben... on va faire un nouvel album avec d'autres génériques de dessins animés.</p>
-                <p style="font-weight: bold; color: #12C3FF;">Sortie prévue en 2027 !</p>
-            </div>
-        </div>
-    </div>
-    
-    <div class="article-actus">
-        <div class="actus-photo"><img src="tour_date_ete_2026.jpg" alt="Good Morning Roger - Summer Tour"></div>
-        <div class="actus-content">
-            <h3>La méga tournée de l'été</h3>
-            <div class="actus-text">
-                <p>Appelle ça comme tu veux : summer tour, tournée de l'été, méga tournée du soleil... En tous cas, le résultat est le même : plein de dates sur les mois de juillet, août et septembre sur lesquelles on va trop s'éclater !</p>
-                <p>De la Bretagne à la Vendée (comme disent les supporters de l'équipe championne de Ligue 2 en 2027) avec même un crochet par Poitiers, tu devrais trouver Good Morning Roger sur ton chemin.</p>
-                <p style="font-weight: bold; color: #12C3FF;">On a trop hâte de te voir sur une (ou plusieurs) de nos dates !</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="article-actus">
-        <div class="actus-photo"><img src="photo11.jpg" alt="Marc - chanteur du groupe Good Morning Roger en concert"></div>
-        <div class="actus-content">
-            <h3>Plein de dates en 2026 !</h3>
-            <div class="actus-text">
-                <p>On avait plein de dates en 2025, eh ben on en a encore plus en 2026, et ça c'est trop cool !</p>
-                <p>Des bars, des festoches... tout ça tout ça, on va bien s'éclater.</p>
-                <p>On compte sur toi pour venir chanter avec nous !</p>
-                <p><a href="#concerts" style="color: #12C3FF; text-decoration: underline; font-weight: bold;">Voir les dates de concerts</a> </p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section id="concerts" class="reveal">
-    <h2>CONCERTS</h2>
-<div class="concert-list">
-<p style="color: #fff; font-weight: bold; text-align: center; font-size: 1.3rem; margin-top: -15px; margin-bottom: 40px; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 10px rgba(18, 195, 255, 0.7);">
-    LES CONCERTS À VENIR
-</p>
-
-<!-- CONTENEUR DES CONCERTS À VENIR -->
-<div class="concert-container" id="upcoming-concerts">
-    <!-- DATES 2026 -->
-    <a href="https://www.facebook.com/events/3233615933482214?locale=fr_FR" target="_blank" class="concert-row-link" data-date="2026-02-13">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">13</span><span class="date-month">FÉVRIER</span></div>
-            <div class="concert-info"><span class="concert-lieu">Le Petit Café de Rezé</span><span class="concert-ville">Rezé (44)</span></div>
-        </div>
-    </a>
-    <a href="https://www.facebook.com/Gapette/" target="_blank" class="concert-row-link" data-date="2026-03-28">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">28</span><span class="date-month">MARS</span></div>
-            <div class="concert-info"><span class="concert-lieu">La Gapette</span><span class="concert-ville">Les Epesses (85)</span></div>
-        </div>
-    </a>
-    <a href="https://www.facebook.com/lelutindetravers/?locale=fr_FR" target="_blank" class="concert-row-link" data-date="2026-04-04">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">04</span><span class="date-month">AVRIL</span></div>
-            <div class="concert-info"><span class="concert-lieu">Lutin de Travers</span><span class="concert-ville">Nantes (44)</span></div>
-        </div>
-    </a>
-    <a href="https://www.facebook.com/p/La-Forge-100063457422069/" target="_blank" class="concert-row-link" data-date="2026-04-05">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">05</span><span class="date-month">AVRIL</span></div>
-            <div class="concert-info"><span class="concert-lieu">La Forge</span><span class="concert-ville">Chambretaud (85)</span></div>
-        </div>
-    </a>
-    <a href="https://brasserie-brume.fr" target="_blank" class="concert-row-link" data-date="2026-05-08">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">08</span><span class="date-month">MAI</span></div>
-            <div class="concert-info"><span class="concert-lieu">Brasserie Horizon</span><span class="concert-ville">Questembert (56)</span></div>
-        </div>
-    </a>
-    <a href="https://www.bar-caveetvous-clisson.fr/" target="_blank" class="concert-row-link" data-date="2026-06-05">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">05</span><span class="date-month">JUIN</span></div>
-            <div class="concert-info"><span class="concert-lieu">Fête de la Musique (La Cave et Vous)</span><span class="concert-ville">Mouzillon (44)</span></div>
-        </div>
-    </a>
-    <a href="https://www.larcadiafougeres.fr/" target="_blank" class="concert-row-link" data-date="2026-06-13">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">13</span><span class="date-month">JUIN</span></div>
-            <div class="concert-info"><span class="concert-lieu">L'Arcadia</span><span class="concert-ville">Fougères (35)</span></div>
-        </div>
-    </a>
-    <a href="https://www.bar-caveetvous-clisson.fr/" target="_blank" class="concert-row-link" data-date="2026-06-17">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">17</span><span class="date-month">JUIN</span></div>
-            <div class="concert-info"><span class="concert-lieu">La Cave et Vous / Hellfest</span><span class="concert-ville">Clisson (44)</span></div>
-        </div>
-    </a>
-    <a href="http://www.vandb.fr/magasin/poitiers-sud/" target="_blank" class="concert-row-link" data-date="2026-07-02">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">02</span><span class="date-month">JUILLET</span></div>
-            <div class="concert-info"><span class="concert-lieu">V and B</span><span class="concert-ville">Poitiers (86)</span></div>
-        </div>
-    </a>
-    <a href="https://www.facebook.com/Rivesdautise?locale=fr_FR" target="_blank" class="concert-row-link" data-date="2026-07-03">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">03</span><span class="date-month">JUILLET</span></div>
-            <div class="concert-info"><span class="concert-lieu">Rives-d'Autise s'amuse</span><span class="concert-ville">Rives d'Autise (85)</span></div>
-        </div>
-    </a>
-    <a href="https://www.facebook.com/Lemillebornes/" target="_blank" class="concert-row-link" data-date="2026-07-04">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">04</span><span class="date-month">JUILLET</span></div>
-            <div class="concert-info"><span class="concert-lieu">Mille Bornes</span><span class="concert-ville">Redon (35)</span></div>
-        </div>
-    </a>
-    <a href="https://breizhpms.fr/" target="_blank" class="concert-row-link" data-date="2026-07-11">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">11</span><span class="date-month">JUILLET</span></div>
-            <div class="concert-info"><span class="concert-lieu">Breizh PMS Festival</span><span class="concert-ville">Guémené-Penfao (44)</span></div>
-        </div>
-    </a>
-    <a href="https://www.instagram.com/lecova_lsd/" target="_blank" class="concert-row-link" data-date="2026-07-25">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">25</span><span class="date-month">JUILLET</span></div>
-            <div class="concert-info"><span class="concert-lieu">Le Cova</span><span class="concert-ville">Les Sables d'Olonne (85)</span></div>
-        </div>
-    </a>
-    <a href="https://www.goodmorningroger.fr" target="_blank" class="concert-row-link" data-date="2026-07-31">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">31</span><span class="date-month">JUILLET</span></div>
-            <div class="concert-info"><span class="concert-lieu">Hangar 24</span><span class="concert-ville">Nantes (44)</span></div>
-        </div>
-    </a>
-    <a href="https://www.bonrepos.bzh/index.php/fr/" target="_blank" class="concert-row-link" data-date="2026-08-01">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">01</span><span class="date-month">AOÛT</span></div>
-            <div class="concert-info"><span class="concert-lieu">Son et Lumière de Bon Repos</span><span class="concert-ville">Bon-Repos (22)</span></div>
-        </div>
-    </a>
-    <a href="https://www.facebook.com/laminuteblondefc/?locale=fr_FR" target="_blank" class="concert-row-link" data-date="2026-08-07">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">07</span><span class="date-month">AOÛT</span></div>
-            <div class="concert-info"><span class="concert-lieu">La Minute Blonde</span><span class="concert-ville">Fontenay-le-Comte (85)</span></div>
-        </div>
-    </a>
-    <a href="https://www.leferrailleur.fr/agenda" target="_blank" class="concert-row-link" data-date="2026-08-28">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">28</span><span class="date-month">AOÛT</span></div>
-            <div class="concert-info"><span class="concert-lieu">Le Ferrailleur (concert sauvage)</span><span class="concert-ville">Nantes (44)</span></div>
-        </div>
-    </a>
-    <a href="https://www.admr44.org/forum-festif-no-limit-edition-2026" target="_blank" class="concert-row-link" data-date="2026-09-05">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">05</span><span class="date-month">SEPT.</span></div>
-            <div class="concert-info"><span class="concert-lieu">Forum Festif No Limit</span><span class="concert-ville">Teillé (44)</span></div>
-        </div>
-    </a>
-    <a href="https://www.facebook.com/Gapette/" target="_blank" class="concert-row-link" data-date="2026-09-12">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">12</span><span class="date-month">SEPT.</span></div>
-            <div class="concert-info"><span class="concert-lieu">La Gapette</span><span class="concert-ville">Les Epesses (85)</span></div>
-        </div>
-    </a>
-    <a href="https://www.brasseriesoma.fr/" target="_blank" class="concert-row-link" data-date="2026-09-18">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">18</span><span class="date-month">SEPT.</span></div>
-            <div class="concert-info"><span class="concert-lieu">Brasserie Soma</span><span class="concert-ville">Le Loroux-Bottereau (44)</span></div>
-        </div>
-    </a>
-    <a href="https://fb.me/e/kaJoFzaaK" target="_blank" class="concert-row-link" data-date="2026-09-19">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">19</span><span class="date-month">SEPT.</span></div>
-            <div class="concert-info"><span class="concert-lieu">Le Petit Café de Rezé</span><span class="concert-ville">Rezé (44)</span></div>
-        </div>
-    </a>
-    <a href="https://www.lespapasbrasseurs.fr/" target="_blank" class="concert-row-link" data-date="2026-09-25">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">25</span><span class="date-month">SEPT.</span></div>
-            <div class="concert-info"><span class="concert-lieu">Les Papas Brasseurs</span><span class="concert-ville">Saint-Hilaire-de-Clisson (44)</span></div>
-        </div>
-    </a>
-    <a href="https://www.facebook.com/lesdecapsules/" target="_blank" class="concert-row-link" data-date="2026-10-24">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">24</span><span class="date-month">OCT.</span></div>
-            <div class="concert-info"><span class="concert-lieu">Les Décapsulés</span><span class="concert-ville">Baud (56)</span></div>
-        </div>
-    </a>
-    <a href="https://www.festival-mots-zik.com/" target="_blank" class="concert-row-link" data-date="2026-11-06">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">06</span><span class="date-month">NOV.</span></div>
-            <div class="concert-info"><span class="concert-lieu">Festival Mots-Zik</span><span class="concert-ville">Saint-Jacut-les-Pins (56)</span></div>
-        </div>
-    </a>
-
-    <!-- DATES 2025 -->
-    <a href="https://www.facebook.com/monkeybikebar?locale=fr_FR" target="_blank" class="concert-row-link" data-date="2025-02-07">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">07</span><span class="date-month">FÉVRIER</span></div>
-            <div class="concert-info"><span class="concert-lieu">Monkey Bike Bar</span><span class="concert-ville">Blain (44)</span></div>
-        </div>
-    </a>
-    <a href="https://www.facebook.com/Lelivebar?locale=fr_FR" target="_blank" class="concert-row-link" data-date="2025-02-14">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">14</span><span class="date-month">FÉVRIER</span></div>
-            <div class="concert-info"><span class="concert-lieu">Live Bar</span><span class="concert-ville">Nantes (44)</span></div>
-        </div>
-    </a>
-    <a href="https://www.facebook.com/events/2072887263194855?locale=fr_FR" target="_blank" class="concert-row-link" data-date="2025-03-08">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">08</span><span class="date-month">MARS</span></div>
-            <div class="concert-info"><span class="concert-lieu">Le Maka</span><span class="concert-ville">La Montagne (44)</span></div>
-        </div>
-    </a>    
-    <a href="https://www.facebook.com/vandbcaudan?locale=fr_FR" target="_blank" class="concert-row-link" data-date="2025-04-18">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">18</span><span class="date-month">AVRIL</span></div>
-            <div class="concert-info"><span class="concert-lieu">V and B Caudan</span><span class="concert-ville">Caudan (56)</span></div>
-        </div>
-    </a>
-    <a href="https://www.facebook.com/events/631721443165337?locale=fr_FR" target="_blank" class="concert-row-link" data-date="2025-04-19">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">19</span><span class="date-month">AVRIL</span></div>
-            <div class="concert-info"><span class="concert-lieu">Mille Bornes</span><span class="concert-ville">Redon (35)</span></div>
-        </div>
-    </a>
-    <a href="https://www.facebook.com/events/588120167028160?locale=fr_FR" target="_blank" class="concert-row-link" data-date="2025-05-31">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">31</span><span class="date-month">MAI</span></div>
-            <div class="concert-info"><span class="concert-lieu">Les Fleurs du Malt</span><span class="concert-ville">Nantes (44)</span></div>
-        </div>
-    </a>
-    <a href="https://www.facebook.com/events/696926819869856?locale=fr_FR" target="_blank" class="concert-row-link" data-date="2025-06-07">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">07</span><span class="date-month">JUIN</span></div>
-            <div class="concert-info"><span class="concert-lieu">Les Fleurs du Malt</span><span class="concert-ville">Nantes (44)</span></div>
-        </div>
-    </a>
-    <a href="https://www.facebook.com/profile.php?id=100092159003649&locale=fr_FR" target="_blank" class="concert-row-link" data-date="2025-07-12">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">12</span><span class="date-month">JUILLET</span></div>
-            <div class="concert-info"><span class="concert-lieu">Restaurant Entre Potes</span><span class="concert-ville">Bretignolles-sur-Mer (85)</span></div>
-        </div>
-    </a>
-    <a href="https://www.facebook.com/events/629110150205004?locale=fr_FR" target="_blank" class="concert-row-link" data-date="2025-07-13">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">13</span><span class="date-month">JUILLET</span></div>
-            <div class="concert-info"><span class="concert-lieu"Erbrée Bamboche</span><span class="concert-ville">Erbrée (35)</span></div>
-        </div>
-    </a>
-    <a href="https://www.facebook.com/events/2930760283786730?locale=fr_FR" target="_blank" class="concert-row-link" data-date="2025-09-05">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">05</span><span class="date-month">SEPT.</span></div>
-            <div class="concert-info"><span class="concert-lieu">La Minute Blonde</span><span class="concert-ville">Fontenay-le-Comte (85)</span></div>
-        </div>
-    </a>
-    <a href="https://www.facebook.com/events/640687998625305?locale=fr_FR" target="_blank" class="concert-row-link" data-date="2025-09-19">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">19</span><span class="date-month">SEPT.</span></div>
-            <div class="concert-info"><span class="concert-lieu">Les Gros Cailloux</span><span class="concert-ville">Le Bignon (44)</span></div>
-        </div>
-    </a>
-    <a href="https://www.facebook.com/events/800031129443856?locale=fr_FR" target="_blank" class="concert-row-link" data-date="2025-10-24">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">24</span><span class="date-month">OCT.</span></div>
-            <div class="concert-info"><span class="concert-lieu">Bar O Mètre</span><span class="concert-ville">Saint-Gildas-des-Bois (44)</span></div>
-        </div>
-    </a>    
-    <a href="https://www.facebook.com/lacaveetvous?locale=fr_FR" target="_blank" class="concert-row-link" data-date="2025-11-08">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">08</span><span class="date-month">NOV.</span></div>
-            <div class="concert-info"><span class="concert-lieu">La Cave et Vous</span><span class="concert-ville">Mouzillon (44)</span></div>
-        </div>
-    </a>
-    <a href="https://www.barbeukmetalfest.fr/" target="_blank" class="concert-row-link" data-date="2025-12-06">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">06</span><span class="date-month">DÉC.</span></div>
-            <div class="concert-info"><span class="concert-lieu">Soirée bénévoles Barbeuk Metal Fest</span><span class="concert-ville">Orée-d'Anjou (49)</span></div>
-        </div>
-    </a>
-    <a href="https://www.facebook.com/events/1898510174357498?locale=fr_FR" target="_blank" class="concert-row-link" data-date="2025-12-13">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">13</span><span class="date-month">DÉC.</span></div>
-            <div class="concert-info"><span class="concert-lieu">Soirée Ghetto Art</span><span class="concert-ville">Nantes (44)</span></div>
-        </div>
-    </a>
-    
-    <!-- DATES 2024 -->
-    <a href="https://www.facebook.com/profile.php?id=100094598455260&locale=fr_FR target="_blank" class="concert-row-link" data-date="2024-09-14">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">14</span><span class="date-month">SEPT.</span></div>
-            <div class="concert-info"><span class="concert-lieu">Bocu'Fest</span><span class="concert-ville">Gétigné (44)</span></div>
-        </div>
-    </a>
-    <a href="https://www.facebook.com/events/486980727480650?locale=fr_FR" target="_blank" class="concert-row-link" data-date="2024-09-28">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">28</span><span class="date-month">SEPT.</span></div>
-            <div class="concert-info"><span class="concert-lieu">Décadanse</span><span class="concert-ville">Nantes (44)</span></div>
-        </div>
-    </a>
-    <a href="https://www.lespapasbrasseurs.fr/" target="_blank" class="concert-row-link" data-date="2024-11-15">
-        <div class="concert-row">
-            <div class="concert-date-box"><span class="date-day">15</span><span class="date-month">NOV.</span></div>
-            <div class="concert-info"><span class="concert-lieu">Les Papas Brasseurs</span><span class="concert-ville">Clisson (44)</span></div>
-        </div>
-    </a>    
-</div>
-
-<!-- BOUTON DÉROULANT GÉNÉRAL DES CONCERTS PASSÉS -->
-<details id="past-concerts-details" style="margin-top: 30px; text-align: center;">
-    <summary style="font-family: 'Bebas Neue', Impact, sans-serif; font-size: 1.5rem; color: #12C3FF; cursor: pointer; padding: 12px 25px; border: 2px solid #12C3FF; border-radius: 8px; display: inline-block; background: rgba(0,0,0,0.5); transition: 0.3s; letter-spacing: 1px;">
-        LES CONCERTS PASSÉS ▼
-    </summary>
-    
-    <div style="margin-top: 25px;">
-        <!-- VOLET 2026 -->
-        <details class="past-year-details" id="year-details-2026">
-            <summary class="past-summary">2026 ▼</summary>
-            <div class="concert-container" id="past-concerts-2026" style="margin-top: 10px;"></div>
-        </details>
-
-        <!-- VOLET 2025 -->
-        <details class="past-year-details" id="year-details-2025">
-            <summary class="past-summary">2025 ▼</summary>
-            <div class="concert-container" id="past-concerts-2025" style="margin-top: 10px;"></div>
-        </details>
-
-        <!-- VOLET 2024 -->
-        <details class="past-year-details" id="year-details-2024">
-            <summary class="past-summary">2024 ▼</summary>
-            <div class="concert-container" id="past-concerts-2024" style="margin-top: 10px;"></div>
-        </details>
-    </div>
-</details>
-
-</div>
-</section>
-
-<section id="musiques" class="reveal">
-    <h2>MUSIQUES</h2>
-<p style="text-align: center; margin-bottom: 30px; font-size: 1.2rem; color: #fff; letter-spacing: 1px;">
-    Tu veux écouter <span style="color: #12C3FF;">Good Morning Roger</span> ? <br> Fais-toi plaiz' !
-</p>
-    <div style="max-width: 700px; margin: 0 auto 25px auto; border: 2px solid #12C3FF; border-radius: 8px; line-height: 0; overflow: hidden;">
-        <iframe style="border: 0; width: 100%; height: 120px;" 
-            src="https://bandcamp.com/EmbeddedPlayer/album=238270185/size=large/bgcol=333333/linkcol=4ec5ec/tracklist=false/artwork=small/track=4118378057/transparent=true/" 
-            seamless><a href="https://goodmorningroger.bandcamp.com/album/good-morning-cover">Good Morning Cover by Good Morning Roger</a>
-        </iframe>
-    </div>
-    <div style="max-width: 700px; margin: 0 auto 25px auto; border: 2px solid #12C3FF; border-radius: 8px; line-height: 0; overflow: hidden;">
-    <iframe style="border: 0; width: 100%; height: 120px; display: block;" 
-        src="https://bandcamp.com/EmbeddedPlayer/album=1414452669/size=large/bgcol=333333/linkcol=12C3FF/tracklist=false/artwork=small/transparent=true/" 
-        seamless>
-        <a href="https://goodmorningroger.bandcamp.com/album/club-roger">Club Roger by Good Morning Roger</a>
-    </iframe>
-</div>
-<div style="max-width: 700px; margin: 0 auto 25px auto; border: 2px solid #12C3FF; border-radius: 8px; line-height: 0; overflow: hidden;">
-    <iframe style="border: 0; width: 100%; height: 120px;" 
-        src="https://bandcamp.com/EmbeddedPlayer/album=1871139396/size=large/bgcol=333333/linkcol=12C3FF/tracklist=false/artwork=small/transparent=true/" 
-        seamless>
-        <a href="https://goodmorningroger.bandcamp.com/album/back-to-90-2000s">Back to 90 - 2000&#39;s by Good Morning Roger</a>
-    </iframe>
-</div>
-    <div class="streaming-box">
-            <span class="streaming-title" style="display: block; width: 100%; margin-bottom: 20px; color: #fff; font-size: 1.4rem;">
-                ON EST AUSSI SUR TOUTES LES PLATEFORMES DE STREAMING
-            </span>
-            <a href="https://open.spotify.com/intl-fr/artist/4G8tJAXMrv57k3GlfhEjsX" target="_blank"><img src="logospot.png" class="logo-social" alt="Spotify"></a>
-            <a href="https://www.deezer.com/fr/artist/248006762" target="_blank"><img src="logodeezer.png" class="logo-social" alt="Deezer"></a>
-            <a href="https://music.amazon.fr/artists/B0CQTXV21G/good-morning-roger" target="_blank"><img src="logoamazon.png" class="logo-social" alt="Amazon "></a>
-            <a href="https://music.apple.com/fr/artist/good-morning-roger/1722583151" target="_blank"><img src="logoapple.png" class="logo-social" alt="Apple "></a>
-            <a href="https://goodmorningroger.bandcamp.com/" target="_blank"><img src="logobandcamp.png" class="logo-social" alt="Bandcamp"></a>
-    </div>
-</section>
-
-<section id="contact" class="reveal">
-    <h2>CONTACT</h2>
-<div style="max-width: 900px; margin: auto; text-align: center;">
-    <p style="font-size: 1.8rem; color: #12C3FF; margin-bottom: 5px; letter-spacing: 1px;">TU VEUX PROGRAMMER GOOD MORNING ROGER ?</p>
-    <p style="color: #fff; margin-bottom: 30px; font-size: 1rem;">Envoie-nous un mail avec un max d'infos sur ton événement,<br> on te répondra très vite.</p>
-    <div style="text-align: center; width: 100%;">
-        <a href="mailto:goodmorningroger.punk@gmail.com"><img src="logomail.png" class="img-mail" alt="Contact"></a>
-        <div style="margin-top: 10px;">
-            <a href="mailto:goodmorningroger.punk@gmail.com" style="color: #fff; font-weight: bold; text-decoration: none; font-size: 1.1rem;">goodmorningroger.punk@gmail.com</a>
-        </div>
-    </div>
-    <div style="margin-top: 40px; margin-bottom: 20px;">
-        <span class="streaming-title" style="color: #fff; font-size: 1.4rem; letter-spacing: 1px;">RETROUVE NOUS AUSSI SUR CES PLATEFORMES</span>
-    </div>
-<div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; align-items: center; margin-bottom: 40px;">
-        <a href="https://www.facebook.com/GoodMorningRoger/" target="_blank"><img src="logofb.png" class="logo-social" alt="Facebook"></a>
-        <a href="https://www.instagram.com/goodmorningroger/" target="_blank"><img src="logoinsta.png" class="logo-social" alt="Instagram"></a>
-        <a href="https://www.youtube.com/@goodmorningroger" target="_blank"><img src="logoyoutube.png" class="logo-social" alt="YouTube"></a>
-        <a href="https://www.tiktok.com/@good.morning.roger" target="_blank"><img src="logotiktok.png" class="logo-social" alt="TikTok"></a>
-        <!--Badge Linkaband-->
-        <a href="https://linkaband.com/good-morning-roger?utm_source=badge&utm_campaign=155963" target="_blank"><img src="https://linkaband.com/assets/images/validation/reservation-noir.png" class="logo-social" alt="Good-morning-roger"></a>
-    </div>
-</div>
-</section>
-
-<footer style="padding: 40px 0; text-align: center;">
-    <p style="font-size: 0.7rem; color: #444; text-transform: uppercase; letter-spacing: 2px;">
-        © 2026 Good Morning Roger - Clisson, France | 
-        <a href="mentions-legales.html" style="color: #444; text-decoration: none; border-bottom: 1px solid #444;">Mentions Légales</a>
-    </p>
-</footer>
 
 <script>
-    const images = document.querySelectorAll('.presentation-item img, .actus-photo img');
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImg = lightbox.querySelector('img');
-    images.forEach(img => {
-        img.addEventListener('click', () => {
-            if (img.src) {
-                lightboxImg.src = img.src;
-                lightbox.style.display = 'flex';
-            }
-        });
-    });
-    lightbox.addEventListener('click', () => { lightbox.style.display = 'none'; });
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            if (entry.isIntersecting) { entry.target.classList.add('active'); }
-        });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.reveal').forEach((section) => { observer.observe(section); });
+const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScUTfXrzeEMICD6qd0xO1kFRONA26Roie8UswMismRyeLI1JQ/formResponse';
+const ENTRY_PSEUDO    = 'entry.1092302864';
+const ENTRY_EMAIL     = 'entry.1741606296';
+const ENTRY_SCORE     = 'entry.1451417508';
+const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRyBiQW025rQchIQ03joD00dFjwIyepgCgZFBYT57hpzNDX_fMfuKa9yzCoHqFTVUwpE1cvz4pLGCAD/pub?output=csv';
 
-    // CLASSEMENT AUTOMATIQUE DES CONCERTS (VENIR VS PASSÉS PAR ANNÉE + FORMAT COMPACT)
-    document.addEventListener("DOMContentLoaded", () => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+document.addEventListener('contextmenu', e => e.preventDefault());
 
-        const concertLinks = document.querySelectorAll('.concert-row-link');
-        const pastDetails = document.getElementById('past-concerts-details');
+const gameContainer = document.getElementById('game-container');
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d', { alpha: false });
 
-        const pastCounts = { "2026": 0, "2025": 0, "2024": 0 };
+ctx.imageSmoothingEnabled = false;
+ctx.webkitImageSmoothingEnabled = false;
 
-        concertLinks.forEach(link => {
-            const dateStr = link.getAttribute('data-date');
-            if (dateStr) {
-                const concertDate = new Date(dateStr + "T00:00:00");
-                if (concertDate < today) {
-                    const year = concertDate.getFullYear().toString();
-                    const targetContainer = document.getElementById(`past-concerts-${year}`);
+canvas.width = 960;
+canvas.height = 540;
 
-                    if (targetContainer) {
-                        // Extrait le jour, mois, lieu et ville
-                        const daySpan = link.querySelector('.date-day');
-                        const monthSpan = link.querySelector('.date-month');
-                        const lieuSpan = link.querySelector('.concert-lieu');
-                        const villeSpan = link.querySelector('.concert-ville');
+const startMainBtn = document.getElementById('start-main-btn');
+const tutoMainBtn = document.getElementById('tuto-main-btn');
+const desktopFullscreenBtn = document.getElementById('desktop-fullscreen-btn');
+const rightStack = document.getElementById('right-stack');
+const versionDisplay = document.getElementById('version-display');
+const rulesBtn = document.getElementById('rules-btn');
+const leaderboardBtn = document.getElementById('leaderboard-btn');
+const aboutBtn = document.getElementById('about-btn');
+const quitBtn = document.getElementById('quit-btn');
 
-                        const day = daySpan ? daySpan.textContent.trim() : '';
-                        const month = monthSpan ? monthSpan.textContent.trim() : '';
-                        const lieu = lieuSpan ? lieuSpan.textContent.trim() : '';
-                        const ville = villeSpan ? villeSpan.textContent.trim() : '';
+const gameOverStack = document.getElementById('game-over-stack');
+const restartBtn = document.getElementById('restart-btn');
+const homeGameOverBtn = document.getElementById('home-gameover-btn');
 
-                        // Transforme la structure vers un affichage 1 seule ligne compacte
-                        link.innerHTML = `
-                            <div class="concert-row-past">
-                                <span class="past-date">${day} ${month}</span>
-                                <span class="past-info">
-                                    <span class="past-lieu-text">${lieu}</span>
-                                    <span class="past-ville-text">${ville}</span>
-                                </span>
-                            </div>
-                        `;
+const mobileHudControls = document.getElementById('mobile-hud-controls');
+const mobilePauseBtn = document.getElementById('mobile-pause-btn');
+const mobileHomeBtn = document.getElementById('mobile-home-btn');
 
-                        targetContainer.appendChild(link);
-                        if (pastCounts[year] !== undefined) {
-                            pastCounts[year]++;
-                        }
-                    }
-                }
-            }
-        });
+const rulesModal = document.getElementById('rules-modal');
+const rulesList = document.getElementById('rules-list');
+const closeRulesBtn = document.getElementById('close-rules-btn');
+const leaderboardModal = document.getElementById('leaderboard-modal');
+const leaderboardBody = document.getElementById('leaderboard-body');
+const closeLeaderboardBtn = document.getElementById('close-leaderboard-btn');
+const aboutModal = document.getElementById('about-modal');
+const closeAboutBtn = document.getElementById('close-about-btn');
+const konamiModal = document.getElementById('konami-modal');
+const konamiYesBtn = document.getElementById('konami-yes-btn');
+const konamiNoBtn = document.getElementById('konami-no-btn');
 
-        // Masque les années vides
-        let totalPast = 0;
-        Object.keys(pastCounts).forEach(year => {
-            const yearDetails = document.getElementById(`year-details-${year}`);
-            if (pastCounts[year] === 0 && yearDetails) {
-                yearDetails.style.display = 'none';
-            } else {
-                totalPast += pastCounts[year];
-            }
-        });
+const tutoDialogBox = document.getElementById('tuto-dialog-box');
+const tutoDialogText = document.getElementById('tuto-dialog-text');
+const tutoNextBtn = document.getElementById('tuto-next-btn');
 
-        // Masque le bloc global "CONCERTS PASSÉS" s'il n'y en a aucun
-        if (totalPast === 0 && pastDetails) {
-            pastDetails.style.display = 'none';
+const scorePromptBox = document.getElementById('score-prompt-box');
+const promptYesBtn = document.getElementById('prompt-yes-btn');
+const promptNoBtn = document.getElementById('prompt-no-btn');
+const saveScoreModal = document.getElementById('save-score-modal');
+const saveScoreForm = document.getElementById('save-score-form');
+const scoreModalTitle = document.getElementById('score-modal-title');
+const giftNotice = document.getElementById('gift-notice');
+const cancelSaveBtn = document.getElementById('cancel-save-btn');
+const saveBtn = document.getElementById('save-btn');
+
+const inputPseudo = document.getElementById('player-pseudo');
+const inputEmail = document.getElementById('player-email');
+
+let promptSelectedOption = 'YES';
+const mainButtonsList = [tutoMainBtn, startMainBtn];
+let mainButtonIdx = 1;
+
+const rightSideButtons = [rulesBtn, leaderboardBtn, aboutBtn, quitBtn];
+let menuFocusArea = 'START'; 
+let rightSideIdx = 0;
+
+const gameOverButtons = [restartBtn, homeGameOverBtn];
+let gameOverSelectedIdx = 0;
+
+let konamiButtonIdx = 0;
+
+const formNavElements = [inputPseudo, inputEmail, cancelSaveBtn, saveBtn];
+let formNavIdx = 0;
+
+const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+let konamiIndex = 0;
+
+let isTutoMode = false;
+let tutoStep = 0;
+let tutoTimer = 0;
+let tutoHighlightedZone = null; 
+let tutoInstructionMessage = "";
+let tutoSubState = 0;
+let tutoObstacleCount = 0;
+let tutoNextCallback = null;
+let customLetterSpawnIndex = 0;
+
+function updateMenuSelection() {
+  startMainBtn.classList.remove('nav-selected');
+  tutoMainBtn.classList.remove('nav-selected');
+  rightSideButtons.forEach(btn => btn.classList.remove('nav-selected'));
+
+  if (menuFocusArea === 'START') {
+    mainButtonsList[mainButtonIdx].classList.add('nav-selected');
+  } else {
+    rightSideButtons[rightSideIdx].classList.add('nav-selected');
+  }
+}
+
+function updateGameOverSelection() {
+  gameOverButtons.forEach((btn, idx) => {
+    if (idx === gameOverSelectedIdx) btn.classList.add('nav-selected');
+    else btn.classList.remove('nav-selected');
+  });
+}
+
+function updateKonamiSelection() {
+  if (konamiButtonIdx === 0) {
+    konamiYesBtn.classList.add('nav-selected');
+    konamiNoBtn.classList.remove('nav-selected');
+  } else {
+    konamiNoBtn.classList.add('nav-selected');
+    konamiYesBtn.classList.remove('nav-selected');
+  }
+}
+
+function updatePromptSelection(option) {
+  promptSelectedOption = option;
+  if (option === 'YES') {
+    promptYesBtn.style.backgroundColor = '#ffffff'; promptYesBtn.style.color = '#ff3333';
+    promptNoBtn.style.backgroundColor = '#ffd54f'; promptNoBtn.style.color = '#1a1a24';
+  } else {
+    promptNoBtn.style.backgroundColor = '#ffffff'; promptNoBtn.style.color = '#ff3333';
+    promptYesBtn.style.backgroundColor = '#ffd54f'; promptYesBtn.style.color = '#1a1a24';
+  }
+}
+
+function updateFormNavSelection() {
+  formNavElements.forEach((el, idx) => {
+    if (idx === formNavIdx) {
+      el.classList.add('nav-selected');
+      if (idx <= 1) el.focus();
+    } else {
+      el.classList.remove('nav-selected');
+    }
+  });
+}
+
+const introVideo = document.getElementById('intro-video');
+const introMusic = new Audio('ecranintro.mp3'); introMusic.loop = true; introMusic.volume = 0.8;
+const bgMusic = new Audio('roger_8bitok.mp3'); bgMusic.loop = true; bgMusic.volume = 0.8; 
+const konamiMusic = new Audio('rogerlechat.mp3'); konamiMusic.loop = true; konamiMusic.volume = 0.8;
+let useRealMusicForNextGame = false;
+
+const marioInvMusic = new Audio('marioinv.mp3'); marioInvMusic.loop = true; marioInvMusic.volume = 1.0;
+const superSayanTheme = new Audio('supersayantheme.mp3'); superSayanTheme.volume = 1.0;
+
+const sounds = {
+  run: new Audio('skate_run.mp3'), jump: new Audio('skate_jump.mp3'), reception: new Audio('skate_reception.mp3'),
+  coin: new Audio('coin_receive.mp3'), damage: new Audio('damage.mp3'), sayan: new Audio('sayan.mp3'),
+  speedFly: new Audio('speed_fly.mp3'), punkbonus: new Audio('punkbonus.mp3'), degom: new Audio('degom.mp3'),
+  debonus: new Audio('debonus.mp3'), debonusend: new Audio('debonusend.mp3'), wilhem: new Audio('wilhem.wav'), cri: new Audio('cri.mp3')
+};
+sounds.run.loop = true; sounds.run.volume = 0.6; sounds.jump.volume = 0.7; sounds.reception.volume = 0.7;
+sounds.coin.volume = 0.8; sounds.damage.volume = 0.85; sounds.sayan.volume = 0.15; sounds.speedFly.volume = 0.15;
+sounds.punkbonus.volume = 0.85; sounds.degom.volume = 0.85; sounds.debonus.volume = 0.85; sounds.debonusend.volume = 0.85;
+sounds.wilhem.volume = 0.85; sounds.cri.volume = 0.85;
+
+let lastSpecialSoundIsWilhem = false;
+let audioUnlocked = false;
+let fadeInterval = null;
+let isPaused = false;
+
+const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+                     || (window.matchMedia && window.matchMedia("(max-width: 900px) and (pointer: coarse)").matches);
+
+if (isMobileDevice) {
+  gameContainer.classList.add('mobile-fullscreen');
+}
+
+document.addEventListener('fullscreenchange', handleFullscreenChange);
+document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+
+function handleFullscreenChange() {
+  const isFS = !!(document.fullscreenElement || document.webkitfullscreenElement);
+  if (isFS) {
+    if (isMobileDevice) gameContainer.classList.add('mobile-fullscreen');
+    else gameContainer.classList.add('desktop-fullscreen');
+  } else {
+    gameContainer.classList.remove('mobile-fullscreen', 'desktop-fullscreen');
+  }
+}
+
+function requestGameFullscreen() {
+  if (isMobileDevice) {
+    gameContainer.classList.add('mobile-fullscreen');
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) elem.requestFullscreen().catch(() => {});
+    else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen().catch(() => {});
+    if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {});
+    setTimeout(() => window.scrollTo(0, 0), 100);
+  }
+}
+
+function toggleDesktopFullscreen() {
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) elem.requestFullscreen().catch(() => {});
+    else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen().catch(() => {});
+  } else {
+    if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen().catch(() => {});
+  }
+}
+
+function unlockAudio() {
+  if (!audioUnlocked) {
+    sounds.run.play().then(() => { sounds.run.pause(); audioUnlocked = true; }).catch(() => {});
+  }
+}
+
+function playIntroMusic() { unlockAudio(); if (introMusic.paused && !gameStarted) introMusic.play().catch(() => {}); }
+function stopIntroMusic() { introMusic.pause(); if (introMusic.readyState >= 2) introMusic.currentTime = 0; }
+
+function startBgMusic() { 
+  unlockAudio(); 
+  stopIntroMusic(); 
+  marioInvMusic.pause(); 
+  
+  if (superSayen.active || invincibleTimer > 0) return;
+
+  const activeBgMusic = useRealMusicForNextGame ? konamiMusic : bgMusic;
+  const otherMusic = useRealMusicForNextGame ? bgMusic : konamiMusic;
+  
+  otherMusic.pause();
+  if (otherMusic.readyState >= 2) otherMusic.currentTime = 0;
+
+  activeBgMusic.muted = false; 
+  activeBgMusic.volume = 0.8; 
+  if (activeBgMusic.readyState >= 2) activeBgMusic.currentTime = 0; 
+  activeBgMusic.play().catch(() => {}); 
+}
+
+function stopAllSounds() {
+  if (fadeInterval) clearInterval(fadeInterval);
+  stopIntroMusic(); bgMusic.pause(); konamiMusic.pause(); marioInvMusic.pause(); superSayanTheme.pause();
+  Object.values(sounds).forEach(sound => { sound.pause(); if (sound.readyState >= 2) sound.currentTime = 0; });
+}
+
+let isRunningSoundActive = false;
+
+function playRunSound() {
+  if (!audioUnlocked || !gameStarted || gameOver || isPaused || !cat.isGrounded || superSayen.active || tutoHighlightedZone) {
+    stopRunSound(); return;
+  }
+  if (!isRunningSoundActive) {
+    isRunningSoundActive = true;
+    sounds.run.currentTime = 0;
+    sounds.run.play().catch(() => {});
+  }
+}
+
+function stopRunSound() { 
+  if (isRunningSoundActive) {
+    isRunningSoundActive = false;
+    sounds.run.pause();
+    if (sounds.run.readyState >= 2) sounds.run.currentTime = 0;
+  }
+}
+
+function playSoundEffect(sound) { if (audioUnlocked && !isPaused) { try { if (sound.readyState >= 2) sound.currentTime = 0; sound.play().catch(() => {}); } catch(e) {} } }
+
+function togglePause() {
+  if (!gameStarted || gameOver || isTutoMode && tutoHighlightedZone) return;
+  isPaused = !isPaused;
+  if (isPaused) {
+    stopRunSound(); if (!bgMusic.paused) bgMusic.pause(); if (!konamiMusic.paused) konamiMusic.pause(); if (!marioInvMusic.paused) marioInvMusic.pause(); if (!superSayanTheme.paused) superSayanTheme.pause();
+  } else {
+    if (superSayen.active) superSayanTheme.play().catch(() => {});
+    else if (invincibleTimer > 0) marioInvMusic.play().catch(() => {});
+    else {
+      const activeBgMusic = useRealMusicForNextGame ? konamiMusic : bgMusic;
+      activeBgMusic.play().catch(() => {});
+    }
+  }
+}
+
+function returnToHome() {
+  gameStarted = false; gameOver = false; isPaused = false; isTutoMode = false;
+  tutoHighlightedZone = null; tutoInstructionMessage = ""; tutoDialogBox.style.display = 'none';
+  superSayen.active = false; invincibleTimer = 0;
+  debonusPlayed = false; debonusEndPlayed = false; punkBonus = null; ejectedObstacles = []; spikes = [];
+  startMainBtn.style.display = 'block'; tutoMainBtn.style.display = 'block';
+  if (!isMobileDevice) desktopFullscreenBtn.style.display = 'block';
+  rightStack.style.display = 'flex'; versionDisplay.style.display = 'block'; mobileHudControls.style.display = 'none'; gameOverStack.style.display = 'none';
+  scorePromptBox.style.display = 'none'; saveScoreModal.style.display = 'none'; konamiModal.style.display = 'none';
+  
+  if (isMobileDevice) gameContainer.classList.add('mobile-fullscreen');
+  else gameContainer.classList.remove('mobile-fullscreen');
+  
+  stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
+}
+
+const ASSET_VERSION = 'v1.0'; 
+function loadSmartImage(baseName) {
+  const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
+  img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
+  img.src = `${baseName}.${extensions[0]}?v=${ASSET_VERSION}`; return img;
+}
+
+const assets = {
+  bg: loadSmartImage('background4'),
+  cat: {
+    runSequence: [loadSmartImage('chat_push2'), loadSmartImage('chat_run'), loadSmartImage('chat_run1'), loadSmartImage('chat_run3')],
+    run4: loadSmartImage('chat_run4'), jump: [loadSmartImage('chat_jump1'), loadSmartImage('chat_jump2'), loadSmartImage('chat_jump3')],
+    crouchSequence: [loadSmartImage('chat_reception2'), loadSmartImage('chat_reception2-1'), loadSmartImage('chat_reception2-2')],
+    crouchAir: loadSmartImage('chat_reception2 - Copie'), fail: loadSmartImage('chat_fail'),
+    transform: [loadSmartImage('chat_transform1'), loadSmartImage('chat_transform2'), loadSmartImage('chat_transform3'), loadSmartImage('chat_transform4'), loadSmartImage('chat_transform5'), loadSmartImage('chat_transform6')],
+    fly: [loadSmartImage('chat_fly1'), loadSmartImage('chat_fly2'), loadSmartImage('chat_fly3'), loadSmartImage('chat_fly4'), loadSmartImage('chat_fly5'), loadSmartImage('chat_fly6')]
+  },
+  platforms: {
+    bleu_short: loadSmartImage('bleu_short'), bleu_medium: loadSmartImage('bleu_medium'), bleu_long: loadSmartImage('bleu_long'),
+    rouge_short: loadSmartImage('rouge_short'), rouge_medium: loadSmartImage('rouge_medium'), rouge_long: loadSmartImage('rouge_long'),
+    vert_short: loadSmartImage('vert_short'), vert_medium: loadSmartImage('vert_medium'), vert_long: loadSmartImage('vert_long')
+  },
+  obstaclesConfig: [
+    { type: 'anim', frames: [loadSmartImage('obstacle_jl1'), loadSmartImage('obstacle_jl2'), loadSmartImage('obstacle_jl3')], targetH: 150 },
+    { type: 'anim', frames: [loadSmartImage('obstacle_marc1'), loadSmartImage('obstacle_marc2'), loadSmartImage('obstacle_marc3')], targetH: 150 },
+    { type: 'air', img: loadSmartImage('obstacle3'), targetW: 120 },
+    { type: 'plat', img: loadSmartImage('obstacle1'), targetH: 100 },
+    { type: 'plat', img: loadSmartImage('obstacle2'), targetH: 140 },
+    { type: 'ground', img: loadSmartImage('obstacle4'), targetH: 75 },
+    { type: 'ground', img: loadSmartImage('obstacle5'), targetH: 80 },
+    { type: 'air', img: loadSmartImage('obstacle6'), targetH: 85 }
+  ],
+  spikes: {
+    court: loadSmartImage('pic-court'),
+    moyen: loadSmartImage('pic-moyen'),
+    long: loadSmartImage('pic-long')
+  },
+  letters: {
+    R: Array.from({length: 8}, (_, i) => loadSmartImage(`R${i+1}`)),
+    O: Array.from({length: 8}, (_, i) => loadSmartImage(`O${i+1}`)),
+    G: Array.from({length: 8}, (_, i) => loadSmartImage(`G${i+1}`)),
+    E: Array.from({length: 8}, (_, i) => loadSmartImage(`E${i+1}`))
+  },
+  punkBonus: loadSmartImage('punkbonus')
+};
+
+function getObstacleDimensions(conf) {
+  const sampleImg = (conf.type === 'anim') ? conf.frames[0] : conf.img;
+  let w = conf.targetW || 100, h = conf.targetH || 100;
+  if (sampleImg && sampleImg.complete && sampleImg.naturalWidth > 0 && sampleImg.naturalHeight > 0) {
+    const ratio = sampleImg.naturalWidth / sampleImg.naturalHeight;
+    if (conf.targetH) { h = conf.targetH; w = h * ratio; }
+    else if (conf.targetW) { w = conf.targetW; h = w / ratio; }
+  }
+  return { w, h };
+}
+
+const BASE_GAME_SPEED = 6.5;
+let baseSpeedMultiplier = 1.0;
+let currentGameSpeed = BASE_GAME_SPEED;
+const GROUND_Y = 430; const ENTITY_GROUND_Y = 418; const GRAVITY = 0.8;
+const JUMP_FORCE = -12; const JUMP_HOLD_FORCE = -0.55; const MAX_JUMP_TIME = 15;
+
+let bgX = 0; let score = 0; let lastScoreTime = Date.now();
+let gameOver = false; let gameStarted = false; let bonusEffectTimer = 0;
+
+const rogerLetters = ['R', 'O', 'G', 'E', 'R'];
+let rogerCollected = [false, false, false, false, false];
+let completedWordsCount = 2; 
+
+let nextSpawnLetterIndex = 0; let lastLetterX = -1000; let lastLetterHeightLevel = -1; let heightLevelRepeatCount = 0;
+let invulnerableTimer = 0; let fallingLetters = [];
+let freezeForSequence = false; let sequenceCurrentLetterIndex = 0; let sequenceAngle = 0; let bounceTimer = 0; let jumpKeyReleased = true;
+let invincibleTimer = 0; let debonusPlayed = false; let debonusEndPlayed = false; let punkBonusTimer = 0; let punkBonus = null; let ejectedObstacles = [];
+let spikes = []; let obstacleSpawnCountSinceSpike = 0;
+
+const superSayen = { active: false, state: 'NONE', timer: 0, transformFrame: 0, flyFrame: 0, animTimer: 0, targetY: 180 };
+const cat = { x: 100, y: ENTITY_GROUND_Y - 110, width: 110, height: 110, vy: 0, isGrounded: true, wasGrounded: true, isPlatformGrounded: false, isCrouching: false, isRun4Pose: false, jumpTimer: 0, isJumping: false, animFrame: 0, animTimer: 0, crouchFrame: 0, crouchTimer: 0, state: 'RUN', damageFlashTimer: 0 };
+
+let platforms = []; let obstacles = []; let items = []; let lastObstacleX = -1000; let obstacleCounter = 0;
+
+function showTutoDialogBox(text, highlightRect, onNext) {
+  tutoDialogText.innerHTML = text;
+  tutoHighlightedZone = highlightRect;
+  tutoNextCallback = onNext;
+  
+  if (tutoStep === 1 || tutoStep === 2) {
+    tutoDialogBox.style.top = 'auto';
+    tutoDialogBox.style.bottom = '35px';
+    tutoDialogBox.style.left = '50%';
+    tutoDialogBox.style.transform = 'translateX(-50%)';
+  } else {
+    tutoDialogBox.style.top = '18px';
+    tutoDialogBox.style.bottom = 'auto';
+    tutoDialogBox.style.left = '50%';
+    tutoDialogBox.style.transform = 'translateX(-50%)';
+  }
+
+  tutoDialogBox.style.display = 'block';
+}
+
+tutoNextBtn.addEventListener('click', () => {
+  tutoDialogBox.style.display = 'none';
+  tutoHighlightedZone = null;
+  if (tutoNextCallback) {
+    const cb = tutoNextCallback; tutoNextCallback = null; cb();
+  }
+});
+
+function startTutorial() {
+  resetGame();
+  isTutoMode = true; 
+  tutoStep = 1;
+  tutoTimer = 0;
+  tutoSubState = 0;
+  tutoObstacleCount = 0;
+  tutoInstructionMessage = "";
+  tutoHighlightedZone = null;
+  completedWordsCount = 2;
+  platforms = []; obstacles = []; items = []; spikes = [];
+  cat.y = ENTITY_GROUND_Y - cat.height; cat.vy = 0; cat.isGrounded = true;
+}
+
+function updateTutorialScript() {
+  if (!isTutoMode || tutoHighlightedZone) return;
+  tutoTimer++;
+
+  if (tutoStep === 1) {
+    if (tutoTimer > 60) {
+      showTutoDialogBox(
+        "Ceci est ton score. Le but est d'accumuler le maximum de points. Plus tu avances loin, plus ton score augmente. Des bonus peuvent aussi te faire gagner des points.",
+        { x: 15, y: 15, w: 230, h: 55 },
+        () => { tutoStep = 2; tutoTimer = 0; }
+      );
+    }
+  }
+  else if (tutoStep === 2) {
+    if (tutoTimer > 30) {
+      const controlsText = isMobileDevice ?
+        "En appuyant sur le <b>côté droit de l'écran (TAP DROIT)</b>, Roger fait un saut. Appui long = saut long ; Appui court = saut court. En appuyant sur le <b>côté gauche (TAP GAUCHE)</b>, Roger se baisse. Le bouton P sert à mettre le jeu en pause et le bouton R à revenir au menu." :
+        "En appuyant sur <b>ESPACE</b>, Roger fait un saut. Appui long = saut long ; Appui court = saut court. En appuyant sur la <b>FLÈCHE DU BAS</b>, Roger se baisse. Pour mettre le jeu en pause, appuie sur <b>ENTRÉE</b> et pour revenir au menu appuie sur <b>ECHAP</b>.";
+
+      const hudX = isMobileDevice ? canvas.width - 370 : canvas.width - 340;
+      showTutoDialogBox(
+        controlsText,
+        { x: hudX, y: 15, w: 320, h: 80 },
+        () => { tutoStep = 3; tutoSubState = 1; tutoTimer = 0; }
+      );
+    }
+  }
+  else if (tutoStep === 3) {
+    if (tutoSubState === 1) {
+      tutoInstructionMessage = isMobileDevice ? "Fais un long saut (TAP DROIT appui long)" : "Fais un long saut (appui long sur ESPACE)";
+      if (!cat.isGrounded && cat.jumpTimer >= 10) { tutoSubState = 2; tutoTimer = 0; }
+    } else if (tutoSubState === 2) {
+      tutoInstructionMessage = isMobileDevice ? "Maintenant, baisse-toi (TAP GAUCHE)" : "Maintenant, baisse-toi (FLÈCHE DU BAS)";
+      if (cat.isCrouching) { tutoSubState = 3; tutoTimer = 0; }
+    } else if (tutoSubState === 3) {
+      tutoInstructionMessage = isMobileDevice ? "Fais un petit saut (TAP DROIT appui court)" : "Fais un petit saut (appui court sur ESPACE)";
+      if (cat.vy < 0 && cat.jumpTimer < 5 && !keys['Space'] && !keys['ArrowUp']) {
+        tutoStep = 4; tutoTimer = 0; tutoSubState = 1; tutoInstructionMessage = "";
+      }
+    }
+  }
+  else if (tutoStep === 4) {
+    const plat = platforms[0];
+    if (plat && plat.x <= canvas.width - 350 && tutoSubState === 1 && !plat.shownPopup) {
+      plat.shownPopup = true;
+      const passText = isMobileDevice ? 
+        "Voici une plateforme. Tu peux sauter dessus (TAP DROIT) ou la traverser en faisant TAP GAUCHE." :
+        "Voici une plateforme. Tu peux sauter dessus (ESPACE) ou la traverser en appuyant sur la FLÈCHE DU BAS.";
+      showTutoDialogBox(
+        passText,
+        { x: plat.x, y: plat.y, w: plat.w, h: plat.h },
+        () => { tutoSubState = 2; }
+      );
+    }
+
+    if (tutoSubState === 2) {
+      tutoInstructionMessage = "Saute sur une plateforme";
+      if (cat.isPlatformGrounded) { tutoSubState = 3; }
+    } else if (tutoSubState === 3) {
+      tutoInstructionMessage = isMobileDevice ? "Maintenant, saute sur la plateforme et descends une fois dessus (TAP DROIT puis une fois dessus TAP GAUCHE)" : "Maintenant, saute sur la plateforme et descends une fois dessus (ESPACE puis une fois dessus FLÈCHE BAS)";
+      const pLong = platforms[0];
+      if (pLong) {
+        if (cat.isPlatformGrounded) pLong.wasOnPlat = true;
+        if (pLong.wasOnPlat && cat.isCrouching && !cat.isPlatformGrounded && cat.y + cat.height < ENTITY_GROUND_Y) {
+          pLong.descendedFromPlat = true;
         }
-    });
+        if (pLong.descendedFromPlat && cat.isGrounded) { tutoSubState = 4; }
+      }
+    } else if (tutoSubState === 4) {
+      tutoInstructionMessage = isMobileDevice ? "Super ! Et enfin, saute en passant au travers de la plateforme (TAP DROIT puis tout de suite après TAP GAUCHE)" : "Super ! Et enfin, saute en passant au travers de la plateforme (ESPACE puis tout de suite après FLÈCHE DU BAS)";
+      const pPass = platforms[0];
+      if (pPass) {
+        if (cat.isPlatformGrounded) { pPass.touchedPlatform = true; }
+        const surfaceY = pPass.y + 14;
+        if (!pPass.touchedPlatform && cat.isCrouching && cat.vy > 0 && cat.x + cat.width > pPass.x && cat.x < pPass.x + pPass.w && cat.y + cat.height >= surfaceY && cat.y < surfaceY) {
+          tutoStep = 5; tutoTimer = 0; tutoSubState = 0; tutoInstructionMessage = "";
+        }
+      }
+    }
+  }
+  else if (tutoStep === 5) {
+    if (tutoSubState === 0) {
+      if (tutoTimer > 120) {
+        if (obstacles.length === 0) {
+          const conf = assets.obstaclesConfig[5]; const dim = getObstacleDimensions(conf);
+          obstacles.push({ x: canvas.width + 100, y: ENTITY_GROUND_Y - dim.h + 5, w: dim.w, h: dim.h, configIdx: 5, frame: 0, animTimer: 0 });
+        }
+        const obs = obstacles[0];
+        if (obs && obs.x <= canvas.width - 350 && !obs.shownPopup) {
+          obs.shownPopup = true;
+          tutoSubState = 1;
+          showTutoDialogBox(
+            "Ceci est un obstacle. Tu peux les éviter en sautant ou en te baissant selon où ils sont placés.",
+            { x: obs.x, y: obs.y, w: obs.w, h: obs.h },
+            () => { tutoSubState = 2; tutoObstacleCount = 0; tutoTimer = 0; }
+          );
+        }
+      }
+    } else if (tutoSubState === 2) {
+      if (tutoObstacleCount === 0) {
+        tutoInstructionMessage = `Évite l'obstacle. SAUTE ! (${tutoObstacleCount}/4)`;
+      } else if (tutoObstacleCount === 1) {
+        tutoInstructionMessage = `Évite l'obstacle. BAISSE-TOI ! (${tutoObstacleCount}/4)`;
+      } else if (tutoObstacleCount === 2) {
+        tutoInstructionMessage = `Évite l'obstacle. SAUTE ! (${tutoObstacleCount}/4)`;
+      } else if (tutoObstacleCount === 3) {
+        tutoInstructionMessage = `Évite l'obstacle. BAISSE-TOI ! (${tutoObstacleCount}/4)`;
+      }
+
+      if (obstacles.length === 0 && tutoTimer > 60) {
+        tutoTimer = 0;
+        let configIdx = 5;
+        if (tutoObstacleCount === 1) configIdx = 3; 
+        else if (tutoObstacleCount === 2) configIdx = 4; 
+        else if (tutoObstacleCount === 3) configIdx = 7; 
+
+        const conf = assets.obstaclesConfig[configIdx]; const dim = getObstacleDimensions(conf);
+        let obsY = ENTITY_GROUND_Y - dim.h + 5;
+        
+        if (configIdx === 7) {
+          obsY = ENTITY_GROUND_Y - dim.h - 70;
+        } else if (configIdx === 3) {
+          obsY = ENTITY_GROUND_Y - 100 - dim.h + 30;
+          platforms.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 100, w: 260, h: 65, key: 'bleu_medium' });
+        } else if (configIdx === 4) {
+          obsY = ENTITY_GROUND_Y - dim.h + 5;
+        }
+        
+        obstacles.push({ x: canvas.width + 100, y: obsY, w: dim.w, h: dim.h, configIdx, frame: 0, animTimer: 0, baseY: obsY });
+      }
+
+      if (obstacles.length > 0) {
+        const cur = obstacles[0];
+        if (cur.x + cur.w < cat.x && !cur.passed) {
+          cur.passed = true;
+          tutoObstacleCount++;
+          if (tutoObstacleCount >= 4) {
+            tutoStep = 6; tutoSubState = 0; tutoTimer = 0; obstacles = []; platforms = []; tutoInstructionMessage = "";
+          }
+        }
+      }
+    }
+  }
+  else if (tutoStep === 6) {
+    if (tutoSubState === 0) {
+      showTutoDialogBox(
+        "Ces grosses lettres R O G E R te protègent d'un choc avec un obstacle.",
+        { x: 15, y: canvas.height - 130, w: 200, h: 110 },
+        () => { tutoSubState = 1; }
+      );
+    } else if (tutoSubState === 1) {
+      tutoInstructionMessage = "Pour le fun (mais à ne pas faire dans le jeu), fonce sur un obstacle pour tester cette protection !";
+      if (obstacles.length === 0 && tutoTimer > 40) {
+        const conf = assets.obstaclesConfig[5]; const dim = getObstacleDimensions(conf);
+        obstacles.push({ x: canvas.width + 100, y: ENTITY_GROUND_Y - dim.h + 5, w: dim.w, h: dim.h, configIdx: 5, frame: 0, animTimer: 0 });
+      }
+      if (completedWordsCount === 1 && tutoSubState === 1) {
+        tutoSubState = 2;
+        tutoTimer = 0;
+        obstacles = [];
+        showTutoDialogBox(
+          "La lettre O t'a protégé et va donc disparaître ! Il te reste encore le R. Mais attention : s'il n'y a plus de lettres, c'est le Game Over assuré !",
+          { x: 15, y: canvas.height - 130, w: 105, h: 110 },
+          () => {
+            tutoSubState = 3;
+            tutoTimer = 0;
+          }
+        );
+      }
+    } else if (tutoSubState === 3) {
+      if (tutoTimer > 60) {
+        tutoStep = 7; tutoSubState = 0; tutoTimer = 0; customLetterSpawnIndex = 0; completedWordsCount = 2; rogerCollected = [false, false, false, false, false];
+      }
+    }
+  }
+  else if (tutoStep === 7) {
+    if (tutoSubState === 0) {
+      showTutoDialogBox(
+        "Pour récupérer une grosse lettre de protection, collecte les lettres sur ton chemin pour reformer R O G E R en bas à droite.",
+        { x: canvas.width - 340, y: canvas.height - 95, w: 320, h: 85 },
+        () => { tutoSubState = 1; tutoTimer = 0; customLetterSpawnIndex = 0; completedWordsCount = 1; rogerCollected = [false, false, false, false, false]; }
+      );
+    } else if (tutoSubState === 1) {
+      tutoInstructionMessage = "Attrape les lettres pour former R O G E R !";
+
+      if (items.length === 0 && obstacles.length === 0 && platforms.length === 0 && tutoTimer > 40) {
+        tutoTimer = 0;
+        if (customLetterSpawnIndex >= 5) {
+          customLetterSpawnIndex = 0; 
+        }
+
+        if (customLetterSpawnIndex === 0) {
+          items.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 120, w: 65, h: 75, char: 'R', frame: 0, animTimer: 0 });
+          const conf = assets.obstaclesConfig[5]; const dim = getObstacleDimensions(conf);
+          obstacles.push({ x: canvas.width + 250, y: ENTITY_GROUND_Y - dim.h + 5, w: dim.w, h: dim.h, configIdx: 5, frame: 0, animTimer: 0 });
+          customLetterSpawnIndex = 1;
+        } else if (customLetterSpawnIndex === 1) {
+          items.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 120, w: 65, h: 75, char: 'O', frame: 0, animTimer: 0 });
+          const conf = assets.obstaclesConfig[3]; const dim = getObstacleDimensions(conf);
+          obstacles.push({ x: canvas.width + 280, y: ENTITY_GROUND_Y - 100 - dim.h + 30, w: dim.w, h: dim.h, configIdx: 3, frame: 0, animTimer: 0 });
+          platforms.push({ x: canvas.width + 230, y: ENTITY_GROUND_Y - 100, w: 260, h: 65, key: 'bleu_medium' });
+          customLetterSpawnIndex = 2;
+        } else if (customLetterSpawnIndex === 2) {
+          items.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 240, w: 65, h: 75, char: 'G', frame: 0, animTimer: 0 });
+          platforms.push({ x: canvas.width + 20, y: ENTITY_GROUND_Y - 200, w: 260, h: 65, key: 'bleu_medium' });
+          customLetterSpawnIndex = 3;
+        } else if (customLetterSpawnIndex === 3) {
+          items.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 120, w: 65, h: 75, char: 'E', frame: 0, animTimer: 0 });
+          const conf = assets.obstaclesConfig[5]; const dim = getObstacleDimensions(conf);
+          obstacles.push({ x: canvas.width + 250, y: ENTITY_GROUND_Y - dim.h + 5, w: dim.w, h: dim.h, configIdx: 5, frame: 0, animTimer: 0 });
+          customLetterSpawnIndex = 4;
+        } else if (customLetterSpawnIndex === 4) {
+          items.push({ x: canvas.width + 320, y: ENTITY_GROUND_Y - 120, w: 65, h: 75, char: 'R', frame: 0, animTimer: 0 });
+          const conf = assets.obstaclesConfig[7]; const dim = getObstacleDimensions(conf);
+          obstacles.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - dim.h - 70, w: dim.w, h: dim.h, configIdx: 7, frame: 0, animTimer: 0, baseY: ENTITY_GROUND_Y - dim.h - 70 });
+          platforms.push({ x: canvas.width + 270, y: ENTITY_GROUND_Y - 130, w: 260, h: 65, key: 'bleu_medium' });
+          customLetterSpawnIndex = 5;
+        }
+      }
+    }
+  }
+  else if (tutoStep === 8) {
+    if (tutoSubState === 0) {
+      tutoInstructionMessage = "";
+      items = []; obstacles = []; platforms = []; spikes = [];
+      if (tutoTimer > 120) {
+        let targetH = 65, targetW = 65;
+        if (assets.punkBonus.complete && assets.punkBonus.naturalWidth > 0 && assets.punkBonus.naturalHeight > 0) {
+          const ratio = assets.punkBonus.naturalWidth / assets.punkBonus.naturalHeight; targetW = targetH * ratio;
+        }
+        punkBonus = { x: canvas.width + 50, baseY: 180, y: 180, w: targetW, h: targetH, time: 0, angle: 0, trail: [] };
+        tutoSubState = 1; 
+        tutoTimer = 0;
+      }
+    } else if (tutoSubState === 1) {
+      if (punkBonus && punkBonus.x <= canvas.width - 150) {
+        showTutoDialogBox(
+          "Ça c'est le bonus punk. Si tu l'attrapes, tu deviens invincible pendant une courte durée et tu peux dégommer tous les obstacles sur ton passage pour engranger max de points !",
+          { x: punkBonus.x, y: punkBonus.y, w: punkBonus.w, h: punkBonus.h },
+          () => {
+            tutoSubState = 2; 
+          }
+        );
+      }
+    } else if (tutoSubState === 2) {
+      tutoInstructionMessage = "Attrape le bonus punk !";
+      
+      if (punkBonus && punkBonus.x + punkBonus.w < -50) {
+        punkBonus.x = canvas.width + 50; 
+      }
+      
+      if (invincibleTimer > 0) {
+        tutoSubState = 3;
+        tutoTimer = 0;
+      }
+    } else if (tutoSubState === 3) {
+      tutoInstructionMessage = "Profite de ton invincibilité pour dégommer les obstacles et collecter des lettres !";
+      
+      if (items.length === 0 && obstacles.length === 0 && platforms.length === 0 && tutoTimer < 750) {
+        spawnWorldElements();
+      }
+
+      if (invincibleTimer === 0) {
+        platforms = []; obstacles = []; items = []; spikes = [];
+        tutoSubState = 4;
+        tutoTimer = 0;
+      }
+    } else if (tutoSubState === 4) {
+      tutoInstructionMessage = "";
+      platforms = []; obstacles = []; items = []; spikes = [];
+      if (tutoTimer > 120) {
+        tutoStep = 9; tutoSubState = 0; tutoTimer = 0; tutoInstructionMessage = "";
+        setTimeout(() => {
+          showTutoDialogBox(
+            "Tu connais désormais les bases pour jouer à Good Morning Roger Sk8in' Cat. À toi de jouer !",
+            null,
+            () => { returnToHome(); }
+          );
+        }, 1000);
+      }
+    }
+  }
+}
+
+function updatePlatformStream() {
+  if (!isTutoMode || !gameStarted) return;
+  if (tutoStep === 4 && platforms.length === 0) {
+    platforms.push({ x: canvas.width + 50, y: ENTITY_GROUND_Y - 130, w: 260, h: 65, key: 'bleu_medium', wasOnPlat: false, descendedFromPlat: false, touchedPlatform: false });
+  }
+}
+
+function triggerSuperSayen() {
+  if (!gameStarted || gameOver || superSayen.active) return;
+  superSayen.active = true; superSayen.state = 'TRANSFORM'; superSayen.timer = 0;
+  superSayen.transformFrame = 0; superSayen.flyFrame = 0; superSayen.animTimer = 0;
+  cat.vy = 0; cat.isGrounded = false; cat.isPlatformGrounded = false; stopRunSound();
+  
+  bgMusic.pause();
+  konamiMusic.pause();
+  
+  if (invincibleTimer > 0) {
+    marioInvMusic.muted = true;
+  } else {
+    marioInvMusic.pause();
+  }
+  
+  if (superSayanTheme.readyState >= 2) superSayanTheme.currentTime = 0;
+  superSayanTheme.volume = 1.0; superSayanTheme.play().catch(() => {});
+  playSoundEffect(sounds.sayan); playSoundEffect(sounds.speedFly);
+}
+
+function transitionSuperSayanToNormal() {
+  superSayanTheme.pause();
+  
+  if (invincibleTimer > 0) {
+    marioInvMusic.muted = false;
+    marioInvMusic.play().catch(() => {});
+    return;
+  }
+
+  marioInvMusic.muted = false;
+  if (useRealMusicForNextGame) {
+    konamiMusic.play().catch(() => {});
+  } else {
+    bgMusic.muted = false;
+    if (bgMusic.paused) bgMusic.play().catch(() => {});
+  }
+}
+
+function triggerLetterFall(char, x, y) {
+  fallingLetters.push({ char: char, x: x, y: y, vy: -3, vx: (Math.random() - 0.5) * 4, angle: 0, vAngle: (Math.random() - 0.5) * 0.2, alpha: 1.0 });
+}
+
+function isPositionNearObstacle(targetX, targetW = 65, safeMargin = 180) {
+  for (let obs of obstacles) { if (targetX + targetW + safeMargin > obs.x && targetX < obs.x + obs.w + safeMargin) return true; }
+  for (let sp of spikes) { if (targetX + targetW + safeMargin > sp.x && targetX < sp.x + sp.w + safeMargin) return true; }
+  return false;
+}
+
+function isPositionNearLetter(targetX, targetW = 100, safeMargin = 180) {
+  for (let item of items) { if (targetX + targetW + safeMargin > item.x && targetX < item.x + item.w + safeMargin) return true; }
+  return false;
+}
+
+function spawnWorldElements() {
+  if ((isTutoMode && (tutoStep < 8 || (tutoStep === 8 && tutoSubState >= 5))) || superSayen.state === 'LANDING' || freezeForSequence || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
+
+  const lastPlat = platforms[platforms.length - 1]; const lastX = lastPlat ? lastPlat.x + lastPlat.w : 350;
+  if (lastX < canvas.width + 300) {
+    const heightZones = [ENTITY_GROUND_Y - 240 + Math.random() * 50, ENTITY_GROUND_Y - 160 + Math.random() * 40, ENTITY_GROUND_Y - 110 + Math.random() * 30];
+    const prevY = lastPlat ? lastPlat.y : ENTITY_GROUND_Y - 100;
+    let targetY = heightZones[Math.floor(Math.random() * heightZones.length)];
+    const heightDifference = prevY - targetY;
+    let gap = 130 + Math.random() * 80; if (heightDifference > 50) gap = 90 + Math.random() * 40;
+    const x = Math.max(canvas.width + 100, lastX + gap);
+    const types = ['short', 'medium', 'long']; const colors = ['bleu', 'rouge', 'vert'];
+    const type = types[Math.floor(Math.random() * types.length)]; const color = colors[Math.floor(Math.random() * colors.length)];
+    const widths = { short: 160, medium: 260, long: 360 }; const w = widths[type];
+    platforms.push({ x, y: targetY, w, h: 65, key: `${color}_${type}` });
+
+    const platObstacleChance = 0.40 + Math.random() * 0.35;
+    if (type !== 'short' && Math.random() < platObstacleChance && (x - lastObstacleX) > (160 + Math.random() * 80)) {
+      const platIndices = [0, 1, 3, 4]; const configIdx = platIndices[Math.floor(Math.random() * platIndices.length)];
+      const conf = assets.obstaclesConfig[configIdx]; const dim = getObstacleDimensions(conf);
+      const obsX = x + (w / 2) - (dim.w / 2);
+      if (!isPositionNearLetter(obsX, dim.w, 180)) {
+        const depthAdjustment = (configIdx === 3) ? 33 : 25; const obsY = targetY - dim.h + depthAdjustment; const flipX = Math.random() < 0.5;
+        obstacles.push({ x: obsX, y: obsY, w: dim.w, h: dim.h, configIdx, frame: 0, animTimer: 0, flipX });
+        lastObstacleX = obsX + dim.w; handleObstacleSpawned(obsX, obsY, dim.w);
+      }
+    }
+  }
+
+  const minSpacing = 180 + Math.random() * 120; const freeSpawnChance = 0.50 + Math.random() * 0.40;
+  if ((canvas.width + 100 - lastObstacleX) > minSpacing && Math.random() < freeSpawnChance) {
+    const threshold = score >= 50000 ? 7 : 10;
+    if (obstacleSpawnCountSinceSpike >= threshold) {
+      obstacleSpawnCountSinceSpike = 0;
+      const spikeTypes = ['court', 'moyen', 'long'];
+      const chosenType = spikeTypes[Math.floor(Math.random() * spikeTypes.length)];
+      const spikeImg = assets.spikes[chosenType];
+      let spikeW = 100, spikeH = 50;
+      if (spikeImg && spikeImg.complete && spikeImg.naturalWidth > 0 && spikeImg.naturalHeight > 0) {
+        const ratio = spikeImg.naturalWidth / spikeImg.naturalHeight;
+        spikeH = 55; spikeW = spikeH * ratio;
+      }
+      const spikeX = canvas.width + 100;
+      const spikeY = ENTITY_GROUND_Y - spikeH + 8;
+      if (!isPositionNearObstacle(spikeX, spikeW, 200)) {
+        spikes.push({ x: spikeX, y: spikeY, w: spikeW, h: spikeH, type: chosenType });
+        lastObstacleX = spikeX + spikeW;
+      }
+    } else {
+      const freeIndices = [0, 1, 2, 5, 6, 7]; const configIdx = freeIndices[Math.floor(Math.random() * freeIndices.length)];
+      const conf = assets.obstaclesConfig[configIdx]; const dim = getObstacleDimensions(conf);
+      const obsX = canvas.width + 100 + Math.random() * 150;
+      if (!isPositionNearLetter(obsX, dim.w, 180)) {
+        const flipX = Math.random() < 0.5; let obsY;
+        if (conf.type === 'air') {
+          if (configIdx === 7) obsY = ENTITY_GROUND_Y - dim.h - 60 - (Math.random() * 15);
+          else obsY = ENTITY_GROUND_Y - (140 + Math.random() * 60);
+          obstacles.push({ x: obsX, baseY: obsY, y: obsY, w: dim.w, h: dim.h, configIdx, type: 'air', floatPhase: Math.random() * Math.PI * 2, flipX });
+        } else {
+          const extraOffset = (configIdx === 0 || configIdx === 1) ? 5 : 0;
+          obsY = ENTITY_GROUND_Y - dim.h + extraOffset;
+          obstacles.push({ x: obsX, y: obsY, w: dim.w, h: dim.h, configIdx, frame: 0, animTimer: 0, flipX });
+        }
+        lastObstacleX = obsX + dim.w; handleObstacleSpawned(obsX, obsY, dim.w);
+      }
+    }
+  }
+}
+
+function handleObstacleSpawned(obsX, obsY, obsW) {
+  if ((isTutoMode && (tutoStep < 8 || (tutoStep === 8 && tutoSubState >= 5))) || superSayen.state === 'LANDING' || (superSayen.state === 'FLY' && superSayen.timer >= 420)) return;
+  obstacleCounter++; obstacleSpawnCountSinceSpike++;
+  const spawnFrequency = 3 + (Math.floor(Math.random() * 3) - 1); 
+  if (obstacleCounter % Math.max(2, spawnFrequency) === 0) {
+    let letterX = obsX + obsW + 150 + (Math.random() * 100);
+    if (letterX - lastLetterX < 260) return;
+    if (!superSayen.active && isPositionNearObstacle(letterX, 65, 180)) letterX += 220 + Math.random() * 80;
+    const char = rogerLetters[nextSpawnLetterIndex]; let letterY;
+    if (superSayen.active && superSayen.state === 'FLY') {
+      const flyZones = [30 + Math.random() * 90, 140 + Math.random() * 100, 260 + Math.random() * 120];
+      letterY = flyZones[Math.floor(Math.random() * flyZones.length)];
+    } else {
+      const heights = [ENTITY_GROUND_Y - 75, ENTITY_GROUND_Y - 180, ENTITY_GROUND_Y - 250];
+      let selectedLevelIdx = Math.floor(Math.random() * heights.length);
+      if (selectedLevelIdx === lastLetterHeightLevel) {
+        heightLevelRepeatCount++;
+        if (heightLevelRepeatCount >= 2) {
+          const alternativeLevels = [0, 1, 2].filter(idx => idx !== lastLetterHeightLevel);
+          selectedLevelIdx = alternativeLevels[Math.floor(Math.random() * alternativeLevels.length)];
+          heightLevelRepeatCount = 1;
+        }
+      } else heightLevelRepeatCount = 1;
+      lastLetterHeightLevel = selectedLevelIdx; letterY = heights[selectedLevelIdx];
+      const matchingPlat = platforms.find(p => letterX + 65 > p.x && letterX < p.x + p.w);
+      if (matchingPlat) letterY = matchingPlat.y - 75;
+    }
+    items.push({ x: letterX, y: letterY, w: 65, h: 75, char: char, frame: 0, animTimer: 0 });
+    lastLetterX = letterX; nextSpawnLetterIndex = (nextSpawnLetterIndex + 1) % rogerLetters.length;
+  }
+}
+
+function drawShadow(centerX, centerY, radiusX, radiusY, opacity = 0.35) {
+  ctx.save(); ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`; ctx.beginPath();
+  ctx.ellipse(Math.round(centerX), Math.round(centerY), Math.round(radiusX), Math.round(radiusY), 0, 0, Math.PI * 2);
+  ctx.fill(); ctx.restore();
+}
+
+const keys = {};
+
+window.addEventListener('keydown', (e) => {
+  if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code) && document.activeElement.tagName !== 'INPUT') e.preventDefault();
+  unlockAudio();
+
+  if (tutoDialogBox.style.display === 'block' && (e.code === 'Space' || e.code === 'Enter')) {
+    tutoNextBtn.click();
+    return;
+  }
+
+  if (konamiModal.style.display === 'flex') {
+    if (e.code === 'ArrowLeft' || e.code === 'ArrowRight') {
+      konamiButtonIdx = konamiButtonIdx === 0 ? 1 : 0;
+      updateKonamiSelection();
+    } else if (e.code === 'Enter' || e.code === 'Space') {
+      if (konamiButtonIdx === 0) konamiYesBtn.click();
+      else konamiNoBtn.click();
+    }
+    return;
+  }
+
+  if (saveScoreModal.style.display === 'block') {
+    if (e.code === 'ArrowDown' || e.code === 'ArrowRight') {
+      formNavIdx = (formNavIdx + 1) % formNavElements.length;
+      updateFormNavSelection();
+    } else if (e.code === 'ArrowUp' || e.code === 'ArrowLeft') {
+      formNavIdx = (formNavIdx - 1 + formNavElements.length) % formNavElements.length;
+      updateFormNavSelection();
+    } else if (e.code === 'Enter' || e.code === 'Space') {
+      e.preventDefault();
+      if (formNavIdx === 2) cancelSaveBtn.click();
+      else if (formNavIdx === 3) saveScoreForm.requestSubmit();
+    }
+    return;
+  }
+
+  if (!gameStarted && rulesModal.style.display !== 'flex' && leaderboardModal.style.display !== 'flex' && aboutModal.style.display !== 'flex' && konamiModal.style.display !== 'flex') {
+    const inputKey = e.key.length === 1 ? e.key.toLowerCase() : e.code; const targetKey = konamiCode[konamiIndex];
+    if (inputKey === targetKey || e.code === targetKey) {
+      konamiIndex++; 
+      if (konamiIndex === konamiCode.length) { 
+        konamiIndex = 0; 
+        konamiButtonIdx = 0;
+        updateKonamiSelection();
+        konamiModal.style.display = 'flex'; 
+      }
+    } else {
+      konamiIndex = (inputKey === konamiCode[0] || e.code === konamiCode[0]) ? 1 : 0;
+    }
+  }
+
+  if (!gameStarted && gameOverStack.style.display !== 'flex' && scorePromptBox.style.display !== 'block' && saveScoreModal.style.display !== 'block' && konamiModal.style.display !== 'flex') {
+    if (menuFocusArea === 'START') {
+      if (e.code === 'ArrowRight') { menuFocusArea = 'RIGHT'; rightSideIdx = 0; updateMenuSelection(); }
+      else if (e.code === 'ArrowDown' || e.code === 'ArrowUp') { mainButtonIdx = (mainButtonIdx + 1) % mainButtonsList.length; updateMenuSelection(); }
+      else if (e.code === 'Enter' || e.code === 'Space') mainButtonsList[mainButtonIdx].click();
+    } else if (menuFocusArea === 'RIGHT') {
+      if (e.code === 'ArrowUp') { rightSideIdx = (rightSideIdx - 1 + rightSideButtons.length) % rightSideButtons.length; updateMenuSelection(); }
+      else if (e.code === 'ArrowDown') { rightSideIdx = (rightSideIdx + 1) % rightSideButtons.length; updateMenuSelection(); }
+      else if (e.code === 'ArrowLeft') { menuFocusArea = 'START'; updateMenuSelection(); }
+      else if (e.code === 'Enter' || e.code === 'Space') rightSideButtons[rightSideIdx].click();
+    }
+    return;
+  }
+
+  if (gameOverStack.style.display === 'flex') {
+    if (e.code === 'ArrowLeft' || e.code === 'ArrowUp') { gameOverSelectedIdx = 0; updateGameOverSelection(); }
+    else if (e.code === 'ArrowRight' || e.code === 'ArrowDown') { gameOverSelectedIdx = 1; updateGameOverSelection(); }
+    else if (e.code === 'Enter' || e.code === 'Space') gameOverButtons[gameOverSelectedIdx].click();
+    return;
+  }
+
+  if (scorePromptBox.style.display === 'block') {
+    if (e.code === 'ArrowLeft') updatePromptSelection('YES');
+    else if (e.code === 'ArrowRight') updatePromptSelection('NO');
+    else if (e.code === 'Enter' || e.code === 'Space') { if (promptSelectedOption === 'YES') promptYesBtn.click(); else promptNoBtn.click(); }
+    return;
+  }
+
+  if (e.code === 'Enter' || e.key === 'p' || e.key === 'P' || e.code === 'KeyP') {
+    if (document.activeElement.tagName !== 'INPUT') { togglePause(); return; }
+  }
+
+  if (e.code === 'Escape') {
+    if (rulesModal.style.display === 'flex') rulesModal.style.display = 'none';
+    else if (leaderboardModal.style.display === 'flex') leaderboardModal.style.display = 'none';
+    else if (aboutModal.style.display === 'flex') aboutModal.style.display = 'none';
+    else if (konamiModal.style.display === 'flex') konamiModal.style.display = 'none';
+    else returnToHome();
+    return;
+  }
+
+  if (isPaused) return;
+  if (!e.repeat) keys[e.code] = true;
+
+  if (e.key === 'r' || e.key === 'R' || e.code === 'KeyR') {
+    if (document.activeElement.tagName !== 'INPUT') {
+      if (gameOver) returnToHome();
+      else if (gameStarted && !superSayen.active) cat.isRun4Pose = true;
+    }
+  }
+});
+
+window.addEventListener('keyup', (e) => {
+  keys[e.code] = false;
+  if (e.code === 'Space' || e.code === 'ArrowUp') { cat.isJumping = false; jumpKeyReleased = true; }
+});
+
+function handleTouchAction(e, isTouchActive) {
+  if (!gameStarted || rulesModal.style.display === 'flex' || leaderboardModal.style.display === 'flex' || aboutModal.style.display === 'flex' || scorePromptBox.style.display === 'block' || saveScoreModal.style.display === 'block' || konamiModal.style.display === 'flex') return;
+  if (isPaused) { if (isTouchActive) togglePause(); return; }
+  
+  if (!isTouchActive || e.touches.length === 0) {
+    keys['ArrowDown'] = false; keys['Space'] = false; keys['ArrowUp'] = false; cat.isJumping = false; jumpKeyReleased = true;
+    return;
+  }
+
+  const viewportWidth = window.innerWidth; let wantDown = false; let wantJump = false;
+  for (let i = 0; i < e.touches.length; i++) {
+    const touch = e.touches[i]; const clientX = touch.clientX;
+    if (gameOver) return;
+    if (clientX < viewportWidth / 2) wantDown = true; else wantJump = true;
+  }
+  keys['ArrowDown'] = wantDown; keys['Space'] = wantJump; keys['ArrowUp'] = wantJump;
+}
+
+document.addEventListener('touchstart', (e) => {
+  requestGameFullscreen();
+  if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn') || e.target.closest('#score-prompt-box') || e.target.closest('#save-score-modal')) return;
+  e.preventDefault(); unlockAudio(); handleTouchAction(e, true);
+}, { passive: false });
+
+document.addEventListener('touchmove', (e) => {
+  if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn') || e.target.closest('#score-prompt-box') || e.target.closest('#save-score-modal')) return;
+  e.preventDefault(); handleTouchAction(e, true);
+}, { passive: false });
+
+document.addEventListener('touchend', (e) => {
+  if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn') || e.target.closest('#score-prompt-box') || e.target.closest('#save-score-modal')) return;
+  e.preventDefault(); handleTouchAction(e, e.touches.length > 0);
+}, { passive: false });
+
+function updateRulesText() {
+  const punkBonusSrc = assets.punkBonus.src || 'punkbonus.png';
+  if (isMobileDevice) {
+    rulesList.innerHTML = `
+      <li>🎮 <b>Tap droite</b> : Sauter (Appui court ou long pour ajuster le niveau du saut)</li>
+      <li>🎮 <b>Tap gauche</b> : Se baisser</li>
+      <li><img src="R1.png" alt="R" class="rule-icon" style="width:22px;"> <b>Lettres ROGER</b> : Collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
+      <li>❤️ <b>Système de vies</b> : Tu débutes avec les GROSSES lettres R et O ! Chaque GROSSE lettre te protège contre un choc. Si tu obtiens 5 GROSSES lettres R O G E R, alors Roger se transforme en Super-Chat pour un max de scoring !</li>
+      <li><img src="${punkBonusSrc}" alt="Bonus Punk" style="width:22px;"> <b>Bonus Punk</b> : Attrape cet item et deviens invincible pendant 15 secondes. Tu peux dégommer tous les obstacles sur ton passage.</li>
+      <li>⚠️ <b>Pics au sol</b> : Saute par-dessus pour éviter de perdre une vie !</li>
+      <li>⏸️ <b>Bouton P</b> : Mettre le jeu en pause / Reprendre le jeu</li>
+      <li>🏠 <b>Bouton R</b> : Revenir à l'écran d'accueil</li>
+    `;
+  } else {
+    rulesList.innerHTML = `
+      <li>🎮 <b>Espace</b> : Sauter (Appui court ou long pour ajuster le niveau du saut)</li>
+      <li>🎮 <b>Flèche du bas</b> : Se baisser</li>
+      <li><img src="R1.png" alt="R" style="width:22px;"> <b>Lettres ROGER</b> : Collecte 5 lettres R O G E R pour gagner une GROSSE lettre.</li>
+      <li>❤️ <b>Système de vies</b> : Tu débutes avec les GROSSES lettres R et O ! Chaque GROSSE lettre te protège contre un choc. Si tu obtiens 5 GROSSES lettres R O G E R, alors Roger se transforme en Super-Chat pour un max de scoring !</li>
+      <li><img src="${punkBonusSrc}" alt="Bonus Punk" style="width:22px;"> <b>Bonus Punk</b> : Attrape cet item et deviens invincible pendant 15 secondes. Tu peux dégommer tous les obstacles sur ton passage.</li>
+      <li>⚠️ <b>Pics au sol</b> : Saute par-dessus pour éviter de perdre une vie !</li>
+      <li>⏸️ <b>Entrée</b> : Mettre le jeu en pause / Reprendre le jeu</li>
+      <li>🏠 <b>Echap</b> : Revenir à l'écran d'accueil</li>
+    `;
+  }
+}
+
+function parseCSVLine(line) {
+  const result = []; let cur = ''; let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') { if (inQuotes && line[i + 1] === '"') { cur += '"'; i++; } else inQuotes = !inQuotes; }
+    else if (c === ',' && !inQuotes) { result.push(cur.trim()); cur = ''; } else cur += c;
+  }
+  result.push(cur.trim()); return result;
+}
+
+function fetchLeaderboard() {
+  leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Chargement du Top 10...</td></tr>';
+  fetch(GOOGLE_SHEET_CSV_URL + '&t=' + Date.now())
+    .then(response => { if (!response.ok) throw new Error("Erreur réseau"); return response.text(); })
+    .then(csvText => {
+      const lines = csvText.split(/\r?\n/).filter(line => line.trim().length > 0);
+      if (lines.length <= 1) { leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Aucun score pour le moment !</td></tr>'; return; }
+      const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase());
+      let pseudoIdx = headers.findIndex(h => h.includes('pseudo')); let scoreIdx = headers.findIndex(h => h.includes('score'));
+      if (pseudoIdx === -1) pseudoIdx = 1; if (scoreIdx === -1) scoreIdx = 3;
+      const entries = [];
+      for (let i = 1; i < lines.length; i++) {
+        const row = parseCSVLine(lines[i]);
+        if (row.length > scoreIdx) {
+          const pseudo = row[pseudoIdx] || 'Anonyme'; const scoreVal = parseInt(row[scoreIdx], 10);
+          if (!isNaN(scoreVal)) entries.push({ pseudo, score: scoreVal });
+        }
+      }
+      entries.sort((a, b) => b.score - a.score); const top10 = entries.slice(0, 10); leaderboardBody.innerHTML = '';
+      if (top10.length === 0) { leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Aucun score pour le moment !</td></tr>'; return; }
+      top10.forEach((row, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td><b>${idx + 1}</b></td><td>${row.pseudo}</td><td style="color:#ffd54f; font-weight:bold;">${row.score}</td>`;
+        leaderboardBody.appendChild(tr);
+      });
+    })
+    .catch(err => { console.error("Erreur classement :", err); leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#e57373;">Impossible de charger le classement.</td></tr>'; });
+}
+
+startMainBtn.addEventListener('click', () => {
+  requestGameFullscreen(); if (introVideo) { introVideo.pause(); introVideo.currentTime = 0; }
+  startMainBtn.style.display = 'none'; tutoMainBtn.style.display = 'none'; desktopFullscreenBtn.style.display = 'none';
+  rightStack.style.display = 'none'; versionDisplay.style.display = 'none'; if (isMobileDevice) mobileHudControls.style.display = 'flex';
+  startBgMusic(); resetGame();
+});
+
+tutoMainBtn.addEventListener('click', () => {
+  requestGameFullscreen(); if (introVideo) { introVideo.pause(); introVideo.currentTime = 0; }
+  startMainBtn.style.display = 'none'; tutoMainBtn.style.display = 'none'; desktopFullscreenBtn.style.display = 'none';
+  rightStack.style.display = 'none'; versionDisplay.style.display = 'none'; if (isMobileDevice) mobileHudControls.style.display = 'flex';
+  startBgMusic(); startTutorial();
+});
+
+desktopFullscreenBtn.addEventListener('click', () => toggleDesktopFullscreen());
+rulesBtn.addEventListener('click', () => { playIntroMusic(); updateRulesText(); rulesModal.style.display = 'flex'; });
+closeRulesBtn.addEventListener('click', () => { rulesModal.style.display = 'none'; });
+
+konamiNoBtn.addEventListener('click', () => {
+  useRealMusicForNextGame = false;
+  konamiModal.style.display = 'none';
+});
+
+konamiYesBtn.addEventListener('click', () => {
+  useRealMusicForNextGame = true;
+  konamiModal.style.display = 'none';
+  
+  requestGameFullscreen(); 
+  if (introVideo) { introVideo.pause(); introVideo.currentTime = 0; }
+  startMainBtn.style.display = 'none'; 
+  tutoMainBtn.style.display = 'none'; 
+  desktopFullscreenBtn.style.display = 'none';
+  rightStack.style.display = 'none'; 
+  versionDisplay.style.display = 'none'; 
+  if (isMobileDevice) mobileHudControls.style.display = 'flex';
+  
+  startBgMusic(); 
+  resetGame();
+});
+
+konamiYesBtn.addEventListener('mouseenter', () => { konamiButtonIdx = 0; updateKonamiSelection(); });
+konamiNoBtn.addEventListener('mouseenter', () => { konamiButtonIdx = 1; updateKonamiSelection(); });
+
+leaderboardBtn.addEventListener('click', () => { playIntroMusic(); fetchLeaderboard(); leaderboardModal.style.display = 'flex'; });
+closeLeaderboardBtn.addEventListener('click', () => { leaderboardModal.style.display = 'none'; });
+aboutBtn.addEventListener('click', () => { playIntroMusic(); aboutModal.style.display = 'flex'; });
+closeAboutBtn.addEventListener('click', () => { aboutModal.style.display = 'none'; });
+quitBtn.addEventListener('click', () => { window.location.href = 'https://www.goodmorningroger.fr/skate-cat.html'; });
+restartBtn.addEventListener('click', () => { startBgMusic(); if (isTutoMode) startTutorial(); else resetGame(); });
+homeGameOverBtn.addEventListener('click', () => returnToHome());
+
+promptYesBtn.addEventListener('click', () => {
+  scorePromptBox.style.display = 'none'; scoreModalTitle.textContent = `ENREGISTRE TON SCORE DE ${score} POINTS !`;
+  saveScoreModal.style.display = 'block'; formNavIdx = 0; updateFormNavSelection();
+});
+promptNoBtn.addEventListener('click', () => {
+  scorePromptBox.style.display = 'none'; gameOverStack.style.display = 'flex'; gameOverSelectedIdx = 0; updateGameOverSelection();
+});
+
+startMainBtn.addEventListener('mouseenter', () => { menuFocusArea = 'START'; mainButtonIdx = 1; updateMenuSelection(); });
+tutoMainBtn.addEventListener('mouseenter', () => { menuFocusArea = 'START'; mainButtonIdx = 0; updateMenuSelection(); });
+rightSideButtons.forEach((btn, idx) => { btn.addEventListener('mouseenter', () => { menuFocusArea = 'RIGHT'; rightSideIdx = idx; updateMenuSelection(); }); });
+gameOverButtons.forEach((btn, idx) => { btn.addEventListener('mouseenter', () => { gameOverSelectedIdx = idx; updateGameOverSelection(); }); });
+cancelSaveBtn.addEventListener('mouseenter', () => { formNavIdx = 2; updateFormNavSelection(); });
+saveBtn.addEventListener('mouseenter', () => { formNavIdx = 3; updateFormNavSelection(); });
+
+cancelSaveBtn.addEventListener('click', () => { saveScoreModal.style.display = 'none'; gameOverStack.style.display = 'flex'; gameOverSelectedIdx = 0; updateGameOverSelection(); });
+
+saveScoreForm.addEventListener('submit', (e) => {
+  e.preventDefault(); const pseudo = inputPseudo.value.trim(); const email = inputEmail.value.trim();
+  if (!pseudo || !email) return;
+  saveBtn.disabled = true; saveBtn.textContent = 'ENVOI...';
+  const formData = new FormData(); formData.append(ENTRY_PSEUDO, pseudo); formData.append(ENTRY_EMAIL, email); formData.append(ENTRY_SCORE, score);
+  const finalizeSubmit = () => { saveScoreModal.style.display = 'none'; saveBtn.disabled = false; saveBtn.textContent = 'SAVE'; gameOverStack.style.display = 'flex'; gameOverSelectedIdx = 0; updateGameOverSelection(); };
+  const timeoutId = setTimeout(finalizeSubmit, 2500);
+  fetch(GOOGLE_FORM_URL, { method: 'POST', mode: 'no-cors', body: formData }).then(() => { clearTimeout(timeoutId); finalizeSubmit(); }).catch(() => { clearTimeout(timeoutId); finalizeSubmit(); });
+});
+
+mobilePauseBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePause(); });
+mobileHomeBtn.addEventListener('click', (e) => { e.stopPropagation(); returnToHome(); });
+
+window.addEventListener('load', () => {
+  if (!isMobileDevice) desktopFullscreenBtn.style.display = 'block';
+  playIntroMusic(); updateRulesText(); updateMenuSelection();
+});
+document.addEventListener('click', () => { requestGameFullscreen(); if (!gameStarted) playIntroMusic(); }, { once: true });
+
+function resetGame() {
+  score = 0; bgX = 0; lastScoreTime = Date.now(); gameOver = false; gameStarted = true; isPaused = false;
+  isTutoMode = false; tutoHighlightedZone = null; tutoInstructionMessage = ""; tutoDialogBox.style.display = 'none';
+  bonusEffectTimer = 0; lastObstacleX = -1000; lastLetterX = -1000; lastLetterHeightLevel = -1; heightLevelRepeatCount = 0;
+  obstacleCounter = 0; completedWordsCount = 2; nextSpawnLetterIndex = 0; invulnerableTimer = 0; fallingLetters = [];
+  superSayen.active = false; superSayen.state = 'NONE'; freezeForSequence = false; sequenceCurrentLetterIndex = 0; sequenceAngle = 0;
+  baseSpeedMultiplier = 1.0; currentGameSpeed = BASE_GAME_SPEED; jumpKeyReleased = true; lastSpecialSoundIsWilhem = false;
+  invincibleTimer = 0; debonusPlayed = false; debonusEndPlayed = false; punkBonusTimer = 0; punkBonus = null; ejectedObstacles = [];
+  spikes = []; obstacleSpawnCountSinceSpike = 0;
+
+  marioInvMusic.pause(); cat.y = ENTITY_GROUND_Y - cat.height; cat.vy = 0; cat.isGrounded = true; cat.wasGrounded = true;
+  cat.isPlatformGrounded = false; cat.isRun4Pose = false; cat.isJumping = false; cat.jumpTimer = 0; cat.crouchFrame = 0; cat.crouchTimer = 0; cat.state = 'RUN';
+  platforms = []; obstacles = []; items = []; rogerCollected = [false, false, false, false, false];
+  desktopFullscreenBtn.style.display = 'none'; gameOverStack.style.display = 'none'; scorePromptBox.style.display = 'none'; saveScoreModal.style.display = 'none'; konamiModal.style.display = 'none';
+}
+
+function update() {
+  if (!gameStarted || gameOver || isPaused) { stopRunSound(); return; }
+
+  if (isTutoMode) {
+    updateTutorialScript();
+    if (tutoHighlightedZone) { stopRunSound(); return; }
+  }
+
+  if (freezeForSequence) {
+    stopRunSound(); sequenceAngle += 0.12; 
+    if (sequenceAngle >= Math.PI * 2) {
+      sequenceAngle = 0; sequenceCurrentLetterIndex++;
+      if (sequenceCurrentLetterIndex >= 5) { freezeForSequence = false; completedWordsCount = 0; score += 10000; triggerSuperSayen(); }
+    }
+    return;
+  }
+
+  bounceTimer += 0.08;
+  if (invulnerableTimer > 0) invulnerableTimer--;
+  if (cat.damageFlashTimer > 0) cat.damageFlashTimer--;
+
+  if (invincibleTimer > 0) {
+    invincibleTimer--;
+    if (invincibleTimer === 120 && !debonusPlayed) { playSoundEffect(sounds.debonus); debonusPlayed = true; }
+    if (invincibleTimer === 60 && !debonusEndPlayed) { playSoundEffect(sounds.debonusend); debonusEndPlayed = true; }
+    if (invincibleTimer === 0) {
+      marioInvMusic.pause(); 
+      if (!superSayen.active) {
+        if (useRealMusicForNextGame) {
+          konamiMusic.play().catch(() => {});
+        } else {
+          bgMusic.muted = false; 
+          if (bgMusic.paused) bgMusic.play().catch(() => {});
+        }
+      }
+      debonusPlayed = false; debonusEndPlayed = false;
+    }
+  }
+
+  if (!isTutoMode) {
+    punkBonusTimer++;
+    if (punkBonusTimer >= 1800 && !punkBonus && !superSayen.active) {
+      punkBonusTimer = 0; let targetH = 65, targetW = 65;
+      if (assets.punkBonus.complete && assets.punkBonus.naturalWidth > 0 && assets.punkBonus.naturalHeight > 0) {
+        const ratio = assets.punkBonus.naturalWidth / assets.punkBonus.naturalHeight; targetW = targetH * ratio;
+      }
+      punkBonus = { x: canvas.width + 50, baseY: 120 + Math.random() * 160, y: 150, w: targetW, h: targetH, time: 0, angle: 0, trail: [] };
+    }
+  }
+
+  if (punkBonus) {
+    punkBonus.time += 0.04; punkBonus.x -= 2.2 + Math.sin(punkBonus.time * 2.5) * 1.8; punkBonus.y = punkBonus.baseY + Math.sin(punkBonus.time * 1.5) * 25; punkBonus.angle = Math.sin(punkBonus.time * 3) * 0.15;
+    punkBonus.trail.push({ x: punkBonus.x + punkBonus.w / 2 + (Math.random() * 14 - 7), y: punkBonus.y + punkBonus.h / 2 + (Math.random() * 14 - 7), size: Math.random() * 8 + 4, alpha: 1.0, color: Math.random() < 0.6 ? '#ffd54f' : '#ffffff' });
+    if (!isTutoMode && punkBonus.x + punkBonus.w < -100) punkBonus = null;
+  }
+
+  if (punkBonus) {
+    punkBonus.trail.forEach(pt => { pt.x -= currentGameSpeed * 0.5; pt.alpha -= 0.04; pt.size *= 0.94; });
+    punkBonus.trail = punkBonus.trail.filter(pt => pt.alpha > 0);
+  }
+
+  ejectedObstacles.forEach(eo => { eo.x += eo.vx; eo.y += eo.vy; eo.vy += 0.5; eo.angle += eo.vRot; });
+  ejectedObstacles = ejectedObstacles.filter(eo => eo.y < canvas.height + 200 && eo.x < canvas.width + 200 && eo.x > -200);
+
+  fallingLetters.forEach(fl => { fl.y += fl.vy; fl.x += fl.vx; fl.vy += 0.4; fl.angle += fl.vAngle; fl.alpha -= 0.02; });
+  fallingLetters = fallingLetters.filter(fl => fl.alpha > 0);
+
+  const now = Date.now();
+  if (now - lastScoreTime >= 1000) { score += superSayen.active ? 500 : 50; lastScoreTime = now; }
+
+  const speedLevel = Math.floor(score / 10000); baseSpeedMultiplier = Math.pow(1.05, speedLevel);
+  let effectiveBaseSpeed = BASE_GAME_SPEED * baseSpeedMultiplier;
+  if (invincibleTimer > 0) effectiveBaseSpeed *= 1.25;
+
+  const jumpPressed = !!(keys['Space'] || keys['ArrowUp']);
+  const flyUpPressed = !!(keys['Space'] || keys['ArrowUp'] || keys['KeyW']);
+  const downPressed = !!(keys['ArrowDown'] || keys['KeyS']);
+
+  if (superSayen.active) {
+    superSayen.animTimer++;
+    if (superSayen.state === 'TRANSFORM') {
+      currentGameSpeed = effectiveBaseSpeed * 0.5; if (cat.y > superSayen.targetY) cat.y -= 3;
+      const frameInterval = (superSayen.transformFrame === 5) ? 4 : 14;
+      if (superSayen.animTimer % frameInterval === 0) { if (superSayen.transformFrame < 5) superSayen.transformFrame++; else { superSayen.state = 'FLY'; superSayen.timer = 0; } }
+    } else if (superSayen.state === 'FLY') {
+      currentGameSpeed = effectiveBaseSpeed * 3.5; superSayen.timer++; score += 15; const flySpeed = 7; const maxFlyY = ENTITY_GROUND_Y - cat.height + 65; 
+      if (flyUpPressed) cat.y = Math.max(30, cat.y - flySpeed); if (downPressed) cat.y = Math.min(maxFlyY, cat.y + flySpeed);
+      if (superSayen.animTimer % 4 === 0) superSayen.flyFrame = (superSayen.flyFrame + 1) % 6;
+      if (superSayen.timer >= 450) { superSayen.state = 'LANDING'; obstacles = []; items = []; platforms = []; spikes = []; lastObstacleX = cat.x + 300; lastLetterX = cat.x + 300; }
+    } else if (superSayen.state === 'LANDING') {
+      currentGameSpeed = effectiveBaseSpeed;
+      if (cat.y < ENTITY_GROUND_Y - cat.height) cat.y += 6; 
+      else { 
+        cat.y = ENTITY_GROUND_Y - cat.height; cat.isGrounded = true; cat.vy = 0; superSayen.active = false; superSayen.state = 'NONE'; lastObstacleX = cat.x + 300; lastLetterX = cat.x + 300; 
+        transitionSuperSayanToNormal();
+      }
+    }
+  } else currentGameSpeed = effectiveBaseSpeed;
+
+  bgX -= currentGameSpeed * 0.4; lastObstacleX -= currentGameSpeed; lastLetterX -= currentGameSpeed;
+
+  updatePlatformStream();
+
+  if (!superSayen.active) {
+    if (downPressed && cat.isPlatformGrounded) { cat.y += 12; cat.isGrounded = false; cat.isPlatformGrounded = false; stopRunSound(); }
+    if (jumpPressed && cat.isGrounded && jumpKeyReleased) { cat.vy = JUMP_FORCE; cat.isGrounded = false; cat.isPlatformGrounded = false; cat.isJumping = true; cat.jumpTimer = 0; cat.isRun4Pose = false; cat.state = 'RUN'; jumpKeyReleased = false; stopRunSound(); playSoundEffect(sounds.jump); }
+    if (jumpPressed && cat.isJumping) { if (cat.jumpTimer < MAX_JUMP_TIME) { cat.vy += JUMP_HOLD_FORCE; cat.jumpTimer++; } }
+    cat.isCrouching = downPressed;
+    if (cat.isCrouching) { cat.crouchTimer++; if (cat.crouchTimer % 6 === 0) cat.crouchFrame = (cat.crouchFrame + 1) % 3; } else { cat.crouchFrame = 0; cat.crouchTimer = 0; }
+    cat.vy += GRAVITY; cat.y += cat.vy;
+  }
+
+  let catBoxX = cat.x + 25; let catBoxWidth = cat.width - 50; let catBoxY = cat.isCrouching ? cat.y + 70 : cat.y + 12; let catBoxHeight = cat.isCrouching ? 32 : cat.height - 24;
+  if (superSayen.active && superSayen.state === 'FLY') {
+    const hitBoxHeight = 110; const speedBuffer = currentGameSpeed * 2.0; catBoxX = cat.x + (cat.width / 2) - 45 - speedBuffer; catBoxWidth = 90 + (speedBuffer * 2); catBoxY = cat.y + (cat.height / 2) - (hitBoxHeight / 2) - 30; catBoxHeight = hitBoxHeight;
+  }
+
+  if (punkBonus) {
+    if (catBoxX < punkBonus.x + punkBonus.w && catBoxX + catBoxWidth > punkBonus.x && catBoxY < punkBonus.y + punkBonus.h && catBoxY + catBoxHeight > punkBonus.y) {
+      playSoundEffect(sounds.punkbonus); invincibleTimer = 900; debonusPlayed = false; debonusEndPlayed = false; punkBonus = null;
+      
+      if (marioInvMusic.readyState >= 2) marioInvMusic.currentTime = 0;
+
+      if (superSayen.active) {
+        marioInvMusic.muted = true;
+        marioInvMusic.play().catch(() => {});
+      } else {
+        bgMusic.pause();
+        konamiMusic.pause();
+        marioInvMusic.muted = false;
+        marioInvMusic.play().catch(() => {});
+      }
+    }
+  }
+
+  if (!superSayen.active) {
+    cat.wasGrounded = cat.isGrounded; cat.isGrounded = false; cat.isPlatformGrounded = false;
+    if (cat.y + cat.height >= ENTITY_GROUND_Y) { cat.y = ENTITY_GROUND_Y - cat.height; cat.vy = 0; cat.isGrounded = true; cat.isJumping = false; }
+    if (!downPressed || cat.vy < 0) {
+      platforms.forEach(p => {
+        const depthOffset = 14; const surfaceY = p.y + depthOffset;
+        if (cat.x + cat.width > p.x && cat.x < p.x + p.w && cat.y + cat.height >= surfaceY && cat.y + cat.height <= surfaceY + 20 && cat.vy >= 0) {
+          cat.y = surfaceY - cat.height + 6; cat.vy = 0; cat.isGrounded = true; cat.isPlatformGrounded = true; cat.isJumping = false;
+        }
+      });
+    }
+  }
+
+  platforms.forEach(p => p.x -= currentGameSpeed);
+  spikes.forEach(s => s.x -= currentGameSpeed);
+  if (!superSayen.active) { if (!cat.wasGrounded && cat.isGrounded) playSoundEffect(sounds.reception); if (cat.isGrounded) playRunSound(); else stopRunSound(); }
+  platforms = platforms.filter(p => p.x + p.w > -100);
+
+  spikes.forEach(s => {
+    let spikeBoxX = s.x + 6; let spikeBoxW = s.w - 12; let spikeBoxY = s.y + 12; let spikeBoxH = s.h - 12;
+    const isSpikeHit = (catBoxX < spikeBoxX + spikeBoxW && catBoxX + catBoxWidth > spikeBoxX && catBoxY < spikeBoxY + spikeBoxH && catBoxY + catBoxHeight > spikeBoxY);
+
+    if (isSpikeHit) {
+      if (invincibleTimer > 0) {
+        playSoundEffect(sounds.degom);
+        score += 80;
+        s.ejected = true;
+      } else if (!superSayen.active && invulnerableTimer <= 0 && cat.damageFlashTimer === 0) {
+        playSoundEffect(sounds.damage);
+        cat.damageFlashTimer = 30;
+
+        if (completedWordsCount > 0) {
+          completedWordsCount--; invulnerableTimer = 90; const masterHudX = 20; const masterHudY = canvas.height - 115;
+          const lostChar = rogerLetters[completedWordsCount]; const lostX = masterHudX + (completedWordsCount * 95);
+          triggerLetterFall(lostChar, lostX, masterHudY);
+        } else {
+          gameOver = true; cat.state = 'FAIL'; stopRunSound(); stopAllSounds();
+          if (!isTutoMode && score >= 3000) { updatePromptSelection('YES'); scorePromptBox.style.display = 'block'; }
+          else { gameOverStack.style.display = 'flex'; gameOverSelectedIdx = 0; updateGameOverSelection(); }
+        }
+      }
+    }
+  });
+  spikes = spikes.filter(s => !s.ejected && s.x + s.w > -100);
+
+  obstacles.forEach(o => {
+    o.x -= currentGameSpeed;
+    if (o.configIdx === 7 && o.baseY !== undefined) {
+      o.y = o.baseY + Math.sin(o.animTimer * 0.1) * 20;
+    }
+    if (o.type === 'air' && o.configIdx !== 7) { o.floatPhase += 0.05; const amp = 12; o.y = o.baseY + Math.sin(o.floatPhase) * amp; }
+    else { o.animTimer++; if (o.animTimer % 10 === 0) o.frame = (o.frame + 1) % 3; }
+
+    let obsBoxX = o.x + 8; 
+    let obsBoxWidth = Math.max(10, o.w - 16); 
+    let obsBoxY = o.type === 'air' ? o.y + 4 : o.y + 8; 
+    let obsBoxHeight = o.type === 'air' ? Math.max(10, o.h - 8) : Math.max(10, o.h - 16);
+
+    const isHit = (catBoxX < obsBoxX + obsBoxWidth && catBoxX + catBoxWidth > obsBoxX && catBoxY < obsBoxY + obsBoxHeight && catBoxY + catBoxHeight > obsBoxY);
+
+    if (isHit) {
+      if (invincibleTimer > 0) {
+        if (o.configIdx === 0 || o.configIdx === 1) { const soundToPlay = lastSpecialSoundIsWilhem ? sounds.cri : sounds.wilhem; playSoundEffect(soundToPlay); lastSpecialSoundIsWilhem = !lastSpecialSoundIsWilhem; }
+        else playSoundEffect(sounds.degom);
+        score += 100; let vx = 8 + Math.random() * 6, vy = -8 - Math.random() * 6; if (cat.vy > 0 && catBoxY + catBoxHeight - cat.vy <= obsBoxY + 20) vy = 6 + Math.random() * 6;
+        const conf = assets.obstaclesConfig[o.configIdx]; let imgToDraw = (conf.type === 'anim') ? conf.frames[o.frame] : conf.img;
+        ejectedObstacles.push({ x: o.x, y: o.y, w: o.w, h: o.h, img: imgToDraw, vx: vx, vy: vy, angle: 0, vRot: (Math.random() - 0.5) * 0.5, flipX: o.flipX });
+        o.ejected = true;
+      } else if (!superSayen.active && invulnerableTimer <= 0 && cat.damageFlashTimer === 0) {
+        playSoundEffect(sounds.damage);
+        cat.damageFlashTimer = 30;
+
+        if (isTutoMode) {
+          if (tutoStep === 5) {
+            tutoObstacleCount = 0; obstacles = []; platforms = []; spikes = []; tutoTimer = 0; return;
+          } else if (tutoStep === 6) {
+            completedWordsCount = 1; 
+            const masterHudX = 20; const masterHudY = canvas.height - 115;
+            triggerLetterFall('O', masterHudX + 95, masterHudY);
+            return;
+          } else if (tutoStep === 7) {
+            if (completedWordsCount > 0) {
+              completedWordsCount--; invulnerableTimer = 90; const masterHudX = 20; const masterHudY = canvas.height - 115;
+              const lostChar = rogerLetters[completedWordsCount]; const lostX = masterHudX + (completedWordsCount * 95);
+              triggerLetterFall(lostChar, lostX, masterHudY);
+              o.ejected = true;
+              return;
+            } else {
+              obstacles = []; platforms = []; items = []; spikes = [];
+              customLetterSpawnIndex = 0; rogerCollected = [false, false, false, false, false];
+              completedWordsCount = 1; tutoTimer = 0;
+              return;
+            }
+          }
+        }
+
+        if (completedWordsCount > 0) {
+          completedWordsCount--; invulnerableTimer = 90; const masterHudX = 20; const masterHudY = canvas.height - 115;
+          const lostChar = rogerLetters[completedWordsCount]; const lostX = masterHudX + (completedWordsCount * 95);
+          triggerLetterFall(lostChar, lostX, masterHudY);
+        } else {
+          gameOver = true; cat.state = 'FAIL'; stopRunSound(); stopAllSounds();
+          if (!isTutoMode && score >= 3000) { updatePromptSelection('YES'); scorePromptBox.style.display = 'block'; }
+          else { gameOverStack.style.display = 'flex'; gameOverSelectedIdx = 0; updateGameOverSelection(); }
+        }
+      }
+    }
+  });
+  obstacles = obstacles.filter(o => !o.ejected && o.x + o.w > -100);
+
+  items.forEach(it => {
+    it.x -= currentGameSpeed; it.animTimer++; if (it.animTimer % 6 === 0) it.frame = (it.frame + 1) % 8;
+    
+    let hitW = it.w, hitH = it.h, hitX = it.x, hitY = it.y;
+    if (superSayen.active && superSayen.state === 'FLY') { hitW = it.w + 60; hitH = it.h + 90; hitX = it.x - 30; hitY = it.y - 45; }
+
+    const itemHit = (catBoxX < hitX + hitW && catBoxX + catBoxWidth > hitX && catBoxY < hitY + hitH && catBoxY + catBoxHeight > hitY);
+
+    if (itemHit) {
+      score += 100;
+      it.collected = true; playSoundEffect(sounds.coin);
+
+      let letterIndex = -1;
+      if (it.char === 'R') {
+        if (!rogerCollected[0]) {
+          letterIndex = 0;
+        } else if (!rogerCollected[4]) {
+          letterIndex = 4;
+        }
+      } else {
+        letterIndex = rogerLetters.indexOf(it.char);
+      }
+
+      if (letterIndex !== -1 && !rogerCollected[letterIndex]) {
+        rogerCollected[letterIndex] = true;
+      }
+
+      if (rogerCollected.every(val => val === true)) {
+        score += 1000; bonusEffectTimer = 90; 
+        rogerCollected = [false, false, false, false, false];
+        
+        if (completedWordsCount < 5) {
+          completedWordsCount++; 
+          
+          if (isTutoMode && tutoStep === 7) {
+            tutoStep = 8; tutoSubState = 0; tutoTimer = 0; customLetterSpawnIndex = 0;
+            items = []; obstacles = []; platforms = []; spikes = [];
+          } else if (completedWordsCount === 5) { 
+            freezeForSequence = true; 
+            sequenceCurrentLetterIndex = 0; 
+            sequenceAngle = 0; 
+          }
+        }
+      }
+    }
+  });
+  items = items.filter(it => !it.collected && it.x + it.w > -100);
+
+  if (bonusEffectTimer > 0) bonusEffectTimer--;
+  
+  if (!isTutoMode || (tutoStep === 8 && tutoSubState === 3)) {
+    spawnWorldElements();
+  }
+  
+  cat.animTimer++; if (cat.animTimer % 14 === 0) cat.animFrame = (cat.animFrame + 1) % 4;
+}
+
+function drawHomeScreen() {
+  if (introVideo.paused) introVideo.play().catch(() => {});
+  if (introVideo.readyState >= 2) {
+    const vidRatio = introVideo.videoWidth / introVideo.videoHeight; const canvasRatio = canvas.width / canvas.height;
+    let renderW, renderH, offsetX, offsetY;
+    if (canvasRatio > vidRatio) { renderW = canvas.width; renderH = canvas.width / vidRatio; offsetX = 0; offsetY = (canvas.height - renderH) / 2; }
+    else { renderH = canvas.height; renderW = canvas.height * vidRatio; offsetX = (canvas.width - renderW) / 2; offsetY = 0; }
+    ctx.drawImage(introVideo, Math.round(offsetX), Math.round(offsetY), Math.round(renderW), Math.round(renderH));
+  } else { ctx.fillStyle = '#1a1a24'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.textAlign = 'left';
+
+  if (!gameStarted) { drawHomeScreen(); if (gameOver) drawGameOverOverlay(); return; }
+
+  if (assets.bg.complete && assets.bg.naturalWidth > 0) {
+    const availableHeight = GROUND_Y; const bgScale = availableHeight / assets.bg.naturalHeight;
+    const bgScaledWidth = assets.bg.naturalWidth * bgScale; const currentBgX = Math.round(bgX % bgScaledWidth);
+    ctx.drawImage(assets.bg, currentBgX, 0, Math.round(bgScaledWidth), availableHeight);
+    ctx.drawImage(assets.bg, Math.round(currentBgX + bgScaledWidth), 0, Math.round(bgScaledWidth), availableHeight);
+    if (currentBgX + bgScaledWidth < canvas.width) ctx.drawImage(assets.bg, Math.round(currentBgX + (bgScaledWidth * 2)), 0, Math.round(bgScaledWidth), availableHeight);
+  } else { ctx.fillStyle = '#1a1a24'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+
+  ctx.fillStyle = '#000000'; ctx.fillRect(0, GROUND_Y, canvas.width, canvas.height - GROUND_Y);
+
+  platforms.forEach(p => {
+    const img = assets.platforms[p.key]; const px = Math.round(p.x), py = Math.round(p.y), pw = Math.round(p.w), ph = Math.round(p.h);
+    if (img && img.complete && img.naturalWidth > 0) ctx.drawImage(img, px, py, pw, ph);
+    else { ctx.fillStyle = p.key.includes('bleu') ? '#4fc3f7' : p.key.includes('rouge') ? '#e57373' : '#81c784'; ctx.fillRect(px, py, pw, ph); }
+  });
+
+  spikes.forEach(s => {
+    const spikeImg = assets.spikes[s.type];
+    const sx = Math.round(s.x), sy = Math.round(s.y), sw = Math.round(s.w), sh = Math.round(s.h);
+    drawShadow(sx + sw / 2, sy + sh - 2, sw * 0.4, 4, 0.3);
+    if (spikeImg && spikeImg.complete && spikeImg.naturalWidth > 0) {
+      ctx.drawImage(spikeImg, sx, sy, sw, sh);
+    } else {
+      ctx.fillStyle = '#b0bec5'; ctx.fillRect(sx, sy, sw, sh);
+    }
+  });
+
+  let shadowTargetY = ENTITY_GROUND_Y;
+  platforms.forEach(p => { const surfaceY = p.y + 14; if (cat.x + cat.width > p.x && cat.x < p.x + p.w && cat.y + cat.height <= surfaceY + 20) shadowTargetY = surfaceY; });
+  const jumpDistance = Math.max(0, shadowTargetY - (cat.y + cat.height));
+  const catShadowRadius = Math.max(12, 35 - (jumpDistance * 0.12)); const catShadowOpacity = Math.max(0.1, 0.40 - (jumpDistance * 0.002));
+  drawShadow(cat.x + cat.width / 2, shadowTargetY, catShadowRadius, 6, catShadowOpacity);
+
+  obstacles.forEach(o => {
+    const conf = assets.obstaclesConfig[o.configIdx]; let obsShadowY = o.y + o.h - 4; let radiusX = o.w * 0.35; let opacity = 0.35;
+    if (conf.type === 'air') {
+      let targetUnderY = ENTITY_GROUND_Y; platforms.forEach(p => { const surfaceY = p.y + 14; if (o.x + o.w > p.x && o.x < p.x + p.w && o.y + o.h < surfaceY) targetUnderY = surfaceY; });
+      obsShadowY = targetUnderY; const airDistance = targetUnderY - (o.y + o.h); radiusX = Math.max(15, (o.w * 0.35) - (airDistance * 0.05)); opacity = Math.max(0.12, 0.35 - (airDistance * 0.0015));
+    }
+    drawShadow(o.x + o.w / 2, obsShadowY, radiusX, 5, opacity);
+  });
+
+  obstacles.forEach(o => {
+    const conf = assets.obstaclesConfig[o.configIdx]; let imgToDraw = (conf.type === 'anim') ? conf.frames[o.frame] : conf.img;
+    const ox = Math.round(o.x), oy = Math.round(o.y), ow = Math.round(o.w), oh = Math.round(o.h);
+    if (imgToDraw && imgToDraw.complete && imgToDraw.naturalWidth > 0) {
+      if (o.flipX) { ctx.save(); ctx.translate(ox + ow, oy); ctx.scale(-1, 1); ctx.drawImage(imgToDraw, 0, 0, ow, oh); ctx.restore(); }
+      else ctx.drawImage(imgToDraw, ox, oy, ow, oh);
+    } else { ctx.fillStyle = '#ff9800'; ctx.fillRect(ox, oy, ow, oh); }
+  });
+
+  ejectedObstacles.forEach(eo => {
+    ctx.save(); ctx.translate(Math.round(eo.x + eo.w / 2), Math.round(eo.y + eo.h / 2)); ctx.rotate(eo.angle);
+    if (eo.flipX) ctx.scale(-1, 1);
+    if (eo.img && eo.img.complete && eo.img.naturalWidth > 0) ctx.drawImage(eo.img, -eo.w / 2, -eo.h / 2, eo.w, eo.h);
+    else { ctx.fillStyle = '#ff9800'; ctx.fillRect(-eo.w / 2, -eo.h / 2, eo.w, eo.h); }
+    ctx.restore();
+  });
+
+  if (punkBonus) {
+    ctx.save(); punkBonus.trail.forEach(pt => { ctx.fillStyle = pt.color; ctx.shadowColor = pt.color; ctx.shadowBlur = 12; ctx.globalAlpha = Math.max(0, pt.alpha); ctx.beginPath(); ctx.arc(Math.round(pt.x), Math.round(pt.y), Math.round(pt.size), 0, Math.PI * 2); ctx.fill(); }); ctx.restore();
+  }
+
+  if (punkBonus) {
+    ctx.save(); const px = Math.round(punkBonus.x), py = Math.round(punkBonus.y), pw = Math.round(punkBonus.w), ph = Math.round(punkBonus.h);
+    const pulse = 1 + Math.sin(Date.now() / 120) * 0.08; const flashColor = Math.floor(Date.now() / 60) % 2 === 0 ? '#ffffff' : '#ffd54f';
+    ctx.shadowColor = flashColor; ctx.shadowBlur = 35; ctx.translate(px + pw / 2, py + ph / 2); ctx.scale(pulse, pulse); ctx.rotate(punkBonus.angle);
+    if (assets.punkBonus.complete && assets.punkBonus.naturalWidth > 0) ctx.drawImage(assets.punkBonus, -pw / 2, -ph / 2, pw, ph);
+    else { ctx.fillStyle = '#ff00ff'; ctx.beginPath(); ctx.arc(0, 0, ph / 2, 0, Math.PI * 2); ctx.fill(); }
+    ctx.restore();
+  }
+
+  if (superSayen.active && superSayen.state === 'FLY') {
+    ctx.save(); ctx.shadowBlur = 0; ctx.shadowColor = 'transparent'; const displaySize = 270;
+    const catCenterX = Math.round(cat.x + (cat.width / 2)); const catCenterY = Math.round(cat.y + cat.height - (displaySize / 2) + 40);
+    const trailGradient = ctx.createLinearGradient(catCenterX - 350, catCenterY, catCenterX, catCenterY);
+    trailGradient.addColorStop(0, 'rgba(255, 215, 0, 0)'); trailGradient.addColorStop(0.5, 'rgba(255, 223, 0, 0.35)'); trailGradient.addColorStop(1, 'rgba(255, 235, 59, 0.85)');
+    ctx.fillStyle = trailGradient; ctx.beginPath(); ctx.moveTo(catCenterX + 20, catCenterY - 40); ctx.lineTo(catCenterX - 350, catCenterY - 15); ctx.lineTo(catCenterX - 350, catCenterY + 15); ctx.lineTo(catCenterX + 20, catCenterY + 40); ctx.closePath(); ctx.fill();
+    for (let i = 0; i < 12; i++) {
+      const pX = Math.round(catCenterX - 40 - (Math.random() * 280)); const pY = Math.round(catCenterY + (Math.random() * 70 - 35)); const pSize = Math.round(Math.random() * 6 + 2);
+      ctx.fillStyle = Math.random() < 0.5 ? '#ffffff' : '#ffd54f'; ctx.fillRect(pX, pY, pSize, pSize);
+    }
+    ctx.restore();
+  }
+
+  const isBlinking = invulnerableTimer > 0 && Math.floor(invulnerableTimer / 6) % 2 === 0;
+
+  if (!isBlinking && (cat.damageFlashTimer === 0 || Math.floor(cat.damageFlashTimer / 4) % 2 === 0)) {
+    let catSprite;
+    if (superSayen.active) {
+      let displaySize = 310;
+      if (superSayen.state === 'TRANSFORM') { catSprite = assets.cat.transform[superSayen.transformFrame]; if (superSayen.transformFrame >= 3) displaySize = 270; }
+      else if (superSayen.state === 'FLY') { catSprite = assets.cat.fly[superSayen.flyFrame]; displaySize = 270; }
+      else if (superSayen.state === 'LANDING') { catSprite = assets.cat.transform[5]; displaySize = 270; }
+      if (catSprite && catSprite.complete && catSprite.naturalWidth > 0) {
+        ctx.save(); if (superSayen.state === 'FLY') { ctx.shadowColor = '#ffd54f'; ctx.shadowBlur = 20; }
+        const drawX = Math.round(cat.x + (cat.width / 2) - (displaySize / 2)); const drawY = Math.round(cat.y + cat.height - displaySize + 40);
+        ctx.drawImage(catSprite, drawX, drawY, displaySize, displaySize); ctx.restore();
+      }
+    } else {
+      if (cat.state === 'FAIL') catSprite = assets.cat.fail;
+      else if (cat.isCrouching && !cat.isGrounded) catSprite = assets.cat.crouchAir;
+      else if (!cat.isGrounded) catSprite = assets.cat.jump[Math.min(1, cat.animFrame % 3)];
+      else if (cat.isCrouching) catSprite = assets.cat.crouchSequence[cat.crouchFrame % 3];
+      else if (cat.isRun4Pose) catSprite = assets.cat.run4;
+      else catSprite = assets.cat.runSequence[cat.animFrame % 4];
+
+      if (cat.state !== 'FAIL') {
+        let drawWidth = cat.width, drawHeight = cat.height, drawX = cat.x, drawY = cat.y;
+        if (catSprite && catSprite.complete && catSprite.naturalWidth > 0) {
+          const spriteRatio = catSprite.naturalWidth / catSprite.naturalHeight;
+          if (cat.isCrouching) {
+            let crouchScale = 0.85; if (!cat.isGrounded) crouchScale = 0.70;
+            drawWidth = cat.width * 1.3 * crouchScale; drawHeight = drawWidth / spriteRatio; drawY = cat.y + (cat.height - drawHeight);
+          }
+          ctx.save();
+          if (invincibleTimer > 0) {
+            const flashTick = Math.floor(Date.now() / 50) % 3; const flashColor = flashTick === 0 ? '#ffffff' : flashTick === 1 ? '#ffd54f' : '#ffeb3b';
+            ctx.shadowColor = flashColor; ctx.shadowBlur = 40;
+          }
+          ctx.drawImage(catSprite, Math.round(drawX), Math.round(drawY), Math.round(drawWidth), Math.round(drawHeight)); ctx.restore();
+        } else { ctx.fillStyle = '#ab47bc'; ctx.fillRect(Math.round(cat.x), Math.round(cat.y), Math.round(cat.width), Math.round(cat.height)); }
+      }
+    }
+  }
+
+  ctx.save(); ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
+  items.forEach(it => {
+    const letterFrames = assets.letters[it.char]; const img = letterFrames ? letterFrames[it.frame] : null;
+    const ix = Math.round(it.x), iy = Math.round(it.y), iw = Math.round(it.w), ih = Math.round(it.h);
+    if (img && img.complete && img.naturalWidth > 0) ctx.drawImage(img, ix, iy, iw, ih);
+    else { ctx.fillStyle = '#ffd54f'; ctx.beginPath(); ctx.arc(ix + iw/2, iy + ih/2, 28, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#000'; ctx.font = 'bold 28px Courier New'; ctx.fillText(it.char, ix + 20, iy + 45); }
+  });
+  ctx.restore();
+
+  if (freezeForSequence) { ctx.save(); ctx.fillStyle = 'rgba(255, 213, 79, 0.35)'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.restore(); }
+
+  ctx.fillStyle = 'rgba(0,0,0,0.65)'; ctx.fillRect(20, 20, 220, 45);
+  ctx.fillStyle = superSayen.active ? '#ffd54f' : '#fff'; ctx.font = 'bold 22px Courier New'; ctx.fillText(`SCORE: ${score}`, 32, 50);
+
+  const isMobile = isMobileDevice; const hudWidth = isMobile ? 260 : 320; const hudXPos = isMobile ? canvas.width - 370 : canvas.width - 340;
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.65)'; ctx.fillRect(hudXPos, 20, hudWidth, 65);
+  ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1; ctx.strokeRect(hudXPos, 20, hudWidth, 65);
+  ctx.fillStyle = '#ffd54f'; ctx.font = 'bold 13px Courier New';
+  if (isMobile) { ctx.fillText("TAP DROITE : SAUTER", hudXPos + 15, 40); ctx.fillText("TAP GAUCHE : BAISSER", hudXPos + 15, 58); }
+  else { ctx.fillText("ESPACE : SAUTER | BAS : BAISSER", hudXPos + 15, 40); ctx.fillText("ENTRÉE : PAUSE", hudXPos + 15, 58); ctx.fillText("ECHAP  : ACCUEIL", hudXPos + 15, 76); }
+
+  const hudX = canvas.width - 340; const hudY = canvas.height - 85;
+  ctx.fillStyle = '#000000'; ctx.fillRect(hudX - 10, hudY - 10, 335, 80);
+  ctx.strokeStyle = '#ffd54f'; ctx.lineWidth = 2; ctx.strokeRect(hudX - 10, hudY - 10, 335, 80);
+  rogerLetters.forEach((char, idx) => {
+    const slotX = hudX + (idx * 64); const isCollected = rogerCollected[idx]; const hudImg = assets.letters[char] ? assets.letters[char][0] : null;
+    if (hudImg && hudImg.complete && hudImg.naturalWidth > 0) { ctx.globalAlpha = isCollected ? 1.0 : 0.25; ctx.drawImage(hudImg, slotX, hudY, 52, 60); ctx.globalAlpha = 1.0; }
+    else { ctx.fillStyle = isCollected ? '#ffd54f' : '#555'; ctx.font = 'bold 36px Courier New'; ctx.fillText(char, slotX + 14, hudY + 44); }
+  });
+
+  const masterHudX = 20; const masterHudY = canvas.height - 115;
+  rogerLetters.forEach((char, idx) => {
+    const slotX = masterHudX + (idx * 95); const isWordCompleted = idx < completedWordsCount;
+    if (isWordCompleted) {
+      const hudImg = assets.letters[char] ? assets.letters[char][0] : null;
+      const bounceOffset = Math.sin(bounceTimer + idx * 0.6) * 12; const currentY = Math.round(masterHudY + bounceOffset);
+      ctx.save();
+      if (freezeForSequence && idx === sequenceCurrentLetterIndex) {
+        const letterWidth = 90, letterHeight = 105;
+        ctx.translate(slotX + letterWidth / 2, currentY + letterHeight / 2); ctx.scale(Math.cos(sequenceAngle), 1); ctx.translate(-(slotX + letterWidth / 2), -(currentY + letterHeight / 2));
+      }
+      if (hudImg && hudImg.complete && hudImg.naturalWidth > 0) ctx.drawImage(hudImg, slotX, currentY, 90, 105);
+      else { ctx.fillStyle = '#ffd54f'; ctx.font = 'bold 64px Courier New'; ctx.fillText(char, slotX + 15, currentY + 75); }
+      ctx.restore();
+    }
+  });
+
+  if (freezeForSequence) {
+    ctx.save(); ctx.textAlign = 'center'; ctx.font = '900 48px Courier New'; ctx.fillStyle = '#ffd54f'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 4;
+    ctx.shadowColor = '#ffd54f'; ctx.shadowBlur = 20; ctx.strokeText('+ 10 000 POINTS !', canvas.width / 2, 140); ctx.fillText('+ 10 000 POINTS !', canvas.width / 2, 140); ctx.restore();
+  }
+
+  fallingLetters.forEach(fl => {
+    const hudImg = assets.letters[fl.char] ? assets.letters[fl.char][0] : null;
+    ctx.save(); ctx.globalAlpha = Math.max(0, fl.alpha); ctx.translate(Math.round(fl.x + 45), Math.round(fl.y + 50)); ctx.rotate(fl.angle);
+    if (hudImg && hudImg.complete && hudImg.naturalWidth > 0) ctx.drawImage(hudImg, -45, -50, 90, 105);
+    else { ctx.fillStyle = '#ff3333'; ctx.font = 'bold 64px Courier New'; ctx.fillText(fl.char, -30, 25); }
+    ctx.restore();
+  });
+
+  if (bonusEffectTimer > 0) {
+    ctx.save(); const alpha = Math.min(1, bonusEffectTimer / 25); ctx.globalAlpha = alpha; ctx.fillStyle = '#ffd54f'; ctx.textAlign = 'center';
+    ctx.font = 'bold 26px Courier New'; ctx.strokeStyle = '#000000'; ctx.lineWidth = 4; const popupX = hudX + 157; const popupY = Math.round((hudY - 20) - (90 - bonusEffectTimer) * 0.3);
+    ctx.strokeText('+1 000 PTS !', popupX, popupY); ctx.fillText('+1 000 PTS !', popupX, popupY); ctx.restore();
+  }
+
+  if (isTutoMode && tutoInstructionMessage && tutoDialogBox.style.display !== 'block') {
+    ctx.save(); 
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.9)'; 
+    ctx.fillRect(canvas.width / 2 - 440, 60, 880, 80);
+    ctx.strokeStyle = '#ffd54f'; ctx.lineWidth = 3; ctx.strokeRect(canvas.width / 2 - 440, 60, 880, 80);
+    ctx.fillStyle = '#ffd54f'; ctx.font = 'bold 22px Courier New'; ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    const maxLineLength = 48;
+    if (tutoInstructionMessage.length > maxLineLength) {
+      let spaceIdx = tutoInstructionMessage.lastIndexOf(' ', maxLineLength);
+      if (spaceIdx === -1) spaceIdx = maxLineLength;
+      const line1 = tutoInstructionMessage.substring(0, spaceIdx);
+      const line2 = tutoInstructionMessage.substring(spaceIdx + 1);
+      ctx.fillText(line1, canvas.width / 2, 88);
+      ctx.fillText(line2, canvas.width / 2, 115);
+    } else {
+      ctx.fillText(tutoInstructionMessage, canvas.width / 2, 100);
+    }
+    ctx.restore();
+  }
+
+  if (isTutoMode && tutoDialogBox.style.display === 'block') {
+    ctx.save(); ctx.fillStyle = 'rgba(0, 0, 0, 0.88)'; 
+    if (tutoHighlightedZone) {
+      const z = tutoHighlightedZone;
+      ctx.fillRect(0, 0, canvas.width, z.y);
+      ctx.fillRect(0, z.y, z.x, z.h);
+      ctx.fillRect(z.x + z.w, z.y, canvas.width - (z.x + z.w), z.h);
+      ctx.fillRect(0, z.y + z.h, canvas.width, canvas.height - (z.y + z.h));
+      ctx.strokeStyle = '#ffd54f'; ctx.lineWidth = 3; ctx.strokeRect(z.x, z.y, z.w, z.h);
+    } else {
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    ctx.restore();
+  }
+
+  if (isPaused) {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.75)'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.textAlign = 'center';
+    ctx.fillStyle = '#ffd54f'; ctx.font = '900 48px Courier New'; ctx.fillText("PARTIE EN PAUSE", canvas.width / 2, canvas.height / 2 - 20);
+    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 20px Courier New';
+    if (isMobileDevice) ctx.fillText("Appuyer de nouveau sur l'écran pour reprendre", canvas.width / 2, canvas.height / 2 + 40);
+    else ctx.fillText("Appuyer sur Entrée pour reprendre la partie", canvas.width / 2, canvas.height / 2 + 40);
+    ctx.textAlign = 'left';
+  }
+
+  if (gameOver) drawGameOverOverlay();
+}
+
+function drawGameOverOverlay() {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.85)'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.textAlign = 'center';
+  ctx.fillStyle = '#ff3333'; ctx.font = '900 64px Courier New'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 4;
+  ctx.strokeText("AÏE !", canvas.width / 2, 100); ctx.fillText("AÏE !", canvas.width / 2, 100);
+  ctx.fillStyle = '#ffd54f'; ctx.font = 'bold 28px Courier New'; ctx.fillText(`SCORE FINAL: ${score}`, canvas.width / 2, 150);
+  const failImg = assets.cat.fail;
+  if (failImg && failImg.complete && failImg.naturalWidth > 0) {
+    const targetHeight = 150; const aspectRatio = failImg.naturalWidth / failImg.naturalHeight; const targetWidth = targetHeight * aspectRatio;
+    ctx.drawImage(failImg, Math.round(canvas.width / 2 - (targetWidth / 2)), 180, Math.round(targetWidth), targetHeight);
+  }
+  ctx.textAlign = 'left';
+}
+
+let lastFrameTime = performance.now();
+function gameLoop(currentTime) {
+  requestAnimationFrame(gameLoop); const deltaTime = currentTime - lastFrameTime;
+  if (deltaTime < 10) return;
+  lastFrameTime = currentTime; update(); draw();
+}
+
+spawnWorldElements(); requestAnimationFrame(gameLoop);
 </script>
 </body>
 </html>
