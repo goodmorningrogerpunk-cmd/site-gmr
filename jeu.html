@@ -1017,15 +1017,16 @@ function spawnWorldElements() {
       }
       const spikeX = canvas.width + 100;
       
-      // Fixation précise : le bas du sprite des pics est calé tout en bas de l'écran (GROUND_Y)
-      const spikeY = GROUND_Y - spikeH + 15; 
+      // Pics descendus de 30px supplémentaires (passage de +15 à +45)
+      const spikeY = GROUND_Y - spikeH + 45; 
       
       if (!isPositionNearObstacle(spikeX, spikeW, 200)) {
         spikes.push({ x: spikeX, y: spikeY, w: spikeW, h: spikeH, type: chosenType });
         lastObstacleX = spikeX + spikeW;
       }
     } else {
-      const freeIndices = [0, 1, 2, 5, 6, 7]; const configIdx = freeIndices[Math.floor(Math.random() * freeIndices.length)];
+      // Intégration explicite de l'obstacle 2 (obstacle3) et l'obstacle 7 (obstacle6) parmi les airs/sol
+      const freeIndices = [0, 1, 2, 5, 6, 2, 7]; const configIdx = freeIndices[Math.floor(Math.random() * freeIndices.length)];
       const conf = assets.obstaclesConfig[configIdx]; const dim = getObstacleDimensions(conf);
       const obsX = canvas.width + 100 + Math.random() * 150;
       if (!isPositionNearLetter(obsX, dim.w, 180)) {
