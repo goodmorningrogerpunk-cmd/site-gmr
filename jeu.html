@@ -299,7 +299,7 @@ let tutoSubState = 0;
 let tutoObstacleCount = 0;
 let tutoNextCallback = null;
 let customLetterSpawnIndex = 0;
-let lastSpawnedConfigIdx = -1; // Règle anti-doublon d'obstacles
+let lastSpawnedConfigIdx = -1; 
 
 function updateMenuSelection() {
   startMainBtn.classList.remove('nav-selected');
@@ -991,7 +991,6 @@ function spawnWorldElements() {
       const platIndices = [0, 1, 3, 4]; 
       let configIdx = platIndices[Math.floor(Math.random() * platIndices.length)];
       
-      // Règle anti-doublon d'obstacles consécutifs
       if (configIdx === lastSpawnedConfigIdx) {
         const filteredPlatIndices = platIndices.filter(idx => idx !== lastSpawnedConfigIdx);
         if (filteredPlatIndices.length > 0) {
@@ -1012,11 +1011,10 @@ function spawnWorldElements() {
 
   const minSpacing = 180 + Math.random() * 120; const freeSpawnChance = 0.50 + Math.random() * 0.40;
   if ((canvas.width + 100 - lastObstacleX) > minSpacing && Math.random() < freeSpawnChance) {
-    // Tous les indices d'obstacles (sol, airs [2 et 7], pics [8,9,10])
+    // Tous les indices d'obstacles (sol, air 3 [2], air 6 [7], pics [8,9,10])
     const freeIndices = [0, 1, 2, 5, 6, 7, 8, 9, 10]; 
     let configIdx = freeIndices[Math.floor(Math.random() * freeIndices.length)];
     
-    // Règle anti-doublon d'obstacles consécutifs
     if (configIdx === lastSpawnedConfigIdx) {
       const filteredFreeIndices = freeIndices.filter(idx => idx !== lastSpawnedConfigIdx);
       if (filteredFreeIndices.length > 0) {
@@ -1560,10 +1558,24 @@ function update() {
     if (o.type === 'air' && o.configIdx !== 7) { o.floatPhase += 0.05; const amp = 12; o.y = o.baseY + Math.sin(o.floatPhase) * amp; }
     else { o.animTimer++; if (o.animTimer % 10 === 0) o.frame = (o.frame + 1) % 3; }
 
-    let obsBoxX = o.x + 8; 
-    let obsBoxWidth = Math.max(10, o.w - 16); 
-    let obsBoxY = o.type === 'air' ? o.y + 4 : (o.type === 'spike' ? o.y + 15 : o.y + 8); 
-    let obsBoxHeight = o.type === 'air' ? Math.max(10, o.h - 8) : (o.type === 'spike' ? Math.max(10, o.h - 15) : Math.max(10, o.h - 16));
+    // Hitbox affinée et réduite pour les pics (type === 'spike')
+    let obsBoxX, obsBoxWidth, obsBoxY, obsBoxHeight;
+    if (o.type === 'spike') {
+      obsBoxX = o.x + 35;
+      obsBoxWidth = Math.max(10, o.w - 70);
+      obsBoxY = o.y + 40;
+      obsBoxHeight = Math.max(10, o.h - 45);
+    } else if (o.type === 'air') {
+      obsBoxX = o.x + 8;
+      obsBoxWidth = Math.max(10, o.w - 16);
+      obsBoxY = o.y + 4;
+      obsBoxHeight = Math.max(10, o.h - 8);
+    } else {
+      obsBoxX = o.x + 8;
+      obsBoxWidth = Math.max(10, o.w - 16);
+      obsBoxY = o.y + 8;
+      obsBoxHeight = Math.max(10, o.h - 16);
+    }
 
     const isHit = (catBoxX < obsBoxX + obsBoxWidth && catBoxX + catBoxWidth > obsBoxX && catBoxY < obsBoxY + obsBoxHeight && catBoxY + catBoxHeight > obsBoxY);
 
