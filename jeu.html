@@ -1016,7 +1016,10 @@ function spawnWorldElements() {
         spikeH = 130; spikeW = spikeH * ratio;
       }
       const spikeX = canvas.width + 100;
-      const spikeY = ENTITY_GROUND_Y; 
+      
+      // Fixation précise : le bas du sprite des pics est calé tout en bas de l'écran (GROUND_Y)
+      const spikeY = GROUND_Y - spikeH + 15; 
+      
       if (!isPositionNearObstacle(spikeX, spikeW, 200)) {
         spikes.push({ x: spikeX, y: spikeY, w: spikeW, h: spikeH, type: chosenType });
         lastObstacleX = spikeX + spikeW;
