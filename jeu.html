@@ -525,7 +525,6 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
-// Mise en pause automatique si l'utilisateur quitte l'onglet (Optimisation batterie)
 document.addEventListener("visibilitychange", () => {
   if (document.hidden && gameStarted && !isPaused && !gameOver) {
     togglePause();
@@ -576,7 +575,6 @@ const assets = {
   punkBonus: loadSmartImage('punkbonus')
 };
 
-// --- SYSTÈME DE PRÉCHARGEMENT GLOBAL ---
 function preloadAllAssets(onComplete) {
   const allImages = [];
   
@@ -1782,7 +1780,12 @@ function drawHomeScreen() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.textAlign = 'left';
 
-  if (!gameStarted) { drawHomeScreen(); if (gameOver) drawGameOverOverlay(); return; }
+  // Si on est sur l'écran d'accueil, on dessine la vidéo du menu et on s'arrête là !
+  if (!gameStarted) { 
+    drawHomeScreen(); 
+    if (gameOver) drawGameOverOverlay(); 
+    return; 
+  }
 
   if (assets.bg.complete && assets.bg.naturalWidth > 0) {
     const availableHeight = GROUND_Y; const bgScale = availableHeight / assets.bg.naturalHeight;
@@ -2034,7 +2037,6 @@ function gameLoop(currentTime) {
   if (deltaTime < 10) return;
   lastFrameTime = currentTime; 
 
-  // Optimisation du rendu Canvas : on ne met à jour/redessine que si nécessaire
   if (gameStarted && !isPaused) {
     update();
   }
