@@ -1467,6 +1467,12 @@ function resetGame() {
   invincibleTimer = 0; debonusPlayed = false; debonusEndPlayed = false; punkBonusTimer = 0; punkBonus = null; ejectedObstacles = [];
   lastSpawnedConfigIdx = -1;
 
+  // Masquage explicite des éléments du menu principal lors du lancement du jeu
+  startMainBtn.style.display = 'none';
+  tutoMainBtn.style.display = 'none';
+  rightStack.style.display = 'none';
+  versionDisplay.style.display = 'none';
+
   marioInvMusic.pause(); cat.y = ENTITY_GROUND_Y - cat.height; cat.vy = 0; cat.isGrounded = true; cat.wasGrounded = true;
   cat.isPlatformGrounded = false; cat.isRun4Pose = false; cat.isJumping = false; cat.jumpTimer = 0; cat.crouchFrame = 0; cat.crouchTimer = 0; cat.state = 'RUN';
   platforms = []; obstacles = []; items = []; rogerCollected = [false, false, false, false, false];
@@ -1780,7 +1786,6 @@ function drawHomeScreen() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.textAlign = 'left';
 
-  // Si on est sur l'écran d'accueil, on dessine la vidéo du menu et on s'arrête là !
   if (!gameStarted) { 
     drawHomeScreen(); 
     if (gameOver) drawGameOverOverlay(); 
