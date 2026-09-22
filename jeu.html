@@ -19,7 +19,7 @@
 
     canvas { 
       width: 100%; height: 100%; object-fit: contain; display: block; image-rendering: pixelated; 
-      transform: translateZ(0); -webkit-transform: translateZ(0);
+      transform: translateZ(0); -webkit-transform: translateZ(0); will-change: transform;
     }
 
     .pixel-btn { font-family: 'Courier New', Courier, monospace; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.1s ease; z-index: 25; }
@@ -104,7 +104,7 @@
 
 <div id="game-container">
   <div id="loading-screen">
-    <div id="loading-title">CHARGEMENT DE GOOD MORNING ROGER SK8TIN' CAT...</div>
+    <div id="loading-title">CHARGEMENT DE GOOD MORNING ROGER SK8IN' CAT...</div>
     <div id="loading-bar-container">
       <div id="loading-bar-fill"></div>
     </div>
@@ -525,6 +525,13 @@ function returnToHome() {
   stopAllSounds(); playIntroMusic(); menuFocusArea = 'START'; mainButtonIdx = 1; rightSideIdx = 0; updateMenuSelection();
 }
 
+// Mise en pause automatique si l'utilisateur quitte l'onglet (Optimisation batterie)
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && gameStarted && !isPaused && !gameOver) {
+    togglePause();
+  }
+});
+
 const ASSET_VERSION = 'v1.0'; 
 function loadSmartImage(baseName) {
   const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
@@ -585,7 +592,7 @@ function preloadAllAssets(onComplete) {
   collectImages(assets);
 
   const allAudio = [introMusic, bgMusic, konamiMusic, marioInvMusic, superSayanTheme, ...Object.values(sounds)];
-  const totalAssets = allImages.length + allAudio.length + 1; // +1 pour la vidéo
+  const totalAssets = allImages.length + allAudio.length + 1; 
   let loadedCount = 0;
 
   const updateProgress = () => {
@@ -611,7 +618,6 @@ function preloadAllAssets(onComplete) {
     aud.oncanplaythrough = updateProgress;
     aud.onerror = updateProgress;
     aud.load();
-    // Sécurité au cas où le chargement audio prendrait du temps ou échouerait silencieusement
     setTimeout(updateProgress, 1500);
   });
 
@@ -2023,15 +2029,20 @@ function drawGameOverOverlay() {
 
 let lastFrameTime = performance.now();
 function gameLoop(currentTime) {
-  requestAnimationFrame(gameLoop); const deltaTime = currentTime - lastFrameTime;
+  requestAnimationFrame(gameLoop); 
+  const deltaTime = currentTime - lastFrameTime;
   if (deltaTime < 10) return;
-  lastFrameTime = currentTime; update(); draw();
+  lastFrameTime = currentTime; 
+
+  // Optimisation du rendu Canvas : on ne met à jour/redessine que si nécessaire
+  if (gameStarted && !isPaused) {
+    update();
+  }
+  draw();
 }
 
-// Lancement du préchargement global au démarrage de la page
 window.addEventListener('load', () => {
   preloadAllAssets(() => {
-    // Disparition de l'écran de chargement
     const loadingScreen = document.getElementById('loading-screen');
     loadingScreen.style.opacity = '0';
     loadingScreen.style.transition = 'opacity 0.4s ease';
@@ -2049,7 +2060,7 @@ window.addEventListener('load', () => {
   });
 });
 
-spawnWorldElements(); requestAnimationFrame(gameLoop);
+requestAnimationFrame(gameLoop);
 </script>
 </body>
 </html>
