@@ -163,11 +163,6 @@ nav a:hover {
     border: 2px solid #2e2e40;
     border-radius: 8px;
     padding: 20px;
-    transition: border-color 0.3s ease;
-}
-
-.rank-card:hover {
-    border-color: #ffd54f;
 }
 
 .rank-card.top1 {
@@ -199,6 +194,23 @@ nav a:hover {
     border-radius: 4px;
 }
 
+.btn-view-ranks {
+    background: #12C3FF;
+    color: #000;
+    font-weight: bold;
+    font-size: 0.85rem;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-view-ranks:hover {
+    background: #ffd54f;
+    transform: scale(1.05);
+}
+
 .prize-list {
     list-style-type: none;
     padding: 0;
@@ -217,6 +229,76 @@ nav a:hover {
 .prize-list li::before {
     content: "🎁";
     font-size: 0.8rem;
+}
+
+/* FENÊTRE MODALE RANG 6-10 */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-card {
+    background: #111118;
+    border: 3px solid #12C3FF;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 450px;
+    padding: 25px;
+    box-shadow: 0 0 30px rgba(18, 195, 255, 0.4);
+    text-align: center;
+}
+
+.modal-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 2.2rem;
+    color: #ffd54f;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+}
+
+.modal-players-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+    text-align: left;
+}
+
+.modal-players-list li {
+    font-size: 1.05rem;
+    color: #fff;
+    padding: 10px;
+    border-bottom: 1px solid #2e2e40;
+    display: flex;
+    justify-content: space-between;
+}
+
+.modal-players-list li span.score {
+    color: #ffd54f;
+    font-weight: bold;
+}
+
+.btn-close-modal {
+    background: #ffd54f;
+    color: #1a1a24;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.3rem;
+    padding: 8px 24px;
+    border: 2px solid #ffffff;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.btn-close-modal:hover {
+    background: #ffffff;
 }
 
 @media (max-width: 800px) {
@@ -346,7 +428,7 @@ nav a:hover {
                 <div class="rank-card">
                     <div class="rank-header">
                         <span class="rank-name">🎗️ RANG 6 À 10</span>
-                        <span class="player-name" id="player-rank-6-10">Chargement...</span>
+                        <button class="btn-view-ranks" id="btn-open-ranks" onclick="openModal()">Voir les 5 joueurs qualifiés</button>
                     </div>
                     <ul class="prize-list">
                         <li>1 CD Club Roger</li>
@@ -358,6 +440,17 @@ nav a:hover {
         </div>
     </div>
 
+    <!-- MODALE CLASSEMENT RANGS 6 À 10 -->
+    <div class="modal-overlay" id="ranksModal">
+        <div class="modal-card">
+            <div class="modal-title">🎗️ RANGS 6 À 10 QUALIFIÉS</div>
+            <ul class="modal-players-list" id="modal-players-container">
+                <li>Chargement des joueurs...</li>
+            </ul>
+            <button class="btn-close-modal" onclick="closeModal()">FERMER</button>
+        </div>
+    </div>
+
     <footer style="padding: 40px 0; text-align: center;">
         <p style="font-size: 0.7rem; color: #444; text-transform: uppercase; letter-spacing: 2px;">
             © 2026 Good Morning Roger - Clisson, France | 
@@ -366,8 +459,8 @@ nav a:hover {
     </footer>
 
     <script>
-        // URL du CSV Google Sheet (issue du code de ton jeu)
         const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRyBiQW025rQchIQ03joD00dFjwIyepgCgZFBYT57hpzNDX_fMfuKa9yzCoHqFTVUwpE1cvz4pLGCAD/pub?output=csv';
+        let ranks6To10Data = [];
 
         function parseCSVLine(line) {
             const result = []; let cur = ''; let inQuotes = false;
@@ -394,9 +487,8 @@ nav a:hover {
                     const lines = csvText.split(/\r?\n/).filter(line => line.trim().length > 0);
                     if (lines.length <= 1) {
                         for (let i = 1; i <= 5; i++) {
-                            document.getElementById(`player-rank-${i}`).textContent = "Acheter un lot / Vacant";
+                            document.getElementById(`player-rank-${i}`).textContent = "Rang libre";
                         }
-                        document.getElementById('player-rank-6-10').textContent = "Vacant";
                         return;
                     }
 
@@ -418,7 +510,7 @@ nav a:hover {
 
                     entries.sort((a, b) => b.score - a.score);
 
-                    // Mise à jour des rangs 1 à 5
+                    // Rangs 1 à 5
                     for (let i = 1; i <= 5; i++) {
                         const player = entries[i - 1];
                         const el = document.getElementById(`player-rank-${i}`);
@@ -429,13 +521,13 @@ nav a:hover {
                         }
                     }
 
-                    // Mise à jour du rang 6 à 10
-                    const ranks6to10 = entries.slice(5, 10);
-                    const elGroup = document.getElementById('player-rank-6-10');
-                    if (ranks6to10.length > 0) {
-                        elGroup.textContent = `${ranks6to10.length} joueur(s) qualifié(s)`;
+                    // Rangs 6 à 10
+                    ranks6To10Data = entries.slice(5, 10);
+                    const btnRanks = document.getElementById('btn-open-ranks');
+                    if (ranks6To10Data.length > 0) {
+                        btnRanks.textContent = `Voir les ${ranks6To10Data.length} joueur(s) qualifié(s)`;
                     } else {
-                        elGroup.textContent = "Rangs libres";
+                        btnRanks.textContent = "Aucun qualifié pour le moment";
                     }
                 })
                 .catch(err => {
@@ -443,9 +535,38 @@ nav a:hover {
                     for (let i = 1; i <= 5; i++) {
                         document.getElementById(`player-rank-${i}`).textContent = "—";
                     }
-                    document.getElementById('player-rank-6-10').textContent = "—";
                 });
         }
+
+        function openModal() {
+            const container = document.getElementById('modal-players-container');
+            container.innerHTML = '';
+
+            if (ranks6To10Data.length === 0) {
+                container.innerHTML = '<li>Aucun joueur classé du rang 6 au rang 10 pour le moment.</li>';
+            } else {
+                ranks6To10Data.forEach((player, idx) => {
+                    const rankNum = idx + 6;
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span>#${rankNum} <b>${player.pseudo}</b></span> <span class="score">${player.score} pts</span>`;
+                    container.appendChild(li);
+                });
+            }
+
+            document.getElementById('ranksModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('ranksModal').style.display = 'none';
+        }
+
+        // Fermer la modale si clic à l'extérieur de la carte
+        window.onclick = function(event) {
+            const modal = document.getElementById('ranksModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
 
         window.addEventListener('DOMContentLoaded', loadRankings);
     </script>
