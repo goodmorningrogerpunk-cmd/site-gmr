@@ -1016,7 +1016,7 @@ function spawnWorldElements() {
         spikeH = 130; spikeW = spikeH * ratio;
       }
       const spikeX = canvas.width + 100;
-      const spikeY = GROUND_Y - spikeH; 
+      const spikeY = ENTITY_GROUND_Y; 
       if (!isPositionNearObstacle(spikeX, spikeW, 200)) {
         spikes.push({ x: spikeX, y: spikeY, w: spikeW, h: spikeH, type: chosenType });
         lastObstacleX = spikeX + spikeW;
