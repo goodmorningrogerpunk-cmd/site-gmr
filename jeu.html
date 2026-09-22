@@ -299,6 +299,7 @@ let tutoSubState = 0;
 let tutoObstacleCount = 0;
 let tutoNextCallback = null;
 let customLetterSpawnIndex = 0;
+let lastSpawnedConfigIdx = -1; // Règle anti-doublon d'obstacles
 
 function updateMenuSelection() {
   startMainBtn.classList.remove('nav-selected');
@@ -537,7 +538,6 @@ const assets = {
     { type: 'ground', img: loadSmartImage('obstacle4'), targetH: 75 },
     { type: 'ground', img: loadSmartImage('obstacle5'), targetH: 80 },
     { type: 'air', img: loadSmartImage('obstacle6'), targetH: 85 },
-    // Types de pics intégrés directement comme obstacles au sol
     { type: 'spike', img: loadSmartImage('pic-court'), targetH: 130 },
     { type: 'spike', img: loadSmartImage('pic-moyen'), targetH: 130 },
     { type: 'spike', img: loadSmartImage('pic-long'), targetH: 130 }
@@ -988,7 +988,18 @@ function spawnWorldElements() {
 
     const platObstacleChance = 0.40 + Math.random() * 0.35;
     if (type !== 'short' && Math.random() < platObstacleChance && (x - lastObstacleX) > (160 + Math.random() * 80)) {
-      const platIndices = [0, 1, 3, 4]; const configIdx = platIndices[Math.floor(Math.random() * platIndices.length)];
+      const platIndices = [0, 1, 3, 4]; 
+      let configIdx = platIndices[Math.floor(Math.random() * platIndices.length)];
+      
+      // Règle anti-doublon d'obstacles consécutifs
+      if (configIdx === lastSpawnedConfigIdx) {
+        const filteredPlatIndices = platIndices.filter(idx => idx !== lastSpawnedConfigIdx);
+        if (filteredPlatIndices.length > 0) {
+          configIdx = filteredPlatIndices[Math.floor(Math.random() * filteredPlatIndices.length)];
+        }
+      }
+      lastSpawnedConfigIdx = configIdx;
+
       const conf = assets.obstaclesConfig[configIdx]; const dim = getObstacleDimensions(conf);
       const obsX = x + (w / 2) - (dim.w / 2);
       if (!isPositionNearLetter(obsX, dim.w, 180)) {
@@ -1001,9 +1012,19 @@ function spawnWorldElements() {
 
   const minSpacing = 180 + Math.random() * 120; const freeSpawnChance = 0.50 + Math.random() * 0.40;
   if ((canvas.width + 100 - lastObstacleX) > minSpacing && Math.random() < freeSpawnChance) {
-    // Tous les obstacles (sol, airs, obstacle 6 et pics confondus) se partagent le lot aléatoire
+    // Tous les indices d'obstacles (sol, airs [2 et 7], pics [8,9,10])
     const freeIndices = [0, 1, 2, 5, 6, 7, 8, 9, 10]; 
-    const configIdx = freeIndices[Math.floor(Math.random() * freeIndices.length)];
+    let configIdx = freeIndices[Math.floor(Math.random() * freeIndices.length)];
+    
+    // Règle anti-doublon d'obstacles consécutifs
+    if (configIdx === lastSpawnedConfigIdx) {
+      const filteredFreeIndices = freeIndices.filter(idx => idx !== lastSpawnedConfigIdx);
+      if (filteredFreeIndices.length > 0) {
+        configIdx = filteredFreeIndices[Math.floor(Math.random() * filteredFreeIndices.length)];
+      }
+    }
+    lastSpawnedConfigIdx = configIdx;
+
     const conf = assets.obstaclesConfig[configIdx]; 
     const dim = getObstacleDimensions(conf);
     const obsX = canvas.width + 100 + Math.random() * 150;
@@ -1371,6 +1392,7 @@ function resetGame() {
   superSayen.active = false; superSayen.state = 'NONE'; freezeForSequence = false; sequenceCurrentLetterIndex = 0; sequenceAngle = 0;
   baseSpeedMultiplier = 1.0; currentGameSpeed = BASE_GAME_SPEED; jumpKeyReleased = true; lastSpecialSoundIsWilhem = false;
   invincibleTimer = 0; debonusPlayed = false; debonusEndPlayed = false; punkBonusTimer = 0; punkBonus = null; ejectedObstacles = [];
+  lastSpawnedConfigIdx = -1;
 
   marioInvMusic.pause(); cat.y = ENTITY_GROUND_Y - cat.height; cat.vy = 0; cat.isGrounded = true; cat.wasGrounded = true;
   cat.isPlatformGrounded = false; cat.isRun4Pose = false; cat.isJumping = false; cat.jumpTimer = 0; cat.crouchFrame = 0; cat.crouchTimer = 0; cat.state = 'RUN';
