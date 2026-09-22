@@ -25,14 +25,29 @@
     .pixel-btn { font-family: 'Courier New', Courier, monospace; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.1s ease; z-index: 25; }
     .pixel-btn.nav-selected, input.nav-selected { background-color: #ffffff !important; border-color: #ff3333 !important; color: #1a1a24 !important; transform: scale(1.04); box-shadow: 0 0 15px #ffd54f !important; }
 
-    #desktop-fullscreen-btn { position: absolute; top: 15px; left: 15px; padding: 8px 14px; font-size: 12px; color: #ffd54f; background-color: rgba(26, 26, 36, 0.85); border: 2px solid #ffd54f; box-shadow: 0 4px 0px #000; z-index: 30; display: none; }
+    #desktop-fullscreen-btn { position: absolute; top: 15px; left: 15px; padding: 8px 14px; font-size: 12px; color: #ffd54f; background-color: rgba(26, 26, 36, 0.85); border: 2px solid #ffd54f; box-shadow: 0 4px 0px #000; z-index: 30; }
 
-    #start-main-btn { position: absolute; top: 72%; left: 5%; transform: translateY(-50%); padding: 16px 28px; font-size: 20px; color: #1a1a24; background-color: #ffd54f; border: 4px solid #ffffff; box-shadow: 0 6px 0px #b29320; display: none; }
-    #tuto-main-btn { position: absolute; top: 57%; left: 5%; transform: translateY(-50%); padding: 12px 24px; font-size: 18px; color: #ffffff; background-color: #2e2e40; border: 3px solid #ffd54f; box-shadow: 0 4px 0px #000; display: none; }
+    #start-main-btn { position: absolute; top: 72%; left: 5%; transform: translateY(-50%); padding: 16px 28px; font-size: 20px; color: #1a1a24; background-color: #ffd54f; border: 4px solid #ffffff; box-shadow: 0 6px 0px #b29320; }
+    #tuto-main-btn { position: absolute; top: 57%; left: 5%; transform: translateY(-50%); padding: 12px 24px; font-size: 18px; color: #ffffff; background-color: #2e2e40; border: 3px solid #ffd54f; box-shadow: 0 4px 0px #000; }
 
-    .right-buttons-stack { position: absolute; top: 68%; right: 5%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 25; display: none; }
+    .right-buttons-stack { position: absolute; top: 68%; right: 5%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 25; }
     .secondary-btn { padding: 8px 16px; font-size: 13px; color: #ffd54f; background-color: #1a1a24; border: 3px solid #ffd54f; box-shadow: 0 4px 0px #000; text-align: center; }
     .quit-btn { color: #ff5252; border-color: #ff5252; }
+
+    #version-display {
+      position: absolute; bottom: 12px; right: 15px; font-size: 13px; font-weight: bold;
+      color: #ffd54f; background: rgba(0, 0, 0, 0.75); padding: 4px 8px; border: 1px solid #ffd54f;
+      border-radius: 4px; pointer-events: none; z-index: 30;
+    }
+
+    /* RÈGLE MAGIQUE : Dès que le conteneur a la classe .in-game, TOUT le menu disparaît instantanément d'office */
+    #game-container.in-game #desktop-fullscreen-btn,
+    #game-container.in-game #start-main-btn,
+    #game-container.in-game #tuto-main-btn,
+    #game-container.in-game #right-stack,
+    #game-container.in-game #version-display {
+      display: none !important;
+    }
 
     #loading-screen {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -75,12 +90,6 @@
     #score-prompt-box, #save-score-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111118; border: 4px solid #ffd54f; border-radius: 8px; padding: 20px; z-index: 60000; text-align: center; }
     #mobile-hud-controls { display: none; position: absolute; top: 15px; right: 15px; gap: 8px; z-index: 40; }
     .hud-touch-btn { width: 42px; height: 42px; background: rgba(0, 0, 0, 0.7); border: 2px solid #ffd54f; color: #ffd54f; font-weight: bold; font-size: 18px; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
-
-    #version-display {
-      position: absolute; bottom: 12px; right: 15px; font-size: 13px; font-weight: bold;
-      color: #ffd54f; background: rgba(0, 0, 0, 0.75); padding: 4px 8px; border: 1px solid #ffd54f;
-      border-radius: 4px; pointer-events: none; z-index: 30; display: none;
-    }
 
     #rotate-device-overlay {
       display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -514,9 +523,11 @@ function returnToHome() {
   tutoHighlightedZone = null; tutoInstructionMessage = ""; tutoDialogBox.style.display = 'none';
   superSayen.active = false; invincibleTimer = 0;
   debonusPlayed = false; debonusEndPlayed = false; punkBonus = null; ejectedObstacles = [];
-  startMainBtn.style.display = 'block'; tutoMainBtn.style.display = 'block';
-  if (!isMobileDevice) desktopFullscreenBtn.style.display = 'block';
-  rightStack.style.display = 'flex'; versionDisplay.style.display = 'block'; mobileHudControls.style.display = 'none'; gameOverStack.style.display = 'none';
+  
+  // On retire la classe .in-game du conteneur pour réafficher les boutons du menu principal
+  gameContainer.classList.remove('in-game');
+
+  mobileHudControls.style.display = 'none'; gameOverStack.style.display = 'none';
   scorePromptBox.style.display = 'none'; saveScoreModal.style.display = 'none'; konamiModal.style.display = 'none';
   
   if (isMobileDevice) gameContainer.classList.add('mobile-fullscreen');
@@ -1376,15 +1387,13 @@ function fetchLeaderboard() {
 
 startMainBtn.addEventListener('click', () => {
   requestGameFullscreen(); if (introVideo) { introVideo.pause(); introVideo.currentTime = 0; }
-  startMainBtn.style.display = 'none'; tutoMainBtn.style.display = 'none'; desktopFullscreenBtn.style.display = 'none';
-  rightStack.style.display = 'none'; versionDisplay.style.display = 'none'; if (isMobileDevice) mobileHudControls.style.display = 'flex';
+  if (isMobileDevice) mobileHudControls.style.display = 'flex';
   startBgMusic(); resetGame();
 });
 
 tutoMainBtn.addEventListener('click', () => {
   requestGameFullscreen(); if (introVideo) { introVideo.pause(); introVideo.currentTime = 0; }
-  startMainBtn.style.display = 'none'; tutoMainBtn.style.display = 'none'; desktopFullscreenBtn.style.display = 'none';
-  rightStack.style.display = 'none'; versionDisplay.style.display = 'none'; if (isMobileDevice) mobileHudControls.style.display = 'flex';
+  if (isMobileDevice) mobileHudControls.style.display = 'flex';
   startBgMusic(); startTutorial();
 });
 
@@ -1403,11 +1412,6 @@ konamiYesBtn.addEventListener('click', () => {
   
   requestGameFullscreen(); 
   if (introVideo) { introVideo.pause(); introVideo.currentTime = 0; }
-  startMainBtn.style.display = 'none'; 
-  tutoMainBtn.style.display = 'none'; 
-  desktopFullscreenBtn.style.display = 'none';
-  rightStack.style.display = 'none'; 
-  versionDisplay.style.display = 'none'; 
   if (isMobileDevice) mobileHudControls.style.display = 'flex';
   
   startBgMusic(); 
@@ -1467,16 +1471,13 @@ function resetGame() {
   invincibleTimer = 0; debonusPlayed = false; debonusEndPlayed = false; punkBonusTimer = 0; punkBonus = null; ejectedObstacles = [];
   lastSpawnedConfigIdx = -1;
 
-  // Masquage explicite des éléments du menu principal lors du lancement du jeu
-  startMainBtn.style.display = 'none';
-  tutoMainBtn.style.display = 'none';
-  rightStack.style.display = 'none';
-  versionDisplay.style.display = 'none';
+  // AJOUT DE LA CLASSE .in-game : Cache instantanément tout le menu principal par CSS pur
+  gameContainer.classList.add('in-game');
 
   marioInvMusic.pause(); cat.y = ENTITY_GROUND_Y - cat.height; cat.vy = 0; cat.isGrounded = true; cat.wasGrounded = true;
   cat.isPlatformGrounded = false; cat.isRun4Pose = false; cat.isJumping = false; cat.jumpTimer = 0; cat.crouchFrame = 0; cat.crouchTimer = 0; cat.state = 'RUN';
   platforms = []; obstacles = []; items = []; rogerCollected = [false, false, false, false, false];
-  desktopFullscreenBtn.style.display = 'none'; gameOverStack.style.display = 'none'; scorePromptBox.style.display = 'none'; saveScoreModal.style.display = 'none'; konamiModal.style.display = 'none';
+  gameOverStack.style.display = 'none'; scorePromptBox.style.display = 'none'; saveScoreModal.style.display = 'none'; konamiModal.style.display = 'none';
 }
 
 function update() {
