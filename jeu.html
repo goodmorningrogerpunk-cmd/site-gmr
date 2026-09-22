@@ -1010,13 +1010,13 @@ function spawnWorldElements() {
       const spikeTypes = ['court', 'moyen', 'long'];
       const chosenType = spikeTypes[Math.floor(Math.random() * spikeTypes.length)];
       const spikeImg = assets.spikes[chosenType];
-      let spikeW = 100, spikeH = 50;
+      let spikeW = 200, spikeH = 130; 
       if (spikeImg && spikeImg.complete && spikeImg.naturalWidth > 0 && spikeImg.naturalHeight > 0) {
         const ratio = spikeImg.naturalWidth / spikeImg.naturalHeight;
-        spikeH = 55; spikeW = spikeH * ratio;
+        spikeH = 130; spikeW = spikeH * ratio;
       }
       const spikeX = canvas.width + 100;
-      const spikeY = ENTITY_GROUND_Y - spikeH + 8;
+      const spikeY = GROUND_Y - spikeH; 
       if (!isPositionNearObstacle(spikeX, spikeW, 200)) {
         spikes.push({ x: spikeX, y: spikeY, w: spikeW, h: spikeH, type: chosenType });
         lastObstacleX = spikeX + spikeW;
@@ -1546,7 +1546,7 @@ function update() {
   platforms = platforms.filter(p => p.x + p.w > -100);
 
   spikes.forEach(s => {
-    let spikeBoxX = s.x + 6; let spikeBoxW = s.w - 12; let spikeBoxY = s.y + 12; let spikeBoxH = s.h - 12;
+    let spikeBoxX = s.x + 10; let spikeBoxW = s.w - 20; let spikeBoxY = s.y + 15; let spikeBoxH = s.h - 15;
     const isSpikeHit = (catBoxX < spikeBoxX + spikeBoxW && catBoxX + catBoxWidth > spikeBoxX && catBoxY < spikeBoxY + spikeBoxH && catBoxY + catBoxHeight > spikeBoxY);
 
     if (isSpikeHit) {
@@ -1729,7 +1729,6 @@ function draw() {
   spikes.forEach(s => {
     const spikeImg = assets.spikes[s.type];
     const sx = Math.round(s.x), sy = Math.round(s.y), sw = Math.round(s.w), sh = Math.round(s.h);
-    drawShadow(sx + sw / 2, sy + sh - 2, sw * 0.4, 4, 0.3);
     if (spikeImg && spikeImg.complete && spikeImg.naturalWidth > 0) {
       ctx.drawImage(spikeImg, sx, sy, sw, sh);
     } else {
