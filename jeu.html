@@ -1317,18 +1317,9 @@ document.addEventListener('touchstart', (e) => {
   e.preventDefault(); unlockAudio(); handleTouchAction(e, true);
 }, { passive: false });
 
-let lastTouchMoveTime = 0;
 document.addEventListener('touchmove', (e) => {
   if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn') || e.target.closest('#score-prompt-box') || e.target.closest('#save-score-modal')) return;
-  e.preventDefault();
-  // Sur iOS, on limite la fréquence de traitement des touchmove pour laisser
-  // plus de temps CPU à la boucle de rendu (évite les à-coups pendant un glissement).
-  if (isIOSDevice) {
-    const now = performance.now();
-    if (now - lastTouchMoveTime < TOUCHMOVE_THROTTLE_MS) return;
-    lastTouchMoveTime = now;
-  }
-  handleTouchAction(e, true);
+  e.preventDefault(); handleTouchAction(e, true);
 }, { passive: false });
 
 document.addEventListener('touchend', (e) => {
@@ -1804,9 +1795,18 @@ function drawHomeScreen() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.textAlign = 'left';
 
+  // Compteur FPS temporaire (diagnostic) — coin haut-gauche
+  const drawFpsCounter = () => {
+    ctx.save(); ctx.font = 'bold 16px monospace'; ctx.textAlign = 'left';
+    ctx.fillStyle = fpsSmoothed < 45 ? '#ff5252' : (fpsSmoothed < 55 ? '#ffd54f' : '#69f0ae');
+    ctx.fillText('FPS: ' + Math.round(fpsSmoothed), 8, 20);
+    ctx.restore();
+  };
+
   if (!gameStarted) { 
     drawHomeScreen(); 
     if (gameOver) drawGameOverOverlay(); 
+    drawFpsCounter();
     return; 
   }
 
@@ -2038,9 +2038,8 @@ function draw() {
   }
 
   if (gameOver) drawGameOverOverlay();
+  drawFpsCounter();
 }
-
-function drawGameOverOverlay() {
   ctx.fillStyle = 'rgba(0, 0, 0, 0.85)'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.textAlign = 'center';
   ctx.fillStyle = '#ff3333'; ctx.font = '900 64px Courier New'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 4;
   ctx.strokeText("AÏE !", canvas.width / 2, 100); ctx.fillText("AÏE !", canvas.width / 2, 100);
@@ -2054,11 +2053,12 @@ function drawGameOverOverlay() {
 }
 
 let lastFrameTime = performance.now();
+let fpsSmoothed = 60;
 function gameLoop(currentTime) {
   requestAnimationFrame(gameLoop); 
   const deltaTime = currentTime - lastFrameTime;
-  const minFrameGap = isIOSDevice ? IOS_TARGET_FRAME_MS : 10;
-  if (deltaTime < minFrameGap) return;
+  if (deltaTime < 10) return;
+  fpsSmoothed = fpsSmoothed * 0.9 + (1000 / deltaTime) * 0.1;
   lastFrameTime = currentTime; 
 
   if (gameStarted && !isPaused) {
