@@ -623,10 +623,21 @@ function preloadAllAssets(onComplete) {
   };
 
   allImages.forEach(img => {
+    // Force le décodage COMPLET des pixels pendant l'écran de chargement.
+    // Sans ça, Safari/iOS décode chaque image à la volée au moment de son
+    // premier dessin en jeu, ce qui provoque des micro-saccades imprévisibles
+    // à chaque fois qu'un nouveau sprite apparaît pour la première fois.
+    const finishImage = () => {
+      if (img.decode) {
+        img.decode().then(updateProgress).catch(updateProgress);
+      } else {
+        updateProgress();
+      }
+    };
     if (img.complete) {
-      updateProgress();
+      finishImage();
     } else {
-      img.onload = updateProgress;
+      img.onload = finishImage;
       img.onerror = updateProgress;
     }
   });
@@ -1792,16 +1803,15 @@ function drawHomeScreen() {
   } else { ctx.fillStyle = '#1a1a24'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
 }
 
+function drawFpsCounter() {
+  ctx.save(); ctx.font = 'bold 16px monospace'; ctx.textAlign = 'left';
+  ctx.fillStyle = fpsSmoothed < 45 ? '#ff5252' : (fpsSmoothed < 55 ? '#ffd54f' : '#69f0ae');
+  ctx.fillText('FPS: ' + Math.round(fpsSmoothed), 8, 20);
+  ctx.restore();
+}
+
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.textAlign = 'left';
-
-  // Compteur FPS temporaire (diagnostic) — coin haut-gauche
-  const drawFpsCounter = () => {
-    ctx.save(); ctx.font = 'bold 16px monospace'; ctx.textAlign = 'left';
-    ctx.fillStyle = fpsSmoothed < 45 ? '#ff5252' : (fpsSmoothed < 55 ? '#ffd54f' : '#69f0ae');
-    ctx.fillText('FPS: ' + Math.round(fpsSmoothed), 8, 20);
-    ctx.restore();
-  };
 
   if (!gameStarted) { 
     drawHomeScreen(); 
