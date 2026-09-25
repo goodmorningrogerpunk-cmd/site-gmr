@@ -407,14 +407,6 @@ let isPaused = false;
 const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
                      || (window.matchMedia && window.matchMedia("(max-width: 900px) and (pointer: coarse)").matches);
 
-// Détection spécifique iOS/iPadOS (Safari) : les optimisations anti-saccades ci-dessous
-// ne s'appliquent QU'À ces appareils, pour ne rien changer sur Android/PC.
-const isIOSDevice = /iPhone|iPad|iPod/i.test(navigator.userAgent)
-                  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPad récents (se déclarent comme Mac)
-const shadowBlurScale = isIOSDevice ? 0 : 1; // coupe les effets de glow (coûteux) uniquement sur iOS
-const IOS_TARGET_FRAME_MS = 16; // ~60 fps stable sur iOS, même sur écrans 120Hz ProMotion
-const TOUCHMOVE_THROTTLE_MS = 16; // limite le traitement des touchmove sur iOS
-
 if (isMobileDevice) {
   gameContainer.classList.add('mobile-fullscreen');
 }
@@ -623,21 +615,10 @@ function preloadAllAssets(onComplete) {
   };
 
   allImages.forEach(img => {
-    // Force le décodage COMPLET des pixels pendant l'écran de chargement.
-    // Sans ça, Safari/iOS décode chaque image à la volée au moment de son
-    // premier dessin en jeu, ce qui provoque des micro-saccades imprévisibles
-    // à chaque fois qu'un nouveau sprite apparaît pour la première fois.
-    const finishImage = () => {
-      if (img.decode) {
-        img.decode().then(updateProgress).catch(updateProgress);
-      } else {
-        updateProgress();
-      }
-    };
     if (img.complete) {
-      finishImage();
+      updateProgress();
     } else {
-      img.onload = finishImage;
+      img.onload = updateProgress;
       img.onerror = updateProgress;
     }
   });
@@ -1803,20 +1784,12 @@ function drawHomeScreen() {
   } else { ctx.fillStyle = '#1a1a24'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
 }
 
-function drawFpsCounter() {
-  ctx.save(); ctx.font = 'bold 16px monospace'; ctx.textAlign = 'left';
-  ctx.fillStyle = fpsSmoothed < 45 ? '#ff5252' : (fpsSmoothed < 55 ? '#ffd54f' : '#69f0ae');
-  ctx.fillText('FPS: ' + Math.round(fpsSmoothed), 8, 20);
-  ctx.restore();
-}
-
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.textAlign = 'left';
 
   if (!gameStarted) { 
     drawHomeScreen(); 
     if (gameOver) drawGameOverOverlay(); 
-    drawFpsCounter();
     return; 
   }
 
@@ -1869,13 +1842,13 @@ function draw() {
   });
 
   if (punkBonus) {
-    ctx.save(); punkBonus.trail.forEach(pt => { ctx.fillStyle = pt.color; ctx.shadowColor = pt.color; ctx.shadowBlur = 12 * shadowBlurScale; ctx.globalAlpha = Math.max(0, pt.alpha); ctx.beginPath(); ctx.arc(Math.round(pt.x), Math.round(pt.y), Math.round(pt.size), 0, Math.PI * 2); ctx.fill(); }); ctx.restore();
+    ctx.save(); punkBonus.trail.forEach(pt => { ctx.fillStyle = pt.color; ctx.shadowColor = pt.color; ctx.shadowBlur = 12; ctx.globalAlpha = Math.max(0, pt.alpha); ctx.beginPath(); ctx.arc(Math.round(pt.x), Math.round(pt.y), Math.round(pt.size), 0, Math.PI * 2); ctx.fill(); }); ctx.restore();
   }
 
   if (punkBonus) {
     ctx.save(); const px = Math.round(punkBonus.x), py = Math.round(punkBonus.y), pw = Math.round(punkBonus.w), ph = Math.round(punkBonus.h);
     const pulse = 1 + Math.sin(Date.now() / 120) * 0.08; const flashColor = Math.floor(Date.now() / 60) % 2 === 0 ? '#ffffff' : '#ffd54f';
-    ctx.shadowColor = flashColor; ctx.shadowBlur = 35 * shadowBlurScale; ctx.translate(px + pw / 2, py + ph / 2); ctx.scale(pulse, pulse); ctx.rotate(punkBonus.angle);
+    ctx.shadowColor = flashColor; ctx.shadowBlur = 35; ctx.translate(px + pw / 2, py + ph / 2); ctx.scale(pulse, pulse); ctx.rotate(punkBonus.angle);
     if (assets.punkBonus.complete && assets.punkBonus.naturalWidth > 0) ctx.drawImage(assets.punkBonus, -pw / 2, -ph / 2, pw, ph);
     else { ctx.fillStyle = '#ff00ff'; ctx.beginPath(); ctx.arc(0, 0, ph / 2, 0, Math.PI * 2); ctx.fill(); }
     ctx.restore();
@@ -1904,7 +1877,7 @@ function draw() {
       else if (superSayen.state === 'FLY') { catSprite = assets.cat.fly[superSayen.flyFrame]; displaySize = 270; }
       else if (superSayen.state === 'LANDING') { catSprite = assets.cat.transform[5]; displaySize = 270; }
       if (catSprite && catSprite.complete && catSprite.naturalWidth > 0) {
-        ctx.save(); if (superSayen.state === 'FLY') { ctx.shadowColor = '#ffd54f'; ctx.shadowBlur = 20 * shadowBlurScale; }
+        ctx.save(); if (superSayen.state === 'FLY') { ctx.shadowColor = '#ffd54f'; ctx.shadowBlur = 20; }
         const drawX = Math.round(cat.x + (cat.width / 2) - (displaySize / 2)); const drawY = Math.round(cat.y + cat.height - displaySize + 40);
         ctx.drawImage(catSprite, drawX, drawY, displaySize, displaySize); ctx.restore();
       }
@@ -1927,7 +1900,7 @@ function draw() {
           ctx.save();
           if (invincibleTimer > 0) {
             const flashTick = Math.floor(Date.now() / 50) % 3; const flashColor = flashTick === 0 ? '#ffffff' : flashTick === 1 ? '#ffd54f' : '#ffeb3b';
-            ctx.shadowColor = flashColor; ctx.shadowBlur = 40 * shadowBlurScale;
+            ctx.shadowColor = flashColor; ctx.shadowBlur = 40;
           }
           ctx.drawImage(catSprite, Math.round(drawX), Math.round(drawY), Math.round(drawWidth), Math.round(drawHeight)); ctx.restore();
         } else { ctx.fillStyle = '#ab47bc'; ctx.fillRect(Math.round(cat.x), Math.round(cat.y), Math.round(cat.width), Math.round(cat.height)); }
@@ -1984,7 +1957,7 @@ function draw() {
 
   if (freezeForSequence) {
     ctx.save(); ctx.textAlign = 'center'; ctx.font = '900 48px Courier New'; ctx.fillStyle = '#ffd54f'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 4;
-    ctx.shadowColor = '#ffd54f'; ctx.shadowBlur = 20 * shadowBlurScale; ctx.strokeText('+ 10 000 POINTS !', canvas.width / 2, 140); ctx.fillText('+ 10 000 POINTS !', canvas.width / 2, 140); ctx.restore();
+    ctx.shadowColor = '#ffd54f'; ctx.shadowBlur = 20; ctx.strokeText('+ 10 000 POINTS !', canvas.width / 2, 140); ctx.fillText('+ 10 000 POINTS !', canvas.width / 2, 140); ctx.restore();
   }
 
   fallingLetters.forEach(fl => {
@@ -2048,7 +2021,6 @@ function draw() {
   }
 
   if (gameOver) drawGameOverOverlay();
-  drawFpsCounter();
 }
 
 function drawGameOverOverlay() {
@@ -2065,12 +2037,10 @@ function drawGameOverOverlay() {
 }
 
 let lastFrameTime = performance.now();
-let fpsSmoothed = 60;
 function gameLoop(currentTime) {
   requestAnimationFrame(gameLoop); 
   const deltaTime = currentTime - lastFrameTime;
   if (deltaTime < 10) return;
-  fpsSmoothed = fpsSmoothed * 0.9 + (1000 / deltaTime) * 0.1;
   lastFrameTime = currentTime; 
 
   if (gameStarted && !isPaused) {
