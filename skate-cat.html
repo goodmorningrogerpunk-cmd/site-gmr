@@ -99,47 +99,68 @@ nav a:hover {
     text-align: center;
 }
 
-/* BANNIÈRE & TEXTE D'ACCROCHE MISE EN AVANT */
+/* BANNIÈRE & TEXTE D'ACCROCHE HIÉRARCHISÉ */
 .intro-box {
     background: rgba(18, 195, 255, 0.05);
     border: 2px solid #12C3FF;
     border-radius: 12px;
-    padding: 25px 20px;
+    padding: 30px 20px;
     margin-bottom: 30px;
     box-shadow: 0 0 25px rgba(18, 195, 255, 0.2);
+    text-align: center;
 }
 
-.intro-title {
+/* 1. EN GROS MAIS PAS TROP */
+.title-large {
     font-family: 'Bebas Neue', cursive;
-    font-size: 2.5rem;
-    color: #ffd54f;
-    letter-spacing: 2px;
-    margin-bottom: 10px;
-    text-shadow: 0 0 12px rgba(255, 213, 79, 0.4);
+    font-size: 2.2rem;
+    color: #ffffff;
+    letter-spacing: 1.5px;
+    line-height: 1.2;
+    margin: 0 0 15px 0;
     text-transform: uppercase;
 }
-
-.intro-event {
-    font-family: 'Roboto', sans-serif;
-    font-size: 1.15rem;
-    color: #ffffff;
-    line-height: 1.5;
-}
-
-.intro-highlight {
-    color: #12C3FF;
-    font-weight: bold;
-}
-
-.intro-date {
-    display: block;
-    margin-top: 10px;
-    font-family: 'Bebas Neue', cursive;
-    font-size: 1.6rem;
+.title-large span {
     color: #ffd54f;
-    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(255, 213, 79, 0.4);
 }
 
+/* 2. EN UN PEU PLUS PETIT */
+.text-medium {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+    color: #d0d0d0;
+    margin: 0 0 20px 0;
+}
+
+/* 3. EN GROS (RELEASE PARTY EN ÉVIDENCE) */
+.text-release-party {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 2rem;
+    color: #ffffff;
+    letter-spacing: 1px;
+    margin: 0 0 10px 0;
+}
+.highlight-release {
+    color: #12C3FF;
+    font-size: 2.3rem;
+    text-shadow: 0 0 12px rgba(18, 195, 255, 0.6);
+    border-bottom: 2px solid #12C3FF;
+    padding-bottom: 2px;
+}
+
+/* 4. EN PLUS GROS (DATE & LIEU) */
+.text-date-location {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 2.6rem;
+    color: #ffd54f;
+    letter-spacing: 1.5px;
+    text-shadow: 0 0 15px rgba(255, 213, 79, 0.5);
+    line-height: 1.2;
+    margin-top: 10px;
+}
+
+/* POCHETTE */
 .pochette-link {
     display: inline-block;
     width: 100%;
@@ -335,7 +356,11 @@ nav a:hover {
 @media (max-width: 800px) {
     .logo-wrapper { max-width: 320px; }
     .game-container { padding: 15px; margin: 20px auto; }
-    .intro-title { font-size: 1.8rem; }
+    .title-large { font-size: 1.7rem; }
+    .text-medium { font-size: 0.9rem; }
+    .text-release-party { font-size: 1.5rem; }
+    .highlight-release { font-size: 1.7rem; }
+    .text-date-location { font-size: 1.8rem; }
     .prizes-title { font-size: 2rem; }
     .rank-grid { grid-template-columns: 1fr; }
 }
@@ -360,7 +385,7 @@ nav a:hover {
     </nav>
 
     <div class="game-container">
-       <!-- TEXTE D'ACCROCHE HIÉRARCHISÉ -->
+        <!-- TEXTE D'ACCROCHE HIÉRARCHISÉ -->
         <div class="intro-box">
             <h2 class="title-large">
                 Explose tous les records sur <br>
