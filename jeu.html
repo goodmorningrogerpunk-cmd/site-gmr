@@ -388,16 +388,82 @@ let useRealMusicForNextGame = false;
 const marioInvMusic = new Audio('marioinv.mp3'); marioInvMusic.loop = true; marioInvMusic.volume = 1.0;
 const superSayanTheme = new Audio('supersayantheme.mp3'); superSayanTheme.volume = 1.0;
 
-const sounds = {
-  run: new Audio('skate_run.mp3'), jump: new Audio('skate_jump.mp3'), reception: new Audio('skate_reception.mp3'),
-  coin: new Audio('coin_receive.mp3'), damage: new Audio('damage.mp3'), sayan: new Audio('sayan.mp3'),
-  speedFly: new Audio('speed_fly.mp3'), punkbonus: new Audio('punkbonus.mp3'), degom: new Audio('degom.mp3'),
-  debonus: new Audio('debonus.mp3'), debonusend: new Audio('debonusend.mp3'), wilhem: new Audio('wilhem.wav'), cri: new Audio('cri.mp3')
+// Effets sonores via Web Audio : décodés une seule fois en AudioBuffer puis joués par un BufferSource léger.
+// (HTMLAudioElement + currentTime = 0 + play() peut bloquer le fil principal, surtout sur Safari, au moment même
+// où un nouvel élément apparaît.) Les musiques longues restent des éléments <audio> en streaming.
+// ---------- Diagnostic de performance : ajouter ?perf=1 à l'URL pour afficher l'overlay ----------
+const PERF_ON = /[?&]perf(=1|=true|&|$)/.test(location.search);
+// Interrupteurs de diagnostic (à ajouter à l'URL, séparés par &) pour isoler la cause d'un gel sur téléphone :
+//   ?noaudio  -> TOUS les sons coupés (effets + roulement + toutes les musiques, y compris celle de l'accueil)
+//   ?nosfx    -> tous les effets sonores coupés (saut, atterrissage, pièces, roulement...), musiques conservées
+//   ?norun    -> seulement le bruit de roulement      ?mute=jump,reception -> effets nommés (run, jump, reception, coin, damage, ...)
+//   ?nomusic  -> toutes les musiques coupées (accueil, fond, konami, invincibilité, super saiyan)
+//   ?nointerp -> désactive l'interpolation de rendu    ?noshadow -> pas d'ombres au sol
+const QS = new URLSearchParams(location.search);
+const DBG_MUTE = new Set((QS.get('mute') || '').split(',').filter(Boolean));
+const DBG_NOSFX = QS.has('nosfx') || QS.has('noaudio'), DBG_NORUN = QS.has('norun'), DBG_NOMUSIC = QS.has('nomusic') || QS.has('noaudio');
+const DBG_NOINTERP = QS.has('nointerp'), DBG_NOSHADOW = QS.has('noshadow');
+// Coupe réellement toute lecture des musiques (play() devient un no-op), quel que soit l'endroit du code qui l'appelle.
+if (DBG_NOMUSIC) [introMusic, bgMusic, konamiMusic, marioInvMusic, superSayanTheme].forEach(a => { a.play = () => Promise.resolve(); });
+// Étiquette visible dès qu'un interrupteur est actif, pour être sûr qu'il est bien pris en compte.
+const dbgActive = [DBG_NOSFX && 'nosfx/noaudio', DBG_NORUN && 'norun', DBG_MUTE.size && ('mute=' + [...DBG_MUTE].join('+')), DBG_NOMUSIC && 'nomusic/noaudio', DBG_NOINTERP && 'nointerp', DBG_NOSHADOW && 'noshadow'].filter(Boolean);
+if (dbgActive.length) {
+  const tag = document.createElement('div');
+  tag.textContent = 'DEBUG : ' + dbgActive.join(' · ');
+  tag.style.cssText = 'position:fixed;top:2px;right:4px;z-index:2147483647;pointer-events:none;font:bold 10px monospace;color:#fff;background:#c0392b;padding:2px 6px;border-radius:3px;';
+  document.addEventListener('DOMContentLoaded', () => document.body.appendChild(tag));
+}
+const perfMarks = []; // évènements récents : { t, tag }
+function perfMark(tag) { if (!PERF_ON) return; perfMarks.push({ t: performance.now(), tag }); if (perfMarks.length > 80) perfMarks.shift(); }
+
+const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+try { audioCtx = AudioContextClass ? new AudioContextClass({ latencyHint: 'interactive' }) : null; } catch (e) { audioCtx = null; }
+// iOS : sans ça, le mute physique du téléphone coupe Web Audio alors que l'ancien <audio> restait audible.
+try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+
+const SFX_FILES = {
+  run: ['skate_run.mp3', 0.6, true], jump: ['skate_jump.mp3', 0.7], reception: ['skate_reception.mp3', 0.7],
+  coin: ['coin_receive.mp3', 0.8], damage: ['damage.mp3', 0.85], sayan: ['sayan.mp3', 0.15],
+  speedFly: ['speed_fly.mp3', 0.15], punkbonus: ['punkbonus.mp3', 0.85], degom: ['degom.mp3', 0.85],
+  debonus: ['debonus.mp3', 0.85], debonusend: ['debonusend.mp3', 0.85], wilhem: ['wilhem.wav', 0.85], cri: ['cri.mp3', 0.85]
 };
-sounds.run.loop = true; sounds.run.volume = 0.6; sounds.jump.volume = 0.7; sounds.reception.volume = 0.7;
-sounds.coin.volume = 0.8; sounds.damage.volume = 0.85; sounds.sayan.volume = 0.15; sounds.speedFly.volume = 0.15;
-sounds.punkbonus.volume = 0.85; sounds.degom.volume = 0.85; sounds.debonus.volume = 0.85; sounds.debonusend.volume = 0.85;
-sounds.wilhem.volume = 0.85; sounds.cri.volume = 0.85;
+const sounds = {};
+Object.entries(SFX_FILES).forEach(([name, [file, volume, loop]]) => {
+  const snd = sounds[name] = { name, file, volume, loop: !!loop, buffer: null, source: null, gain: null };
+  if (!audioCtx) return;
+  // un seul GainNode par son, créé une fois (au lieu d'un nouveau nœud à chaque lecture)
+  snd.gain = audioCtx.createGain(); snd.gain.gain.value = volume; snd.gain.connect(audioCtx.destination);
+  fetch(file).then(r => r.arrayBuffer())
+    .then(data => new Promise((resolve, reject) => audioCtx.decodeAudioData(data, resolve, reject))) // forme callback : compatible vieux Safari
+    .then(buf => { snd.buffer = buf; })
+    .catch(err => console.warn('SFX non chargé :', file, err));
+});
+
+// Le roulement (son en boucle) n'est plus arrêté/recréé à chaque saut et atterrissage : la source tourne en continu
+// et on coupe/rétablit simplement son volume. Moins de création/destruction de nœuds audio (coûteux sur iOS).
+function sfxStop(snd, hard) {
+  if (snd.loop && !hard) { if (snd.source) snd.gain.gain.value = 0; return; }
+  if (snd.source) { try { snd.source.stop(); } catch (e) {} snd.source = null; }
+}
+let lastResumeAttempt = 0;
+function sfxPlay(snd) {
+  if (!audioCtx || !snd.buffer) return;
+  if (DBG_NOSFX || DBG_MUTE.has(snd.name) || (DBG_NORUN && snd.name === 'run')) return;
+  const t0 = PERF_ON ? performance.now() : 0;
+  perfMark('sfx:' + snd.file.replace(/\.\w+$/, ''));
+  if (audioCtx.state !== 'running') { // jamais plus d'une tentative toutes les 400 ms
+    const n = performance.now(); if (n - lastResumeAttempt > 400) { lastResumeAttempt = n; audioCtx.resume().catch(() => {}); }
+  }
+  if (snd.loop && snd.source) { snd.gain.gain.value = snd.volume; }
+  else {
+    sfxStop(snd, true); // relancer un son le redémarre depuis le début
+    const src = audioCtx.createBufferSource();
+    src.buffer = snd.buffer; src.loop = snd.loop; snd.gain.gain.value = snd.volume;
+    src.connect(snd.gain); src.start(0); snd.source = src;
+  }
+  if (PERF_ON) { const dt = performance.now() - t0; if (dt > 4) perfMark('LENT sfxPlay ' + snd.file + ' ' + Math.round(dt) + 'ms'); }
+}
 
 let lastSpecialSoundIsWilhem = false;
 let audioUnlocked = false;
@@ -406,6 +472,13 @@ let isPaused = false;
 
 const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
                      || (window.matchMedia && window.matchMedia("(max-width: 900px) and (pointer: coarse)").matches);
+
+// Détection spécifique iOS/iPadOS (Safari) : les optimisations anti-saccades ci-dessous
+// ne s'appliquent QU'À ces appareils, pour ne rien changer sur Android/PC.
+const isIOSDevice = /iPhone|iPad|iPod/i.test(navigator.userAgent)
+                  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPad récents (se déclarent comme Mac)
+const IOS_TARGET_FRAME_MS = 16; // ~60 fps stable sur iOS, même sur écrans 120Hz ProMotion
+const TOUCHMOVE_THROTTLE_MS = 16; // limite le traitement des touchmove sur iOS
 
 if (isMobileDevice) {
   gameContainer.classList.add('mobile-fullscreen');
@@ -424,15 +497,22 @@ function handleFullscreenChange() {
   }
 }
 
+// Appelée à chaque touche sur mobile : doit être quasi gratuite après le premier appel (sinon, sur iOS, le
+// scrollTo / les changements de classe / les appels API répétés provoquent des recalculs de mise en page).
+let orientationLockTried = false; let scrollResetPending = true;
+window.addEventListener('orientationchange', () => { scrollResetPending = true; });
 function requestGameFullscreen() {
-  if (isMobileDevice) {
-    gameContainer.classList.add('mobile-fullscreen');
-    const elem = document.documentElement;
+  if (!isMobileDevice) return;
+  if (!gameContainer.classList.contains('mobile-fullscreen')) gameContainer.classList.add('mobile-fullscreen');
+  const elem = document.documentElement;
+  const inFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
+  if (!inFullscreen) { // iPhone Safari n'a pas d'API plein écran : rien n'est rappelé à chaque touche
+    perfMark('fs-request');
     if (elem.requestFullscreen) elem.requestFullscreen().catch(() => {});
-    else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen().catch(() => {});
-    if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {});
-    setTimeout(() => window.scrollTo(0, 0), 100);
+    else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
   }
+  if (!orientationLockTried && screen.orientation && screen.orientation.lock) { orientationLockTried = true; screen.orientation.lock('landscape').catch(() => {}); }
+  if (scrollResetPending) { scrollResetPending = false; setTimeout(() => window.scrollTo(0, 0), 100); }
 }
 
 function toggleDesktopFullscreen() {
@@ -448,7 +528,8 @@ function toggleDesktopFullscreen() {
 
 function unlockAudio() {
   if (!audioUnlocked) {
-    sounds.run.play().then(() => { sounds.run.pause(); audioUnlocked = true; }).catch(() => {});
+    if (!audioCtx) { audioUnlocked = true; return; }
+    audioCtx.resume().then(() => { audioUnlocked = true; }).catch(() => {});
   }
 }
 
@@ -477,7 +558,7 @@ function startBgMusic() {
 function stopAllSounds() {
   if (fadeInterval) clearInterval(fadeInterval);
   stopIntroMusic(); bgMusic.pause(); konamiMusic.pause(); marioInvMusic.pause(); superSayanTheme.pause();
-  Object.values(sounds).forEach(sound => { sound.pause(); if (sound.readyState >= 2) sound.currentTime = 0; });
+  Object.values(sounds).forEach(snd => sfxStop(snd, true));
 }
 
 let isRunningSoundActive = false;
@@ -488,20 +569,18 @@ function playRunSound() {
   }
   if (!isRunningSoundActive) {
     isRunningSoundActive = true;
-    sounds.run.currentTime = 0;
-    sounds.run.play().catch(() => {});
+    sfxPlay(sounds.run);
   }
 }
 
 function stopRunSound() { 
   if (isRunningSoundActive) {
     isRunningSoundActive = false;
-    sounds.run.pause();
-    if (sounds.run.readyState >= 2) sounds.run.currentTime = 0;
+    sfxStop(sounds.run);
   }
 }
 
-function playSoundEffect(sound) { if (audioUnlocked && !isPaused) { try { if (sound.readyState >= 2) sound.currentTime = 0; sound.play().catch(() => {}); } catch(e) {} } }
+function playSoundEffect(sound) { if (audioUnlocked && !isPaused) sfxPlay(sound); }
 
 function togglePause() {
   if (!gameStarted || gameOver || isTutoMode && tutoHighlightedZone) return;
@@ -542,15 +621,19 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
-const ASSET_VERSION = 'v1.0'; 
+const ASSET_VERSION = 'v1.1';
+// Version optimisée (WebP, redimensionnée à 2x la taille d'affichage) dans /opt, avec repli sur
+// les fichiers originaux (png/jpg...) si une version optimisée est absente. Les originaux ne sont pas modifiés.
 function loadSmartImage(baseName) {
-  const img = new Image(); const extensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG']; let extIdx = 0;
-  img.onerror = () => { extIdx++; if (extIdx < extensions.length) img.src = `${baseName}.${extensions[extIdx]}?v=${ASSET_VERSION}`; };
-  img.src = `${baseName}.${extensions[0]}?v=${ASSET_VERSION}`; return img;
+  const img = new Image();
+  const candidates = [`opt/${baseName}.webp`, ...['png', 'jpg', 'jpeg', 'PNG', 'JPG'].map(ext => `${baseName}.${ext}`)];
+  let idx = 0;
+  img.onerror = () => { idx++; if (idx < candidates.length) img.src = `${candidates[idx]}?v=${ASSET_VERSION}`; };
+  img.src = `${candidates[0]}?v=${ASSET_VERSION}`; return img;
 }
 
 const assets = {
-  bg: loadSmartImage('background4'),
+  bgTiles: Array.from({length: 9}, (_, i) => loadSmartImage(`bg/bg_${i}`)), // background4 découpé en 9 tuiles de 2048px max (voir opt/bg)
   cat: {
     runSequence: [loadSmartImage('chat_push2'), loadSmartImage('chat_run'), loadSmartImage('chat_run1'), loadSmartImage('chat_run3')],
     run4: loadSmartImage('chat_run4'), jump: [loadSmartImage('chat_jump1'), loadSmartImage('chat_jump2'), loadSmartImage('chat_jump3')],
@@ -600,7 +683,7 @@ function preloadAllAssets(onComplete) {
   }
   collectImages(assets);
 
-  const allAudio = [introMusic, bgMusic, konamiMusic, marioInvMusic, superSayanTheme, ...Object.values(sounds)];
+  const allAudio = [introMusic, bgMusic, konamiMusic, marioInvMusic, superSayanTheme];
   const totalAssets = allImages.length + allAudio.length + 1; 
   let loadedCount = 0;
 
@@ -615,10 +698,21 @@ function preloadAllAssets(onComplete) {
   };
 
   allImages.forEach(img => {
+    // Force le décodage COMPLET des pixels pendant l'écran de chargement.
+    // Sans ça, Safari/iOS décode chaque image à la volée au moment de son
+    // premier dessin en jeu, ce qui provoque des micro-saccades imprévisibles
+    // à chaque fois qu'un nouveau sprite apparaît pour la première fois.
+    const finishImage = () => {
+      if (img.decode) {
+        img.decode().then(updateProgress).catch(updateProgress);
+      } else {
+        updateProgress();
+      }
+    };
     if (img.complete) {
-      updateProgress();
+      finishImage();
     } else {
-      img.onload = updateProgress;
+      img.onload = finishImage;
       img.onerror = updateProgress;
     }
   });
@@ -637,6 +731,42 @@ function preloadAllAssets(onComplete) {
     introVideo.onerror = updateProgress;
     setTimeout(updateProgress, 1500);
   }
+}
+
+// iOS Safari libère régulièrement les pixels décodés des <img> peu utilisés (poses de saut/accroupi, dessinées
+// seulement pendant l'action) puis les redécode, sur le fil principal, au dessin suivant -> gel à chaque action.
+// Un ImageBitmap garde ses pixels décodés : le dessin ne déclenche plus aucun décodage.
+function convertAssetsToBitmaps() {
+  if (typeof createImageBitmap !== 'function') return Promise.resolve();
+  const jobs = [];
+  const visit = (holder, key) => {
+    const v = holder[key];
+    if (v instanceof HTMLImageElement) {
+      if (!(v.complete && v.naturalWidth > 0)) return;
+      jobs.push(createImageBitmap(v).then(bmp => {
+        // le code de dessin teste img.complete / naturalWidth : on les recopie sur le bitmap, et on vérifie que ça a pris
+        bmp.complete = true; bmp.naturalWidth = bmp.width; bmp.naturalHeight = bmp.height; bmp.src = v.src;
+        if (bmp.complete === true && bmp.naturalWidth === bmp.width) holder[key] = bmp;
+      }).catch(() => {}));
+    } else if (v && typeof v === 'object' && !(v instanceof ImageBitmap)) {
+      Object.keys(v).forEach(k => visit(v, k));
+    }
+  };
+  Object.keys(assets).forEach(k => visit(assets, k));
+  return Promise.all(jobs);
+}
+
+// Premier dessin (envoi GPU) de chaque sprite pendant l'écran de chargement, pas en pleine partie.
+function warmUpAssets() {
+  const leaves = [];
+  const walk = v => {
+    if (!v || typeof v !== 'object') return;
+    if (v instanceof ImageBitmap || v instanceof HTMLImageElement) { leaves.push(v); return; }
+    Object.keys(v).forEach(k => walk(v[k]));
+  };
+  walk(assets);
+  leaves.forEach(img => { try { ctx.drawImage(img, 0, 0, 2, 2); } catch (e) {} });
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function getObstacleDimensions(conf) {
@@ -1170,11 +1300,77 @@ function handleObstacleSpawned(obsX, obsY, obsW) {
   }
 }
 
-function drawShadow(centerX, centerY, radiusX, radiusY, opacity = 0.35) {
-  ctx.save(); ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`; ctx.beginPath();
-  ctx.ellipse(Math.round(centerX), Math.round(centerY), Math.round(radiusX), Math.round(radiusY), 0, 0, Math.PI * 2);
-  ctx.fill(); ctx.restore();
+// Fond défilant en tuiles : on ne dessine que les tuiles visibles. Les bords sont arrondis à partir de positions
+// cumulées (et non de largeurs arrondies) pour éviter toute couture entre deux tuiles.
+let bgTileLayout = null;
+function drawBackground() {
+  const tiles = assets.bgTiles;
+  if (!bgTileLayout) {
+    if (!tiles.every(t => t.complete && t.naturalWidth > 0)) { ctx.fillStyle = '#1a1a24'; ctx.fillRect(0, 0, canvas.width, canvas.height); return; }
+    const scale = GROUND_Y / tiles[0].naturalHeight; let x = 0;
+    const starts = tiles.map(t => { const st = x; x += t.naturalWidth * scale; return st; });
+    bgTileLayout = { starts, total: x };
+  }
+  const { starts, total } = bgTileLayout; const offset = bgX % total; // <= 0
+  for (let copy = 0; copy < 2; copy++) {
+    const base = offset + copy * total;
+    for (let i = 0; i < tiles.length; i++) {
+      const left = Math.round(base + starts[i]);
+      const right = Math.round(base + (i + 1 < tiles.length ? starts[i + 1] : total));
+      if (right <= 0 || left >= canvas.width) continue;
+      ctx.drawImage(tiles[i], left, 0, right - left, GROUND_Y);
+    }
+  }
 }
+
+// --- Effets pré-rendus (remplacent shadowBlur / ellipse par frame, coûteux sur tous les navigateurs) ---
+function makeOffscreen(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+
+const GLOW_SIZE = 128;
+const glowSprites = {};
+['#ffffff', '#ffd54f', '#ffeb3b'].forEach(color => {
+  const c = makeOffscreen(GLOW_SIZE, GLOW_SIZE), g = c.getContext('2d'), r = GLOW_SIZE / 2;
+  const rgb = color.length === 4 ? color.replace(/#(.)(.)(.)/, '#$1$1$2$2$3$3') : color;
+  const rr = parseInt(rgb.slice(1, 3), 16), gg = parseInt(rgb.slice(3, 5), 16), bb = parseInt(rgb.slice(5, 7), 16);
+  const grad2 = g.createRadialGradient(r, r, 0, r, r, r);
+  grad2.addColorStop(0, `rgba(${rr},${gg},${bb},0.85)`); grad2.addColorStop(0.4, `rgba(${rr},${gg},${bb},0.4)`); grad2.addColorStop(1, `rgba(${rr},${gg},${bb},0)`);
+  g.fillStyle = grad2; g.fillRect(0, 0, GLOW_SIZE, GLOW_SIZE);
+  glowSprites[color] = c;
+});
+
+function drawGlow(color, cx, cy, radius, alpha = 1) {
+  const spr = glowSprites[color]; if (!spr) return;
+  const prevSmooth = ctx.imageSmoothingEnabled; ctx.imageSmoothingEnabled = true;
+  ctx.globalAlpha = alpha; const d = Math.round(radius * 2);
+  ctx.drawImage(spr, Math.round(cx - radius), Math.round(cy - radius), d, d);
+  ctx.globalAlpha = 1; ctx.imageSmoothingEnabled = prevSmooth;
+}
+
+// Ombre au sol : ellipse noire unie pré-rendue, dessinée à l'échelle voulue avec globalAlpha.
+const shadowSprite = (() => { const c = makeOffscreen(128, 32), g = c.getContext('2d'); g.fillStyle = '#000'; g.beginPath(); g.ellipse(64, 16, 64, 16, 0, 0, Math.PI * 2); g.fill(); return c; })();
+function drawShadow(centerX, centerY, radiusX, radiusY, opacity = 0.35) {
+  if (DBG_NOSHADOW) return;
+  ctx.globalAlpha = opacity;
+  ctx.drawImage(shadowSprite, Math.round(centerX - radiusX), Math.round(centerY - radiusY), Math.round(radiusX * 2), Math.round(radiusY * 2));
+  ctx.globalAlpha = 1;
+}
+
+// Traînée du super saiyan : dégradé jaune pré-rendu (même géométrie qu'avant : 370px x 80px, origine = centre du chat - 350).
+const flyTrailSprite = (() => {
+  const c = makeOffscreen(370, 80), g = c.getContext('2d'); const cx = 350, cy = 40;
+  const grad = g.createLinearGradient(cx - 350, cy, cx, cy);
+  grad.addColorStop(0, 'rgba(255, 215, 0, 0)'); grad.addColorStop(0.5, 'rgba(255, 223, 0, 0.35)'); grad.addColorStop(1, 'rgba(255, 235, 59, 0.85)');
+  g.fillStyle = grad; g.beginPath(); g.moveTo(cx + 20, cy - 40); g.lineTo(cx - 350, cy - 15); g.lineTo(cx - 350, cy + 15); g.lineTo(cx + 20, cy + 40); g.closePath(); g.fill();
+  return c;
+})();
+
+// Texte "+ 10 000 POINTS !" avec son halo, rendu une seule fois.
+const bonusTextSprite = (() => {
+  const c = makeOffscreen(640, 130), g = c.getContext('2d');
+  g.textAlign = 'center'; g.font = "900 48px 'Courier New'"; g.fillStyle = '#ffd54f'; g.strokeStyle = '#ffffff'; g.lineWidth = 4;
+  g.shadowColor = '#ffd54f'; g.shadowBlur = 20; g.strokeText('+ 10 000 POINTS !', 320, 65); g.fillText('+ 10 000 POINTS !', 320, 65);
+  return c;
+})();
 
 const keys = {};
 
@@ -1285,6 +1481,11 @@ window.addEventListener('keyup', (e) => {
   if (e.code === 'Space' || e.code === 'ArrowUp') { cat.isJumping = false; jumpKeyReleased = true; }
 });
 
+const TOUCH_IGNORE_SELECTOR = '.game-modal, #mobile-hud-controls, .pixel-btn, #score-prompt-box, #save-score-modal';
+let viewportWidth = window.innerWidth; // mis en cache : lire innerWidth à chaque touche peut forcer un recalcul de mise en page
+window.addEventListener('resize', () => { viewportWidth = window.innerWidth; });
+window.addEventListener('orientationchange', () => { viewportWidth = window.innerWidth; });
+
 function handleTouchAction(e, isTouchActive) {
   if (!gameStarted || rulesModal.style.display === 'flex' || leaderboardModal.style.display === 'flex' || aboutModal.style.display === 'flex' || scorePromptBox.style.display === 'block' || saveScoreModal.style.display === 'block' || konamiModal.style.display === 'flex') return;
   if (isPaused) { if (isTouchActive) togglePause(); return; }
@@ -1294,7 +1495,7 @@ function handleTouchAction(e, isTouchActive) {
     return;
   }
 
-  const viewportWidth = window.innerWidth; let wantDown = false; let wantJump = false;
+  let wantDown = false; let wantJump = false;
   for (let i = 0; i < e.touches.length; i++) {
     const touch = e.touches[i]; const clientX = touch.clientX;
     if (gameOver) return;
@@ -1303,19 +1504,27 @@ function handleTouchAction(e, isTouchActive) {
   keys['ArrowDown'] = wantDown; keys['Space'] = wantJump; keys['ArrowUp'] = wantJump;
 }
 
+// touchstart / touchend gardent preventDefault (évite les clics fantômes et bloque le défilement de toute la séquence tactile).
 document.addEventListener('touchstart', (e) => {
+  perfMark('touchstart');
   requestGameFullscreen();
-  if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn') || e.target.closest('#score-prompt-box') || e.target.closest('#save-score-modal')) return;
+  if (e.target.closest(TOUCH_IGNORE_SELECTOR)) return;
   e.preventDefault(); unlockAudio(); handleTouchAction(e, true);
 }, { passive: false });
 
+// touchmove : passif (le défilement est déjà bloqué par le preventDefault de touchstart + touch-action: none)
+// et limité à une fois par TOUCHMOVE_THROTTLE_MS pour ne pas saturer le fil principal pendant un appui prolongé.
+let lastTouchMoveTime = 0;
 document.addEventListener('touchmove', (e) => {
-  if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn') || e.target.closest('#score-prompt-box') || e.target.closest('#save-score-modal')) return;
-  e.preventDefault(); handleTouchAction(e, true);
-}, { passive: false });
+  if (e.timeStamp - lastTouchMoveTime < TOUCHMOVE_THROTTLE_MS) return;
+  lastTouchMoveTime = e.timeStamp;
+  if (e.target.closest(TOUCH_IGNORE_SELECTOR)) return;
+  handleTouchAction(e, true);
+}, { passive: true });
 
 document.addEventListener('touchend', (e) => {
-  if (e.target.closest('.game-modal') || e.target.closest('#mobile-hud-controls') || e.target.closest('.pixel-btn') || e.target.closest('#score-prompt-box') || e.target.closest('#save-score-modal')) return;
+  perfMark('touchend');
+  if (e.target.closest(TOUCH_IGNORE_SELECTOR)) return;
   e.preventDefault(); handleTouchAction(e, e.touches.length > 0);
 }, { passive: false });
 
@@ -1462,6 +1671,7 @@ mobileHomeBtn.addEventListener('click', (e) => { e.stopPropagation(); returnToHo
 document.addEventListener('click', () => { requestGameFullscreen(); if (!gameStarted) playIntroMusic(); }, { once: true });
 
 function resetGame() {
+  interpValid = false; // pas d'interpolation tant qu'un premier pas n'a pas mémorisé les positions
   score = 0; bgX = 0; lastScoreTime = Date.now(); gameOver = false; gameStarted = true; isPaused = false;
   isTutoMode = false; tutoHighlightedZone = null; tutoInstructionMessage = ""; tutoDialogBox.style.display = 'none';
   bonusEffectTimer = 0; lastObstacleX = -1000; lastLetterX = -1000; lastLetterHeightLevel = -1; heightLevelRepeatCount = 0;
@@ -1479,6 +1689,23 @@ function resetGame() {
   platforms = []; obstacles = []; items = []; rogerCollected = [false, false, false, false, false];
   gameOverStack.style.display = 'none'; scorePromptBox.style.display = 'none'; saveScoreModal.style.display = 'none'; konamiModal.style.display = 'none';
 }
+
+// --- Évite les allocations par frame (ramasse-miettes) : suppression en place + pool de particules ---
+function compactInPlace(arr, keep, onRemove) {
+  let w = 0;
+  for (let r = 0; r < arr.length; r++) {
+    const e = arr[r];
+    if (keep(e)) { if (w !== r) arr[w] = e; w++; }
+    else if (onRemove) onRemove(e);
+  }
+  arr.length = w; return arr;
+}
+const trailPool = []; const MAX_TRAIL_POINTS = 40;
+function addTrailPoint(trail, x, y, size, color) {
+  if (trail.length >= MAX_TRAIL_POINTS) return;
+  const pt = trailPool.pop() || {}; pt.x = x; pt.y = y; pt.size = size; pt.alpha = 1.0; pt.color = color; trail.push(pt);
+}
+function recycleTrailPoint(pt) { pt._px = undefined; pt._py = undefined; pt._rx = undefined; pt._ry = undefined; trailPool.push(pt); }
 
 function update() {
   if (!gameStarted || gameOver || isPaused) { stopRunSound(); return; }
@@ -1532,20 +1759,20 @@ function update() {
 
   if (punkBonus) {
     punkBonus.time += 0.04; punkBonus.x -= 2.2 + Math.sin(punkBonus.time * 2.5) * 1.8; punkBonus.y = punkBonus.baseY + Math.sin(punkBonus.time * 1.5) * 25; punkBonus.angle = Math.sin(punkBonus.time * 3) * 0.15;
-    punkBonus.trail.push({ x: punkBonus.x + punkBonus.w / 2 + (Math.random() * 14 - 7), y: punkBonus.y + punkBonus.h / 2 + (Math.random() * 14 - 7), size: Math.random() * 8 + 4, alpha: 1.0, color: Math.random() < 0.6 ? '#ffd54f' : '#ffffff' });
+    addTrailPoint(punkBonus.trail, punkBonus.x + punkBonus.w / 2 + (Math.random() * 14 - 7), punkBonus.y + punkBonus.h / 2 + (Math.random() * 14 - 7), Math.random() * 8 + 4, Math.random() < 0.6 ? '#ffd54f' : '#ffffff');
     if (!isTutoMode && punkBonus.x + punkBonus.w < -100) punkBonus = null;
   }
 
   if (punkBonus) {
     punkBonus.trail.forEach(pt => { pt.x -= currentGameSpeed * 0.5; pt.alpha -= 0.04; pt.size *= 0.94; });
-    punkBonus.trail = punkBonus.trail.filter(pt => pt.alpha > 0);
+    compactInPlace(punkBonus.trail, pt => pt.alpha > 0, recycleTrailPoint);
   }
 
   ejectedObstacles.forEach(eo => { eo.x += eo.vx; eo.y += eo.vy; eo.vy += 0.5; eo.angle += eo.vRot; });
-  ejectedObstacles = ejectedObstacles.filter(eo => eo.y < canvas.height + 200 && eo.x < canvas.width + 200 && eo.x > -200);
+  ejectedObstacles = compactInPlace(ejectedObstacles, eo => eo.y < canvas.height + 200 && eo.x < canvas.width + 200 && eo.x > -200);
 
   fallingLetters.forEach(fl => { fl.y += fl.vy; fl.x += fl.vx; fl.vy += 0.4; fl.angle += fl.vAngle; fl.alpha -= 0.02; });
-  fallingLetters = fallingLetters.filter(fl => fl.alpha > 0);
+  fallingLetters = compactInPlace(fallingLetters, fl => fl.alpha > 0);
 
   const now = Date.now();
   if (now - lastScoreTime >= 1000) { score += superSayen.active ? 500 : 50; lastScoreTime = now; }
@@ -1630,7 +1857,7 @@ function update() {
 
   platforms.forEach(p => p.x -= currentGameSpeed);
   if (!superSayen.active) { if (!cat.wasGrounded && cat.isGrounded) playSoundEffect(sounds.reception); if (cat.isGrounded) playRunSound(); else stopRunSound(); }
-  platforms = platforms.filter(p => p.x + p.w > -100);
+  platforms = compactInPlace(platforms, p => p.x + p.w > -100);
 
   obstacles.forEach(o => {
     o.x -= currentGameSpeed;
@@ -1714,7 +1941,7 @@ function update() {
       }
     }
   });
-  obstacles = obstacles.filter(o => !o.ejected && o.x + o.w > -100);
+  obstacles = compactInPlace(obstacles, o => !o.ejected && o.x + o.w > -100);
 
   items.forEach(it => {
     it.x -= currentGameSpeed; it.animTimer++; if (it.animTimer % 6 === 0) it.frame = (it.frame + 1) % 8;
@@ -1762,7 +1989,7 @@ function update() {
       }
     }
   });
-  items = items.filter(it => !it.collected && it.x + it.w > -100);
+  items = compactInPlace(items, it => !it.collected && it.x + it.w > -100);
 
   if (bonusEffectTimer > 0) bonusEffectTimer--;
   
@@ -1784,22 +2011,35 @@ function drawHomeScreen() {
   } else { ctx.fillStyle = '#1a1a24'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
 }
 
+function drawFpsCounter() {
+  ctx.save(); ctx.font = 'bold 16px monospace'; ctx.textAlign = 'left';
+  ctx.fillStyle = fpsSmoothed < 45 ? '#ff5252' : (fpsSmoothed < 55 ? '#ffd54f' : '#69f0ae');
+  ctx.fillText('FPS: ' + Math.round(fpsSmoothed), 8, 20);
+  ctx.restore();
+}
+
+// --- HUD : les parties statiques sont pré-rendues et redessinées seulement quand leur contenu change ---
+function drawCachedLayer(layer, key, x, y, w, h, paint) {
+  if (layer.key !== key) {
+    if (!layer.canvas) layer.canvas = makeOffscreen(w, h);
+    const g = layer.canvas.getContext('2d'); g.imageSmoothingEnabled = false; g.clearRect(0, 0, w, h);
+    g.save(); g.translate(-x, -y); g.textAlign = 'left'; paint(g); g.restore(); layer.key = key;
+  }
+  ctx.drawImage(layer.canvas, x, y);
+}
+const hudHintLayer = {}, hudSlotsLayer = {};
+
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.textAlign = 'left';
 
   if (!gameStarted) { 
     drawHomeScreen(); 
     if (gameOver) drawGameOverOverlay(); 
+    drawFpsCounter();
     return; 
   }
 
-  if (assets.bg.complete && assets.bg.naturalWidth > 0) {
-    const availableHeight = GROUND_Y; const bgScale = availableHeight / assets.bg.naturalHeight;
-    const bgScaledWidth = assets.bg.naturalWidth * bgScale; const currentBgX = Math.round(bgX % bgScaledWidth);
-    ctx.drawImage(assets.bg, currentBgX, 0, Math.round(bgScaledWidth), availableHeight);
-    ctx.drawImage(assets.bg, Math.round(currentBgX + bgScaledWidth), 0, Math.round(bgScaledWidth), availableHeight);
-    if (currentBgX + bgScaledWidth < canvas.width) ctx.drawImage(assets.bg, Math.round(currentBgX + (bgScaledWidth * 2)), 0, Math.round(bgScaledWidth), availableHeight);
-  } else { ctx.fillStyle = '#1a1a24'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+  drawBackground();
 
   ctx.fillStyle = '#000000'; ctx.fillRect(0, GROUND_Y, canvas.width, canvas.height - GROUND_Y);
 
@@ -1842,24 +2082,23 @@ function draw() {
   });
 
   if (punkBonus) {
-    ctx.save(); punkBonus.trail.forEach(pt => { ctx.fillStyle = pt.color; ctx.shadowColor = pt.color; ctx.shadowBlur = 12; ctx.globalAlpha = Math.max(0, pt.alpha); ctx.beginPath(); ctx.arc(Math.round(pt.x), Math.round(pt.y), Math.round(pt.size), 0, Math.PI * 2); ctx.fill(); }); ctx.restore();
+    punkBonus.trail.forEach(pt => { const a = Math.max(0, pt.alpha); drawGlow(pt.color, pt.x, pt.y, pt.size * 1.8 + 6, a * 0.8); ctx.fillStyle = pt.color; ctx.globalAlpha = a; ctx.beginPath(); ctx.arc(Math.round(pt.x), Math.round(pt.y), Math.round(pt.size), 0, Math.PI * 2); ctx.fill(); });
+    ctx.globalAlpha = 1;
   }
 
   if (punkBonus) {
     ctx.save(); const px = Math.round(punkBonus.x), py = Math.round(punkBonus.y), pw = Math.round(punkBonus.w), ph = Math.round(punkBonus.h);
     const pulse = 1 + Math.sin(Date.now() / 120) * 0.08; const flashColor = Math.floor(Date.now() / 60) % 2 === 0 ? '#ffffff' : '#ffd54f';
-    ctx.shadowColor = flashColor; ctx.shadowBlur = 35; ctx.translate(px + pw / 2, py + ph / 2); ctx.scale(pulse, pulse); ctx.rotate(punkBonus.angle);
+    drawGlow(flashColor, px + pw / 2, py + ph / 2, Math.max(pw, ph) * pulse * 0.5 + 38, 0.9); ctx.translate(px + pw / 2, py + ph / 2); ctx.scale(pulse, pulse); ctx.rotate(punkBonus.angle);
     if (assets.punkBonus.complete && assets.punkBonus.naturalWidth > 0) ctx.drawImage(assets.punkBonus, -pw / 2, -ph / 2, pw, ph);
     else { ctx.fillStyle = '#ff00ff'; ctx.beginPath(); ctx.arc(0, 0, ph / 2, 0, Math.PI * 2); ctx.fill(); }
     ctx.restore();
   }
 
   if (superSayen.active && superSayen.state === 'FLY') {
-    ctx.save(); ctx.shadowBlur = 0; ctx.shadowColor = 'transparent'; const displaySize = 270;
+    ctx.save(); const displaySize = 270;
     const catCenterX = Math.round(cat.x + (cat.width / 2)); const catCenterY = Math.round(cat.y + cat.height - (displaySize / 2) + 40);
-    const trailGradient = ctx.createLinearGradient(catCenterX - 350, catCenterY, catCenterX, catCenterY);
-    trailGradient.addColorStop(0, 'rgba(255, 215, 0, 0)'); trailGradient.addColorStop(0.5, 'rgba(255, 223, 0, 0.35)'); trailGradient.addColorStop(1, 'rgba(255, 235, 59, 0.85)');
-    ctx.fillStyle = trailGradient; ctx.beginPath(); ctx.moveTo(catCenterX + 20, catCenterY - 40); ctx.lineTo(catCenterX - 350, catCenterY - 15); ctx.lineTo(catCenterX - 350, catCenterY + 15); ctx.lineTo(catCenterX + 20, catCenterY + 40); ctx.closePath(); ctx.fill();
+    ctx.drawImage(flyTrailSprite, catCenterX - 350, catCenterY - 40);
     for (let i = 0; i < 12; i++) {
       const pX = Math.round(catCenterX - 40 - (Math.random() * 280)); const pY = Math.round(catCenterY + (Math.random() * 70 - 35)); const pSize = Math.round(Math.random() * 6 + 2);
       ctx.fillStyle = Math.random() < 0.5 ? '#ffffff' : '#ffd54f'; ctx.fillRect(pX, pY, pSize, pSize);
@@ -1877,8 +2116,9 @@ function draw() {
       else if (superSayen.state === 'FLY') { catSprite = assets.cat.fly[superSayen.flyFrame]; displaySize = 270; }
       else if (superSayen.state === 'LANDING') { catSprite = assets.cat.transform[5]; displaySize = 270; }
       if (catSprite && catSprite.complete && catSprite.naturalWidth > 0) {
-        ctx.save(); if (superSayen.state === 'FLY') { ctx.shadowColor = '#ffd54f'; ctx.shadowBlur = 20; }
+        ctx.save();
         const drawX = Math.round(cat.x + (cat.width / 2) - (displaySize / 2)); const drawY = Math.round(cat.y + cat.height - displaySize + 40);
+        if (superSayen.state === 'FLY') drawGlow('#ffd54f', drawX + displaySize / 2, drawY + displaySize / 2, displaySize * 0.42, 0.75);
         ctx.drawImage(catSprite, drawX, drawY, displaySize, displaySize); ctx.restore();
       }
     } else {
@@ -1900,7 +2140,7 @@ function draw() {
           ctx.save();
           if (invincibleTimer > 0) {
             const flashTick = Math.floor(Date.now() / 50) % 3; const flashColor = flashTick === 0 ? '#ffffff' : flashTick === 1 ? '#ffd54f' : '#ffeb3b';
-            ctx.shadowColor = flashColor; ctx.shadowBlur = 40;
+            drawGlow(flashColor, drawX + drawWidth / 2, drawY + drawHeight / 2, Math.max(drawWidth, drawHeight) * 0.5 + 30, 0.9);
           }
           ctx.drawImage(catSprite, Math.round(drawX), Math.round(drawY), Math.round(drawWidth), Math.round(drawHeight)); ctx.restore();
         } else { ctx.fillStyle = '#ab47bc'; ctx.fillRect(Math.round(cat.x), Math.round(cat.y), Math.round(cat.width), Math.round(cat.height)); }
@@ -1919,23 +2159,29 @@ function draw() {
 
   if (freezeForSequence) { ctx.save(); ctx.fillStyle = 'rgba(255, 213, 79, 0.35)'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.restore(); }
 
+  // Le score change ~1 fois par seconde : dessiné directement (un re-rendu de calque hors-écran à ce rythme coûte plus cher que 2 appels).
   ctx.fillStyle = 'rgba(0,0,0,0.65)'; ctx.fillRect(20, 20, 220, 45);
   ctx.fillStyle = superSayen.active ? '#ffd54f' : '#fff'; ctx.font = 'bold 22px Courier New'; ctx.fillText(`SCORE: ${score}`, 32, 50);
 
   const isMobile = isMobileDevice; const hudWidth = isMobile ? 260 : 320; const hudXPos = isMobile ? canvas.width - 370 : canvas.width - 340;
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.65)'; ctx.fillRect(hudXPos, 20, hudWidth, 65);
-  ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1; ctx.strokeRect(hudXPos, 20, hudWidth, 65);
-  ctx.fillStyle = '#ffd54f'; ctx.font = 'bold 13px Courier New';
-  if (isMobile) { ctx.fillText("TAP DROITE : SAUTER", hudXPos + 15, 40); ctx.fillText("TAP GAUCHE : BAISSER", hudXPos + 15, 58); }
-  else { ctx.fillText("ESPACE : SAUTER | BAS : BAISSER", hudXPos + 15, 40); ctx.fillText("ENTRÉE : PAUSE", hudXPos + 15, 58); ctx.fillText("ECHAP  : ACCUEIL", hudXPos + 15, 76); }
+  drawCachedLayer(hudHintLayer, isMobile ? 'm' : 'd', hudXPos - 1, 19, hudWidth + 2, 68, g => {
+    g.fillStyle = 'rgba(0, 0, 0, 0.65)'; g.fillRect(hudXPos, 20, hudWidth, 65);
+    g.strokeStyle = '#ffffff'; g.lineWidth = 1; g.strokeRect(hudXPos, 20, hudWidth, 65);
+    g.fillStyle = '#ffd54f'; g.font = 'bold 13px Courier New';
+    if (isMobile) { g.fillText("TAP DROITE : SAUTER", hudXPos + 15, 40); g.fillText("TAP GAUCHE : BAISSER", hudXPos + 15, 58); }
+    else { g.fillText("ESPACE : SAUTER | BAS : BAISSER", hudXPos + 15, 40); g.fillText("ENTRÉE : PAUSE", hudXPos + 15, 58); g.fillText("ECHAP  : ACCUEIL", hudXPos + 15, 76); }
+  });
 
   const hudX = canvas.width - 340; const hudY = canvas.height - 85;
-  ctx.fillStyle = '#000000'; ctx.fillRect(hudX - 10, hudY - 10, 335, 80);
-  ctx.strokeStyle = '#ffd54f'; ctx.lineWidth = 2; ctx.strokeRect(hudX - 10, hudY - 10, 335, 80);
-  rogerLetters.forEach((char, idx) => {
-    const slotX = hudX + (idx * 64); const isCollected = rogerCollected[idx]; const hudImg = assets.letters[char] ? assets.letters[char][0] : null;
-    if (hudImg && hudImg.complete && hudImg.naturalWidth > 0) { ctx.globalAlpha = isCollected ? 1.0 : 0.25; ctx.drawImage(hudImg, slotX, hudY, 52, 60); ctx.globalAlpha = 1.0; }
-    else { ctx.fillStyle = isCollected ? '#ffd54f' : '#555'; ctx.font = 'bold 36px Courier New'; ctx.fillText(char, slotX + 14, hudY + 44); }
+  const slotsReady = rogerLetters.every(c => assets.letters[c] && assets.letters[c][0].complete && assets.letters[c][0].naturalWidth > 0);
+  drawCachedLayer(hudSlotsLayer, rogerCollected.map(v => v ? 1 : 0).join('') + (slotsReady ? 'r' : 'w'), hudX - 12, hudY - 12, 339, 84, g => {
+    g.fillStyle = '#000000'; g.fillRect(hudX - 10, hudY - 10, 335, 80);
+    g.strokeStyle = '#ffd54f'; g.lineWidth = 2; g.strokeRect(hudX - 10, hudY - 10, 335, 80);
+    rogerLetters.forEach((char, idx) => {
+      const slotX = hudX + (idx * 64); const isCollected = rogerCollected[idx]; const hudImg = assets.letters[char] ? assets.letters[char][0] : null;
+      if (hudImg && hudImg.complete && hudImg.naturalWidth > 0) { g.globalAlpha = isCollected ? 1.0 : 0.25; g.drawImage(hudImg, slotX, hudY, 52, 60); g.globalAlpha = 1.0; }
+      else { g.fillStyle = isCollected ? '#ffd54f' : '#555'; g.font = 'bold 36px Courier New'; g.fillText(char, slotX + 14, hudY + 44); }
+    });
   });
 
   const masterHudX = 20; const masterHudY = canvas.height - 115;
@@ -1956,8 +2202,7 @@ function draw() {
   });
 
   if (freezeForSequence) {
-    ctx.save(); ctx.textAlign = 'center'; ctx.font = '900 48px Courier New'; ctx.fillStyle = '#ffd54f'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 4;
-    ctx.shadowColor = '#ffd54f'; ctx.shadowBlur = 20; ctx.strokeText('+ 10 000 POINTS !', canvas.width / 2, 140); ctx.fillText('+ 10 000 POINTS !', canvas.width / 2, 140); ctx.restore();
+    ctx.drawImage(bonusTextSprite, Math.round(canvas.width / 2 - 320), 140 - 65);
   }
 
   fallingLetters.forEach(fl => {
@@ -2021,6 +2266,7 @@ function draw() {
   }
 
   if (gameOver) drawGameOverOverlay();
+  drawFpsCounter();
 }
 
 function drawGameOverOverlay() {
@@ -2036,21 +2282,132 @@ function drawGameOverOverlay() {
   ctx.textAlign = 'left';
 }
 
-let lastFrameTime = performance.now();
-function gameLoop(currentTime) {
-  requestAnimationFrame(gameLoop); 
-  const deltaTime = currentTime - lastFrameTime;
-  if (deltaTime < 10) return;
-  lastFrameTime = currentTime; 
-
-  if (gameStarted && !isPaused) {
-    update();
+// --- Interpolation de rendu ---
+// update() tourne à pas fixe (60 Hz) ; le rendu, lui, suit l'écran (60/90/120/144 Hz). Sans interpolation, sur un écran
+// 120 Hz une frame sur deux n'avance pas (saccade). Avant chaque pas on mémorise la position précédente (_px/_py) ;
+// au rendu on dessine entre l'ancienne et la nouvelle position selon la fraction de pas écoulée (renderAlpha).
+let renderAlpha = 1; let interpValid = false; let prevBgX = 0; let realBgX = 0; let prevCatY = 0; let realCatY = 0;
+function snapAll(arr) { for (let i = 0; i < arr.length; i++) { const o = arr[i]; o._px = o.x; o._py = o.y; } }
+function interpAll(arr, a) {
+  for (let i = 0; i < arr.length; i++) {
+    const o = arr[i]; if (o._px === undefined) continue;
+    o._rx = o.x; o._ry = o.y; o.x = o._px + (o.x - o._px) * a; o.y = o._py + (o.y - o._py) * a;
   }
-  draw();
+}
+function restoreAll(arr) { for (let i = 0; i < arr.length; i++) { const o = arr[i]; if (o._rx === undefined) continue; o.x = o._rx; o.y = o._ry; o._rx = undefined; o._ry = undefined; } }
+const singleHolder = [null];
+function snapshotPrev() {
+  snapAll(platforms); snapAll(obstacles); snapAll(items); snapAll(ejectedObstacles); snapAll(fallingLetters);
+  if (punkBonus) { singleHolder[0] = punkBonus; snapAll(singleHolder); snapAll(punkBonus.trail); }
+  prevBgX = bgX; prevCatY = cat.y; interpValid = true;
+}
+function applyInterpolation(a) {
+  interpAll(platforms, a); interpAll(obstacles, a); interpAll(items, a); interpAll(ejectedObstacles, a); interpAll(fallingLetters, a);
+  if (punkBonus) { singleHolder[0] = punkBonus; interpAll(singleHolder, a); interpAll(punkBonus.trail, a); }
+  realBgX = bgX; bgX = prevBgX + (bgX - prevBgX) * a; realCatY = cat.y; cat.y = prevCatY + (cat.y - prevCatY) * a;
+}
+function restoreInterpolation() {
+  restoreAll(platforms); restoreAll(obstacles); restoreAll(items); restoreAll(ejectedObstacles); restoreAll(fallingLetters);
+  if (punkBonus) { singleHolder[0] = punkBonus; restoreAll(singleHolder); restoreAll(punkBonus.trail); }
+  bgX = realBgX; cat.y = realCatY;
+}
+
+// ---------- Overlay de diagnostic (?perf=1) ----------
+const perfState = { ema: 0, hitches: [], hitchTimes: [], worst: 0, count: 0, updSum: 0, drwSum: 0, frames: 0, lastCrouch: false, lastGrounded: true, lastObs: 0, lastPlat: 0, lastItems: 0, lastScore: 0, lastPaint: 0, el: null };
+function perfEnsureOverlay() {
+  if (perfState.el) return;
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;left:4px;bottom:4px;z-index:2147483647;pointer-events:none;font:10px/1.25 monospace;color:#7CFC00;background:rgba(0,0,0,.72);padding:4px 6px;border-radius:4px;max-width:96vw;white-space:pre;';
+  document.body.appendChild(el); perfState.el = el;
+}
+let perfHiddenAt = -99999;
+document.addEventListener('visibilitychange', () => { perfHiddenAt = performance.now(); perfMark('visibility'); });
+function perfRecentlyHidden(now) { return now - perfHiddenAt < 3000; }
+let perfPrevLog = [];
+try { perfPrevLog = JSON.parse(localStorage.getItem('gmrPerfLog') || '[]'); } catch (e) {}
+function perfFrame(rawDelta, updMs, drawMs, now) {
+  const st = perfState; perfEnsureOverlay();
+  if (!gameStarted || isPaused) { st.lastScore = score; return; }
+  // évènements déduits de l'état du jeu
+  if (cat.isCrouching !== st.lastCrouch) { perfMark(cat.isCrouching ? 'crouch-on' : 'crouch-off'); st.lastCrouch = cat.isCrouching; }
+  if (cat.isGrounded !== st.lastGrounded) { perfMark(cat.isGrounded ? 'land' : 'jump/air'); st.lastGrounded = cat.isGrounded; }
+  if (obstacles.length > st.lastObs) perfMark('spawn-obstacle'); st.lastObs = obstacles.length;
+  if (platforms.length > st.lastPlat) perfMark('spawn-platform'); st.lastPlat = platforms.length;
+  if (items.length > st.lastItems) perfMark('spawn-letter'); st.lastItems = items.length;
+  if (score !== st.lastScore) { perfMark('score-change'); st.lastScore = score; }
+
+  if (!st.ema) st.ema = rawDelta;
+  st.frames++; st.updSum += updMs; st.drwSum += drawMs;
+  const isHitch = rawDelta > Math.max(st.ema * 1.8, st.ema + 12) && rawDelta < 60000 && !document.hidden && !perfRecentlyHidden(now);
+  if (!isHitch) st.ema = st.ema * 0.97 + rawDelta * 0.03;
+  else {
+    st.count++; st.worst = Math.max(st.worst, rawDelta);
+    const from = now - rawDelta - 150; const tags = {};
+    for (const m of perfMarks) if (m.t >= from) tags[m.tag] = (tags[m.tag] || 0) + 1;
+    const tagStr = (rawDelta > 1500 ? 'GEL! ' : '') + (Object.keys(tags).map(k => k + (tags[k] > 1 ? 'x' + tags[k] : '')).join(',') || 'AUCUN (rien avant)');
+    st.hitchTimes.push(now); if (st.hitchTimes.length > 6) st.hitchTimes.shift();
+    st.hitches.push(`${(now / 1000).toFixed(1)}s ${Math.round(rawDelta)}ms js(upd ${updMs.toFixed(1)} drw ${drawMs.toFixed(1)}) ${tagStr}`);
+    if (st.hitches.length > 7) st.hitches.shift();
+    try { localStorage.setItem('gmrPerfLog', JSON.stringify(st.hitches)); } catch (e) {}
+    st.lastPaint = 0;
+  }
+  if (now - st.lastPaint > 500) {
+    st.lastPaint = now;
+    let periodic = '';
+    if (st.hitchTimes.length >= 4) {
+      const iv = []; for (let i = 1; i < st.hitchTimes.length; i++) iv.push(st.hitchTimes[i] - st.hitchTimes[i - 1]);
+      const mean = iv.reduce((a, b) => a + b, 0) / iv.length;
+      if (iv.every(x => Math.abs(x - mean) < mean * 0.2)) periodic = ` | PERIODIQUE ~${(mean / 1000).toFixed(2)}s`;
+    }
+    st.el.textContent = `PERF fps~${Math.round(1000 / st.ema)} base ${st.ema.toFixed(1)}ms | accrocs ${st.count} pire ${Math.round(st.worst)}ms${periodic}\n` +
+      `js moy upd ${(st.updSum / st.frames).toFixed(2)} drw ${(st.drwSum / st.frames).toFixed(2)}ms | audio ${audioCtx ? audioCtx.state : 'n/a'} | dpr ${window.devicePixelRatio} | ${isIOSDevice ? 'iOS' : 'non-iOS'}\n` +
+      (st.hitches.join('\n') || '(aucun accroc détecté)') +
+      (perfPrevLog.length ? '\n-- session précédente --\n' + perfPrevLog.join('\n') : '');
+  }
+}
+
+let lastFrameTime = performance.now();
+let fpsSmoothed = 60;
+let updateAccumulator = 0;
+const FIXED_UPDATE_STEP_MS = 1000 / 60; // update() a été écrit en supposant ~60 pas/seconde
+const MAX_UPDATE_STEPS_PER_FRAME = 5; // sécurité anti "spiral of death" si l'onglet était en pause
+
+function gameLoop(currentTime) {
+  requestAnimationFrame(gameLoop);
+  let deltaTime = currentTime - lastFrameTime;
+  lastFrameTime = currentTime;
+  if (deltaTime <= 0) return;
+  const rawDelta = deltaTime; const perfU0 = PERF_ON ? performance.now() : 0;
+  if (deltaTime > 250) deltaTime = 250; // onglet remis au premier plan après un moment : on ignore le trou
+
+  fpsSmoothed = fpsSmoothed * 0.9 + (1000 / deltaTime) * 0.1;
+
+  // Pas de temps fixe : update() avance toujours par tranches exactes de
+  // FIXED_UPDATE_STEP_MS de temps de jeu, quel que soit le rythme réel des
+  // frames de l'appareil (variable notamment sur iOS). Ça évite que la
+  // vitesse du jeu varie avec les irrégularités de rendu — c'est ce qui
+  // donnait l'impression de saccades même quand le FPS affiché restait correct.
+  updateAccumulator += deltaTime;
+  let steps = 0;
+  while (updateAccumulator >= FIXED_UPDATE_STEP_MS && steps < MAX_UPDATE_STEPS_PER_FRAME) {
+    if (gameStarted && !isPaused) { snapshotPrev(); update(); }
+    updateAccumulator -= FIXED_UPDATE_STEP_MS;
+    steps++;
+  }
+  if (steps === MAX_UPDATE_STEPS_PER_FRAME) updateAccumulator = 0; // évite l'accumulation si le device est très en retard
+
+  const perfD0 = PERF_ON ? performance.now() : 0;
+  renderAlpha = Math.min(1, updateAccumulator / FIXED_UPDATE_STEP_MS);
+  if (gameStarted && !isPaused && interpValid && renderAlpha < 1 && !DBG_NOINTERP) {
+    applyInterpolation(renderAlpha);
+    try { draw(); } finally { restoreInterpolation(); }
+  } else draw();
+  if (PERF_ON) perfFrame(rawDelta, perfD0 - perfU0, performance.now() - perfD0, currentTime);
 }
 
 window.addEventListener('load', () => {
   preloadAllAssets(() => {
+    Promise.resolve().then(convertAssetsToBitmaps).then(warmUpAssets).catch(() => {}).then(() => {
     const loadingScreen = document.getElementById('loading-screen');
     loadingScreen.style.opacity = '0';
     loadingScreen.style.transition = 'opacity 0.4s ease';
@@ -2065,6 +2422,7 @@ window.addEventListener('load', () => {
       updateRulesText();
       updateMenuSelection();
     }, 400);
+    });
   });
 });
 
