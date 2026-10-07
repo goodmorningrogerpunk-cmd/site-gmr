@@ -68,7 +68,6 @@
             padding: 16px;
         }
 
-        /* Conteneur Roue 3D */
         .roulette-wrapper {
             position: relative;
             width: 100%;
@@ -81,7 +80,6 @@
             align-items: center;
             justify-content: center;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-            perspective: 600px; /* Effet de perspective 3D */
         }
 
         .roulette-window {
@@ -89,7 +87,6 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            transform-style: preserve-3d;
         }
 
         .roulette-items {
@@ -97,7 +94,6 @@
             width: 100%;
             left: 0;
             top: 0;
-            transform-style: preserve-3d;
         }
 
         .roulette-item {
@@ -114,7 +110,6 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            backface-visibility: hidden;
         }
 
         .winning-line-container {
@@ -356,7 +351,7 @@
     <script>
         let participants = ["Alice", "Bob", "Charlie", "David", "Emma", "Fabien", "Gaëlle", "Hugo"];
         const ITEM_HEIGHT = 46;
-        let currentTranslateY = 0;
+        let baseTranslateY = 0;
 
         const btnOpenModal = document.getElementById('btnOpenModal');
         const modal = document.getElementById('participantsModal');
@@ -414,35 +409,30 @@
 
         function buildRoulette(list) {
             rouletteItems.innerHTML = '';
-            // On répète un grand nombre de fois pour permettre de longs tours de roue
-            const totalLoops = 150;
+            // Répétition importante pour permettre un long défilement du haut vers le bas
+            const totalLoops = 200;
             const repeated = [];
             for (let i = 0; i < totalLoops; i++) {
                 repeated.push(...list);
             }
-            repeated.forEach((name, index) => {
+            repeated.forEach(name => {
                 const div = document.createElement('div');
                 div.className = 'roulette-item';
                 div.textContent = name;
-                
-                // Effet 3D dynamique selon la position par rapport au centre visible
-                // Simule la courbure d'une roue sur sa tranche
-                const offsetFromCenter = index - 75 * list.length;
-                const rotX = offsetFromCenter * -3; 
-                div.style.transform = `rotateX(${rotX}deg) translateZ(30px)`;
-                
                 rouletteItems.appendChild(div);
             });
 
             rouletteItems.style.transition = 'none';
             const containerHeight = 140;
             const centerOffset = (containerHeight / 2) - (ITEM_HEIGHT / 2) - 2;
-            const initialTargetIndex = 75 * list.length;
-            currentTranslateY = -(initialTargetIndex * ITEM_HEIGHT) + centerOffset;
-            rouletteItems.style.transform = "translateY(" + currentTranslateY + "px)";
+            
+            // On se place au milieu exact pour pouvoir défiler vers le bas
+            const initialTargetIndex = 100 * list.length;
+            baseTranslateY = -(initialTargetIndex * ITEM_HEIGHT) + centerOffset;
+            rouletteItems.style.transform = "translateY(" + baseTranslateY + "px)";
         }
 
-        // Chargement initial
+        // Chargement initial immédiat
         buildRoulette(participants);
 
         const canvas = document.getElementById('confetti-canvas');
@@ -498,3 +488,18 @@
                     ctx.fillRect(-c.size / 2, -c.size / 2, c.size, c.size);
                     ctx.restore();
                 }
+            });
+
+            if (activeCount > 0) {
+                requestAnimationFrame(animateConfetti);
+            }
+        }
+
+        let isSpinning = false;
+
+        btnSpin.onclick = function(e) {
+            e.preventDefault();
+            if (isSpinning || participants.length === 0) return;
+            isSpinning = true;
+            btnSpin.disabled = true;
+            btnOpenModal.disabled =
