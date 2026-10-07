@@ -45,6 +45,7 @@
             flex-direction: column;
             align-items: center;
             gap: 20px;
+            z-index: 2;
         }
 
         .btn-primary {
@@ -178,7 +179,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.7);
-            z-index: 100;
+            z-index: 1000;
             align-items: center;
             justify-content: center;
             padding: 20px;
@@ -246,7 +247,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
+            z-index: 2000;
             align-items: center;
             justify-content: center;
             padding: 20px;
@@ -426,3 +427,152 @@
             const totalLoops = 300;
             const repeated = [];
             for (let i = 0; i < totalLoops; i++) {
+                repeated.push(...list);
+            }
+            
+            repeated.forEach(function(name) {
+                const div = document.createElement('div');
+                div.className = 'roulette-item';
+                div.textContent = name;
+                rouletteItems.appendChild(div);
+            });
+
+            rouletteItems.style.transition = 'none';
+            const containerHeight = 140;
+            const centerOffset = (containerHeight / 2) - (ITEM_HEIGHT / 2) - 2;
+            
+            currentTranslateY = -(startIndex * ITEM_HEIGHT) + centerOffset;
+            rouletteItems.style.transform = "translateY(" + currentTranslateY + "px)";
+        }
+
+        // Initialisation immédiate au chargement
+        const initialStartIndex = 100 * participants.length;
+        buildRoulette(participants, initialStartIndex);
+
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let confettis = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.onresize = resizeCanvas;
+        resizeCanvas();
+
+        function launchConfetti() {
+            confettis = [];
+            const colors = ['#58a6ff', '#3fb950', '#f85149', '#d29922', '#bc8cff'];
+            const leftOrigin = window.innerWidth * 0.2;
+            const rightOrigin = window.innerWidth * 0.8;
+
+            for (let i = 0; i < 120; i++) {
+                const originX = i < 60 ? leftOrigin : rightOrigin;
+                const angle = (Math.random() * Math.PI) - (Math.PI / 2);
+                const speed = Math.random() * 8 + 4;
+                confettis.push({
+                    x: originX,
+                    y: window.innerHeight / 2,
+                    vx: Math.cos(angle) * speed * (i < 60 ? -1 : 1),
+                    vy: Math.sin(angle) * speed - 3,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    size: Math.random() * 8 + 4,
+                    rotation: Math.random() * 360,
+                    vRot: Math.random() * 10 - 5
+                });
+            }
+            animateConfetti();
+        }
+
+        function animateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let activeCount = 0;
+            confettis.forEach(function(c) {
+                c.x += c.vx;
+                c.y += c.vy;
+                c.vy += 0.3;
+                c.rotation += c.vRot;
+
+                if (c.y < canvas.height + 50) {
+                    activeCount++;
+                    ctx.save();
+                    ctx.translate(c.x, c.y);
+                    ctx.rotate((c.rotation * Math.PI) / 180);
+                    ctx.fillStyle = c.color;
+                    ctx.fillRect(-c.size / 2, -c.size / 2, c.size, c.size);
+                    ctx.restore();
+                }
+            });
+
+            if (activeCount > 0) {
+                requestAnimationFrame(animateConfetti);
+            }
+        }
+
+        let isSpinning = false;
+
+        btnSpin.onclick = function(e) {
+            e.preventDefault();
+            if (isSpinning || participants.length === 0) return;
+            isSpinning = true;
+            btnSpin.disabled = true;
+            btnOpenModal.disabled = true;
+            winnerAnnouncement.textContent = "";
+            winningLine.classList.remove('glow');
+            winnerPopup.classList.remove('active');
+
+            soundRoulette.currentTime = 0;
+            soundRoulette.play().catch(function(err) { console.log("Audio error:", err); });
+
+            logoLeft.classList.add('bouncing');
+            logoRight.classList.add('bouncing');
+
+            const winningIndexInOriginal = Math.floor(Math.random() * participants.length);
+            const chosenWinner = participants[winningIndexInOriginal];
+
+            const containerHeight = 140;
+            const centerOffset = (containerHeight / 2) - (ITEM_HEIGHT / 2) - 2;
+            const currentIndexApprox = Math.round((-currentTranslateY + centerOffset) / ITEM_HEIGHT);
+            
+            const targetBlockOffset = 60;
+            const targetLoopsIndex = Math.ceil(currentIndexApprox / participants.length) + targetBlockOffset;
+            const targetIndex = (targetLoopsIndex * participants.length) + winningIndexInOriginal;
+
+            const targetTranslateY = -(targetIndex * ITEM_HEIGHT) + centerOffset;
+
+            rouletteItems.style.transition = 'transform 14s cubic-bezier(0.1, 0.85, 0.1, 1)';
+            rouletteItems.style.transform = "translateY(" + targetTranslateY + "px)";
+
+            setTimeout(function() {
+                isSpinning = false;
+                btnSpin.disabled = false;
+                btnOpenModal.disabled = false;
+
+                currentTranslateY = targetTranslateY;
+
+                btnSpin.textContent = "Relancer";
+
+                soundRoulette.pause();
+                soundWinner.currentTime = 0;
+                soundWinner.play().catch(function(err) { console.log("Audio error:", err); });
+
+                logoLeft.classList.remove('bouncing');
+                logoRight.classList.remove('bouncing');
+                winningLine.classList.add('glow');
+
+                winnerAnnouncement.textContent = "🎉 Gagnant(e) : " + chosenWinner + " ! 🎉";
+                
+                popupWinnerName.textContent = chosenWinner;
+                winnerPopup.classList.add('active');
+
+                launchConfetti();
+            }, 14000);
+        };
+
+        btnClosePopup.onclick = function(e) {
+            e.preventDefault();
+            winnerPopup.classList.remove('active');
+        };
+    </script>
+</body>
+</html>
