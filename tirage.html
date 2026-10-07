@@ -81,6 +81,7 @@
             align-items: center;
             justify-content: center;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            perspective: 800px;
         }
 
         .roulette-window {
@@ -88,6 +89,7 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
+            transform-style: preserve-3d;
         }
 
         .roulette-items {
@@ -95,6 +97,7 @@
             width: 100%;
             left: 0;
             top: 0;
+            transform-style: preserve-3d;
         }
 
         .roulette-item {
@@ -111,6 +114,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            backface-visibility: hidden;
         }
 
         .winning-line-container {
@@ -413,7 +417,7 @@
             const lines = participantsInput.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             if (lines.length > 0) {
                 participants = lines;
-                buildRoulette(participants, 0);
+                buildRoulette(participants, 100 * participants.length);
                 modal.classList.remove('active');
                 btnSpin.disabled = false;
                 winnerAnnouncement.textContent = "";
@@ -430,10 +434,15 @@
                 repeated.push(...list);
             }
             
-            repeated.forEach(function(name) {
+            repeated.forEach(function(name, index) {
                 const div = document.createElement('div');
                 div.className = 'roulette-item';
                 div.textContent = name;
+                
+                const offsetFromCenter = index - startIndex;
+                const rotX = offsetFromCenter * -4; 
+                div.style.transform = "rotateX(" + rotX + "deg) translateZ(40px)";
+                
                 rouletteItems.appendChild(div);
             });
 
@@ -445,7 +454,6 @@
             rouletteItems.style.transform = "translateY(" + currentTranslateY + "px)";
         }
 
-        // Initialisation immédiate au chargement
         const initialStartIndex = 100 * participants.length;
         buildRoulette(participants, initialStartIndex);
 
@@ -532,9 +540,10 @@
 
             const containerHeight = 140;
             const centerOffset = (containerHeight / 2) - (ITEM_HEIGHT / 2) - 2;
-            const currentIndexApprox = Math.round((-currentTranslateY + centerOffset) / ITEM_HEIGHT);
             
-            const targetBlockOffset = 60;
+            // Défilement de HAUT en BAS (les noms descendent visuellement comme une bande qu'on tire vers le bas)
+            const currentIndexApprox = Math.round((-currentTranslateY + centerOffset) / ITEM_HEIGHT);
+            const targetBlockOffset = 60; 
             const targetLoopsIndex = Math.ceil(currentIndexApprox / participants.length) + targetBlockOffset;
             const targetIndex = (targetLoopsIndex * participants.length) + winningIndexInOriginal;
 
