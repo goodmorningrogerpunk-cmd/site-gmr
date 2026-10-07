@@ -21,7 +21,6 @@
             justify-content: flex-start;
             min-height: 100vh;
             padding: 20px 15px;
-            overflow-x: hidden;
         }
 
         header {
@@ -58,7 +57,6 @@
             cursor: pointer;
             width: 100%;
             box-shadow: 0 4px 15px rgba(35, 134, 54, 0.4);
-            -webkit-tap-highlight-color: transparent;
         }
 
         .btn-action {
@@ -87,17 +85,13 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .roulette-items {
             position: absolute;
             width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            left: 0;
+            top: 0;
         }
 
         .roulette-item {
@@ -182,7 +176,6 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(5px);
             z-index: 100;
             align-items: center;
             justify-content: center;
@@ -203,7 +196,6 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         .modal-content h2 {
@@ -221,11 +213,6 @@
             padding: 12px;
             font-size: 0.95rem;
             resize: none;
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: #58a6ff;
         }
 
         .participant-count {
@@ -349,7 +336,8 @@
 
         function buildRoulette(list) {
             rouletteItems.innerHTML = '';
-            const totalLoops = 50;
+            // On répète la liste 100 fois pour avoir une très longue bande sécurisée
+            const totalLoops = 100;
             const repeated = [];
             for (let i = 0; i < totalLoops; i++) {
                 repeated.push(...list);
@@ -437,6 +425,7 @@
             winnerAnnouncement.textContent = "";
             winningLine.classList.remove('glow');
 
+            // Remise à zéro propre de la position
             rouletteItems.style.transition = 'none';
             rouletteItems.style.transform = 'translateY(0px)';
             void rouletteItems.offsetHeight;
@@ -447,9 +436,11 @@
             const winningIndexInOriginal = Math.floor(Math.random() * participants.length);
             const chosenWinner = participants[winningIndexInOriginal];
 
-            const targetBlock = 25;
+            // On cible un bloc au milieu (ex: la 50ème boucle sur 100) pour avoir de la marge partout
+            const targetBlock = 50;
             const targetIndex = (targetBlock * participants.length) + winningIndexInOriginal;
             
+            // Calcul précis pour centrer exactement l'élément dans la fenêtre de 140px
             const containerHeight = 140;
             const centerOffset = (containerHeight / 2) - (ITEM_HEIGHT / 2);
             const targetTranslateY = -(targetIndex * ITEM_HEIGHT) + centerOffset;
