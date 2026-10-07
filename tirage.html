@@ -104,7 +104,6 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            will-change: transform;
         }
 
         .roulette-item {
@@ -121,11 +120,6 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
-
-        .roulette-item.active-candidate {
-            color: #ffffff;
-            font-weight: 700;
         }
 
         /* Fixed Center Winning Line (Stable, no bouncing) */
@@ -285,7 +279,7 @@
     </header>
 
     <div class="container">
-        <button class="btn-primary" id="btn-open-modal">📝 Ajouter les participants</button>
+        <button class="btn-primary" id="btn-open-modal">Ajouter les participants</button>
 
         <div class="roulette-wrapper">
             <div class="winning-line-container" id="winningLine">
@@ -294,199 +288,4 @@
             </div>
             <div class="roulette-window">
                 <div class="roulette-items" id="rouletteItems">
-                    <div class="roulette-item">Ajoutez des participants !</div>
-                </div>
-            </div>
-        </div>
-
-        <button class="btn-primary btn-action" id="btn-spin" disabled>Hop, c'est parti !</button>
-
-        <div class="winner-announcement" id="winnerAnnouncement"></div>
-    </div>
-
-    <!-- Modal for editing participants -->
-    <div class="modal" id="participantsModal">
-        <div class="modal-content">
-            <h2>Liste des participants (un par ligne)</h2>
-            <textarea id="participantsInput" placeholder="Jean Dupont&#10;Marie Curie&#10;Thomas Edison"></textarea>
-            <div class="participant-count" id="participantCount">0 participant(s)</div>
-            <div class="modal-buttons">
-                <button class="btn-secondary" id="btn-cancel">Annuler</button>
-                <button class="btn-primary" id="btn-save" style="flex:1;">Enregistrer</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let participants = ["Alice", "Bob", "Charlie", "David", "Emma", "Fabien", "Gaëlle", "Hugo"];
-        const ITEM_HEIGHT = 46;
-
-        const btnOpenModal = document.getElementById('btn-open-modal');
-        const modal = document.getElementById('participantsModal');
-        const btnCancel = document.getElementById('btn-cancel');
-        const btnSave = document.getElementById('btn-save');
-        const participantsInput = document.getElementById('participantsInput');
-        const participantCount = document.getElementById('participantCount');
-        const btnSpin = document.getElementById('btn-spin');
-        const rouletteItems = document.getElementById('rouletteItems');
-        const winningLine = document.getElementById('winningLine');
-        const logoLeft = document.getElementById('logoLeft');
-        const logoRight = document.getElementById('logoRight');
-        const winnerAnnouncement = document.getElementById('winnerAnnouncement');
-
-        function updateParticipantsListText() {
-            participantsInput.value = participants.join('\n');
-            updateCount();
-        }
-
-        function updateCount() {
-            const lines = participantsInput.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            participantCount.textContent = `${lines.length} participant(s)`;
-            btnSpin.disabled = lines.length === 0;
-        }
-
-        participantsInput.addEventListener('input', updateCount);
-
-        btnOpenModal.addEventListener('click', () => {
-            updateParticipantsListText();
-            modal.classList.add('active');
-        });
-
-        btnCancel.addEventListener('click', () => {
-            modal.classList.remove('active');
-        });
-
-        btnSave.addEventListener('click', () => {
-            const lines = participantsInput.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            if (lines.length > 0) {
-                participants = lines;
-                buildRoulette(participants);
-                modal.classList.remove('active');
-                btnSpin.disabled = false;
-                winnerAnnouncement.textContent = "";
-                winningLine.classList.remove('glow');
-            }
-        });
-
-        function buildRoulette(list) {
-            rouletteItems.innerHTML = '';
-            const repeated = [];
-            for (let i = 0; i < 30; i++) {
-                repeated.push(...list);
-            }
-            repeated.forEach((name, index) => {
-                const div = document.createElement('div');
-                div.className = 'roulette-item';
-                div.textContent = name;
-                rouletteItems.appendChild(div);
-            });
-            rouletteItems.style.transform = 'translateY(0px)';
-        }
-
-        buildRoulette(participants);
-
-        // Système de confettis
-        const canvas = document.getElementById('confetti-canvas');
-        const ctx = canvas.getContext('2d');
-        let confettis = [];
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        function launchConfetti() {
-            confettis = [];
-            const colors = ['#58a6ff', '#3fb950', '#f85149', '#d29922', '#bc8cff'];
-            const leftOrigin = window.innerWidth * 0.2;
-            const rightOrigin = window.innerWidth * 0.8;
-
-            for (let i = 0; i < 120; i++) {
-                const originX = i < 60 ? leftOrigin : rightOrigin;
-                const angle = (Math.random() * Math.PI) - (Math.PI / 2);
-                const speed = Math.random() * 8 + 4;
-                confettis.push({
-                    x: originX,
-                    y: window.innerHeight / 2,
-                    vx: Math.cos(angle) * speed * (i < 60 ? -1 : 1),
-                    vy: Math.sin(angle) * speed - 3,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    size: Math.random() * 8 + 4,
-                    rotation: Math.random() * 360,
-                    vRot: Math.random() * 10 - 5
-                });
-            }
-            animateConfetti();
-        }
-
-        function animateConfetti() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            let activeCount = 0;
-            confettis.forEach(c => {
-                c.x += c.vx;
-                c.y += c.vy;
-                c.vy += 0.3;
-                c.rotation += c.vRot;
-
-                if (c.y < canvas.height + 50) {
-                    activeCount++;
-                    ctx.save();
-                    ctx.translate(c.x, c.y);
-                    ctx.rotate((c.rotation * Math.PI) / 180);
-                    ctx.fillStyle = c.color;
-                    ctx.fillRect(-c.size / 2, -c.size / 2, c.size, c.size);
-                    ctx.restore();
-                }
-            });
-
-            if (activeCount > 0) {
-                requestAnimationFrame(animateConfetti);
-            }
-        }
-
-        // Logique du tirage au sort (7 secondes)
-        let isSpinning = false;
-
-        btnSpin.addEventListener('click', () => {
-            if (isSpinning || participants.length === 0) return;
-            isSpinning = true;
-            btnSpin.disabled = true;
-            btnOpenModal.disabled = true;
-            winnerAnnouncement.textContent = "";
-            winningLine.classList.remove('glow');
-
-            // Faire sautiller uniquement les logos
-            logoLeft.classList.add('bouncing');
-            logoRight.classList.add('bouncing');
-
-            const winningIndexInOriginal = Math.floor(Math.random() * participants.length);
-            const chosenWinner = participants[winningIndexInOriginal];
-
-            const targetBlock = 20;
-            const targetIndex = (targetBlock * participants.length) + winningIndexInOriginal;
-            
-            const containerHeight = 140;
-            const centerOffset = (containerHeight / 2) - (ITEM_HEIGHT / 2);
-            const targetTranslateY = -(targetIndex * ITEM_HEIGHT) + centerOffset;
-
-            rouletteItems.style.transition = 'transform 7s cubic-bezier(0.1, 0.9, 0.1, 1)';
-            rouletteItems.style.transform = `translateY(${targetTranslateY}px)`;
-
-            setTimeout(() => {
-                isSpinning = false;
-                btnSpin.disabled = false;
-                btnOpenModal.disabled = false;
-
-                logoLeft.classList.remove('bouncing');
-                logoRight.classList.remove('bouncing');
-                winningLine.classList.add('glow');
-
-                winnerAnnouncement.textContent = `🎉 Gagnant(e) : ${chosenWinner} ! 🎉`;
-                launchConfetti();
-            }, 7000);
-        });
-    </script>
-</body>
-</html>
+                    <div class="roulette-item">Ajoutez des participants
