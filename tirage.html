@@ -109,6 +109,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            line-height: 46px;
         }
 
         .winning-line-container {
@@ -344,7 +345,6 @@
 
         function buildRoulette(list) {
             rouletteItems.innerHTML = '';
-            // On répète la liste 150 fois pour assurer une grande bande de défilement sur 14 secondes
             const totalLoops = 150;
             const repeated = [];
             for (let i = 0; i < totalLoops; i++) {
@@ -357,11 +357,10 @@
                 rouletteItems.appendChild(div);
             });
 
-            // Positionnement initial pour centrer parfaitement le tout premier élément sur la ligne centrale
             rouletteItems.style.transition = 'none';
             const containerHeight = 140;
+            // Alignement géométrique parfait au centre exact de la ligne
             const centerOffset = (containerHeight / 2) - (ITEM_HEIGHT / 2);
-            // On se place par défaut sur le premier élément du bloc médian
             const initialTargetIndex = 75 * participants.length;
             const initialTranslateY = -(initialTargetIndex * ITEM_HEIGHT) + centerOffset;
             rouletteItems.style.transform = "translateY(" + initialTranslateY + "px)";
@@ -440,7 +439,6 @@
             winnerAnnouncement.textContent = "";
             winningLine.classList.remove('glow');
 
-            // Lancer le son de la roulette
             soundRoulette.currentTime = 0;
             soundRoulette.play().catch(e => console.log("Audio play error:", e));
 
@@ -450,7 +448,6 @@
             const winningIndexInOriginal = Math.floor(Math.random() * participants.length);
             const chosenWinner = participants[winningIndexInOriginal];
 
-            // On cible un bloc lointain pour faire tourner pendant 14 secondes
             const targetBlock = 120;
             const targetIndex = (targetBlock * participants.length) + winningIndexInOriginal;
             
@@ -458,7 +455,6 @@
             const centerOffset = (containerHeight / 2) - (ITEM_HEIGHT / 2);
             const targetTranslateY = -(targetIndex * ITEM_HEIGHT) + centerOffset;
 
-            // Animation de 14 secondes avec courbe de ralentissement fluide
             rouletteItems.style.transition = 'transform 14s cubic-bezier(0.1, 0.85, 0.1, 1)';
             rouletteItems.style.transform = "translateY(" + targetTranslateY + "px)";
 
@@ -467,7 +463,6 @@
                 btnSpin.disabled = false;
                 btnOpenModal.disabled = false;
 
-                // Arrêter le son de la roulette et lancer le son du gagnant
                 soundRoulette.pause();
                 soundWinner.currentTime = 0;
                 soundWinner.play().catch(e => console.log("Audio play error:", e));
