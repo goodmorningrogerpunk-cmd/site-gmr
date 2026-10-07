@@ -502,4 +502,64 @@
             if (isSpinning || participants.length === 0) return;
             isSpinning = true;
             btnSpin.disabled = true;
-            btnOpenModal.disabled =
+            btnOpenModal.disabled = true;
+            winnerAnnouncement.textContent = "";
+            winningLine.classList.remove('glow');
+            winnerPopup.classList.remove('active');
+
+            soundRoulette.currentTime = 0;
+            soundRoulette.play().catch(err => console.log("Audio play error:", err));
+
+            logoLeft.classList.add('bouncing');
+            logoRight.classList.add('bouncing');
+
+            // Choix du gagnant aléatoire
+            const winningIndexInOriginal = Math.floor(Math.random() * participants.length);
+            const chosenWinner = participants[winningIndexInOriginal];
+
+            // Pour que ça défile de haut en bas, on avance vers des index supérieurs (blocs futurs)
+            const targetBlock = 150; 
+            const targetIndex = (targetBlock * participants.length) + winningIndexInOriginal;
+            
+            const containerHeight = 140;
+            const centerOffset = (containerHeight / 2) - (ITEM_HEIGHT / 2) - 2;
+            const targetTranslateY = -(targetIndex * ITEM_HEIGHT) + centerOffset;
+
+            // Application de l'animation de 14 secondes
+            rouletteItems.style.transition = 'transform 14s cubic-bezier(0.1, 0.85, 0.1, 1)';
+            rouletteItems.style.transform = "translateY(" + targetTranslateY + "px)";
+
+            setTimeout(function() {
+                isSpinning = false;
+                btnSpin.disabled = false;
+                btnOpenModal.disabled = false;
+
+                // Mémorisation de la position pour le prochain "Relancer"
+                baseTranslateY = targetTranslateY;
+
+                btnSpin.textContent = "Relancer";
+
+                soundRoulette.pause();
+                soundWinner.currentTime = 0;
+                soundWinner.play().catch(err => console.log("Audio play error:", err));
+
+                logoLeft.classList.remove('bouncing');
+                logoRight.classList.remove('bouncing');
+                winningLine.classList.add('glow');
+
+                winnerAnnouncement.textContent = "🎉 Gagnant(e) : " + chosenWinner + " ! 🎉";
+                
+                popupWinnerName.textContent = chosenWinner;
+                winnerPopup.classList.add('active');
+
+                launchConfetti();
+            }, 14000);
+        };
+
+        btnClosePopup.onclick = function(e) {
+            e.preventDefault();
+            winnerPopup.classList.remove('active');
+        };
+    </script>
+</body>
+</html>
