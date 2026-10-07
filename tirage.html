@@ -58,6 +58,7 @@
             cursor: pointer;
             width: 100%;
             box-shadow: 0 4px 15px rgba(35, 134, 54, 0.4);
+            z-index: 5;
         }
 
         .btn-action {
@@ -237,7 +238,6 @@
             flex: 1;
         }
 
-        /* Pop-up Gagnant */
         .winner-popup {
             display: none;
             position: fixed;
@@ -250,7 +250,6 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            animation: fadeIn 0.3s ease;
         }
 
         .winner-popup.active {
@@ -270,7 +269,6 @@
             flex-direction: column;
             align-items: center;
             gap: 15px;
-            animation: scaleUp 0.3s ease;
         }
 
         .winner-popup-content h3 {
@@ -285,16 +283,6 @@
             text-shadow: 0 0 10px rgba(63, 185, 80, 0.5);
             word-break: break-all;
             margin: 10px 0;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes scaleUp {
-            from { transform: scale(0.8); }
-            to { transform: scale(1); }
         }
 
         .winner-announcement {
@@ -325,16 +313,130 @@
                 <img src="chat_tete.png" alt="Logo" class="side-logo" id="logoRight">
             </div>
             <div class="roulette-window">
-                <div class="roulette-items" id="rouletteItems">
-                    <div class="roulette-item">Ajoutez des participants !</div>
-                </div>
+                <div class="roulette-items" id="rouletteItems"></div>
             </div>
         </div>
 
-        <button class="btn-primary btn-action" id="btnSpin" type="button" disabled>Hop, c'est parti !</button>
+        <button class="btn-primary btn-action" id="btnSpin" type="button">Hop, c'est parti !</button>
 
         <div class="winner-announcement" id="winnerAnnouncement"></div>
     </div>
 
     <!-- Modale édition participants -->
-    <div class="modal" id="participants
+    <div class="modal" id="participantsModal">
+        <div class="modal-content">
+            <h2>Liste des participants (un par ligne)</h2>
+            <textarea id="participantsInput"></textarea>
+            <div class="participant-count" id="participantCount">0 participant(s)</div>
+            <div class="modal-buttons">
+                <button class="btn-secondary" id="btnCancel" type="button">Annuler</button>
+                <button class="btn-primary" id="btnSave" type="button" style="flex:1;">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pop-up Popin Gagnant -->
+    <div class="winner-popup" id="winnerPopup">
+        <div class="winner-popup-content">
+            <h3>🎉 Gagnant(e) ! 🎉</h3>
+            <div class="winner-name-highlight" id="popupWinnerName">Nom</div>
+            <button class="btn-primary" id="btnClosePopup" type="button">Fermer</button>
+        </div>
+    </div>
+
+    <!-- Éléments Audio -->
+    <audio id="soundRoulette" src="roulette.mp3" preload="auto"></audio>
+    <audio id="soundWinner" src="winner.mp3" preload="auto"></audio>
+
+    <script>
+        let participants = ["Alice", "Bob", "Charlie", "David", "Emma", "Fabien", "Gaëlle", "Hugo"];
+        const ITEM_HEIGHT = 46;
+
+        const btnOpenModal = document.getElementById('btnOpenModal');
+        const modal = document.getElementById('participantsModal');
+        const btnCancel = document.getElementById('btnCancel');
+        const btnSave = document.getElementById('btnSave');
+        const participantsInput = document.getElementById('participantsInput');
+        const participantCount = document.getElementById('participantCount');
+        const btnSpin = document.getElementById('btnSpin');
+        const rouletteItems = document.getElementById('rouletteItems');
+        const winningLine = document.getElementById('winningLine');
+        const logoLeft = document.getElementById('logoLeft');
+        const logoRight = document.getElementById('logoRight');
+        const winnerAnnouncement = document.getElementById('winnerAnnouncement');
+        
+        const winnerPopup = document.getElementById('winnerPopup');
+        const popupWinnerName = document.getElementById('popupWinnerName');
+        const btnClosePopup = document.getElementById('btnClosePopup');
+
+        const soundRoulette = document.getElementById('soundRoulette');
+        const soundWinner = document.getElementById('soundWinner');
+
+        function updateCount() {
+            const lines = participantsInput.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            participantCount.textContent = lines.length + " participant(s)";
+            btnSpin.disabled = lines.length === 0;
+        }
+
+        participantsInput.oninput = updateCount;
+
+        btnOpenModal.onclick = function() {
+            participantsInput.value = participants.join('\n');
+            updateCount();
+            modal.classList.add('active');
+        };
+
+        btnCancel.onclick = function() {
+            modal.classList.remove('active');
+        };
+
+        btnSave.onclick = function() {
+            const lines = participantsInput.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            if (lines.length > 0) {
+                participants = lines;
+                buildRoulette(participants);
+                modal.classList.remove('active');
+                btnSpin.disabled = false;
+                winnerAnnouncement.textContent = "";
+                winningLine.classList.remove('glow');
+                btnSpin.textContent = "Hop, c'est parti !";
+            }
+        };
+
+        function buildRoulette(list) {
+            rouletteItems.innerHTML = '';
+            const totalLoops = 150;
+            const repeated = [];
+            for (let i = 0; i < totalLoops; i++) {
+                repeated.push(...list);
+            }
+            repeated.forEach(name => {
+                const div = document.createElement('div');
+                div.className = 'roulette-item';
+                div.textContent = name;
+                rouletteItems.appendChild(div);
+            });
+
+            rouletteItems.style.transition = 'none';
+            const containerHeight = 140;
+            const centerOffset = (containerHeight / 2) - (ITEM_HEIGHT / 2) - 2;
+            const initialTargetIndex = 75 * participants.length;
+            const initialTranslateY = -(initialTargetIndex * ITEM_HEIGHT) + centerOffset;
+            rouletteItems.style.transform = "translateY(" + initialTranslateY + "px)";
+        }
+
+        // Initialisation immédiate
+        buildRoulette(participants);
+
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let confettis = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.onresize = resizeCanvas;
+        resizeCanvas();
+
+        function launchConfetti() {
