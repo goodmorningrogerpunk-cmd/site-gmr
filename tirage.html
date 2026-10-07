@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tirage au sort - Festival Mots-Zik</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0d1117;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding: 20px 15px;
+            overflow-x: hidden;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            max-width: 500px;
+        }
+
+        h1 {
+            font-size: 1.15rem;
+            line-height: 1.4;
+            color: #58a6ff;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(88, 166, 255, 0.3);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #238636 0%, #2ea043 100%);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(35, 134, 54, 0.4);
+            transition: transform 0.1s ease, filter 0.2s ease;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-action {
+            background: linear-gradient(135deg, #1f6feb 0%, #388bfd 100%);
+            box-shadow: 0 4px 20px rgba(31, 111, 235, 0.5);
+            font-size: 1.15rem;
+            padding: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Roulette Container */
+        .roulette-wrapper {
+            position: relative;
+            width: 100%;
+            height: 140px;
+            background: #161b22;
+            border-radius: 16px;
+            border: 2px solid #30363d;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .roulette-window {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .roulette-items {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            will-change: transform;
+        }
+
+        .roulette-item {
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: #8b949e;
+            width: 100%;
+            text-align: center;
+            padding: 0 60px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .roulette-item.active-candidate {
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        /* Fixed Center Winning Line (Stable, no bouncing) */
+        .winning-line-container {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            width: 100%;
+            height: 46px;
+            border-top: 2px solid rgba(88, 166, 255, 0.4);
+            border-bottom: 2px solid rgba(88, 166, 255, 0.4);
+            background: rgba(88, 166, 255, 0.05);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10px;
+            z-index: 10;
+        }
+
+        .winning-line-container.glow {
+            border-color: #58a6ff;
+            background: rgba(88, 166, 255, 0.2);
+            box-shadow: 0 0 20px #58a6ff, inset 0 0 15px #58a6ff;
+            animation: linePulse 1s infinite alternate;
+        }
+
+        @keyframes linePulse {
+            from { box-shadow: 0 0 10px #58a6ff, inset 0 0 10px #58a6ff; }
+            to { box-shadow: 0 0 25px #58a6ff, inset 0 0 20px #58a6ff; }
+        }
+
+        /* Logos on sides of the winning line (only they bounce) */
+        .side-logo {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #58a6ff;
+            background: #000;
+        }
+
+        .side-logo.bouncing {
+            animation: logoBounce 0.2s infinite alternate;
+        }
+
+        @keyframes logoBounce {
+            0% { transform: translateY(-3px) scale(1.05); }
+            100% { transform: translateY(3px) scale(0.95); }
+        }
+
+        /* Confetti Canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* Modal Popup for participants */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #161b22;
+            border: 1px solid #30363d;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .modal-content h2 {
+            font-size: 1.2rem;
+            color: #c9d1d9;
+        }
+
+        textarea {
+            width: 100%;
+            height: 180px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: white;
+            padding: 12px;
+            font-size: 0.95rem;
+            resize: none;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #58a6ff;
+        }
+
+        .participant-count {
+            font-size: 0.85rem;
+            color: #8b949e;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-secondary {
+            background: #21262d;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .winner-announcement {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #3fb950;
+            min-height: 40px;
+            text-shadow: 0 0 10px rgba(63, 185, 80, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <header>
+        <h1>Qui va gagner 2 places pour la soirée du vendredi 6 novembre au festival Mots-Zik ?</h1>
+    </header>
+
+    <div class="container">
+        <button class="btn-primary" id="btn-open-modal">📝 Ajouter les participants</button>
+
+        <div class="roulette-wrapper">
+            <div class="winning-line-container" id="winningLine">
+                <img src="chat_tete.png" alt="Logo" class="side-logo" id="logoLeft">
+                <img src="chat_tete.png" alt="Logo" class="side-logo" id="logoRight">
+            </div>
+            <div class="roulette-window">
+                <div class="roulette-items" id="rouletteItems">
+                    <div class="roulette-item">Ajoutez des participants !</div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-primary btn-action" id="btn-spin" disabled>Hop, c'est parti !</button>
+
+        <div class="winner-announcement" id="winnerAnnouncement"></div>
+    </div>
+
+    <!-- Modal for editing participants -->
+    <div class="modal" id="participantsModal">
+        <div class="modal-content">
+            <h2>Liste des participants (un par ligne)</h2>
+            <textarea id="participantsInput" placeholder="Jean Dupont&#10;Marie Curie&#10;Thomas Edison"></textarea>
+            <div class="participant-count" id="participantCount">0 participant(s)</div>
+            <div class="modal-buttons">
+                <button class="btn-secondary" id="btn-cancel">Annuler</button>
+                <button class="btn-primary" id="btn-save" style="flex:1;">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let participants = ["Alice", "Bob", "Charlie", "David", "Emma", "Fabien", "Gaëlle", "Hugo"];
+        const ITEM_HEIGHT = 46;
+
+        const btnOpenModal = document.getElementById('btn-open-modal');
+        const modal = document.getElementById('participantsModal');
+        const btnCancel = document.getElementById('btn-cancel');
+        const btnSave = document.getElementById('btn-save');
+        const participantsInput = document.getElementById('participantsInput');
+        const participantCount = document.getElementById('participantCount');
+        const btnSpin = document.getElementById('btn-spin');
+        const rouletteItems = document.getElementById('rouletteItems');
+        const winningLine = document.getElementById('winningLine');
+        const logoLeft = document.getElementById('logoLeft');
+        const logoRight = document.getElementById('logoRight');
+        const winnerAnnouncement = document.getElementById('winnerAnnouncement');
+
+        function updateParticipantsListText() {
+            participantsInput.value = participants.join('\n');
+            updateCount();
+        }
+
+        function updateCount() {
+            const lines = participantsInput.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            participantCount.textContent = `${lines.length} participant(s)`;
+            btnSpin.disabled = lines.length === 0;
+        }
+
+        participantsInput.addEventListener('input', updateCount);
+
+        btnOpenModal.addEventListener('click', () => {
+            updateParticipantsListText();
+            modal.classList.add('active');
+        });
+
+        btnCancel.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        btnSave.addEventListener('click', () => {
+            const lines = participantsInput.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            if (lines.length > 0) {
+                participants = lines;
+                buildRoulette(participants);
+                modal.classList.remove('active');
+                btnSpin.disabled = false;
+                winnerAnnouncement.textContent = "";
+                winningLine.classList.remove('glow');
+            }
+        });
+
+        function buildRoulette(list) {
+            rouletteItems.innerHTML = '';
+            const repeated = [];
+            for (let i = 0; i < 30; i++) {
+                repeated.push(...list);
+            }
+            repeated.forEach((name, index) => {
+                const div = document.createElement('div');
+                div.className = 'roulette-item';
+                div.textContent = name;
+                rouletteItems.appendChild(div);
+            });
+            rouletteItems.style.transform = 'translateY(0px)';
+        }
+
+        buildRoulette(participants);
+
+        // Système de confettis
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let confettis = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function launchConfetti() {
+            confettis = [];
+            const colors = ['#58a6ff', '#3fb950', '#f85149', '#d29922', '#bc8cff'];
+            const leftOrigin = window.innerWidth * 0.2;
+            const rightOrigin = window.innerWidth * 0.8;
+
+            for (let i = 0; i < 120; i++) {
+                const originX = i < 60 ? leftOrigin : rightOrigin;
+                const angle = (Math.random() * Math.PI) - (Math.PI / 2);
+                const speed = Math.random() * 8 + 4;
+                confettis.push({
+                    x: originX,
+                    y: window.innerHeight / 2,
+                    vx: Math.cos(angle) * speed * (i < 60 ? -1 : 1),
+                    vy: Math.sin(angle) * speed - 3,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    size: Math.random() * 8 + 4,
+                    rotation: Math.random() * 360,
+                    vRot: Math.random() * 10 - 5
+                });
+            }
+            animateConfetti();
+        }
+
+        function animateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let activeCount = 0;
+            confettis.forEach(c => {
+                c.x += c.vx;
+                c.y += c.vy;
+                c.vy += 0.3;
+                c.rotation += c.vRot;
+
+                if (c.y < canvas.height + 50) {
+                    activeCount++;
+                    ctx.save();
+                    ctx.translate(c.x, c.y);
+                    ctx.rotate((c.rotation * Math.PI) / 180);
+                    ctx.fillStyle = c.color;
+                    ctx.fillRect(-c.size / 2, -c.size / 2, c.size, c.size);
+                    ctx.restore();
+                }
+            });
+
+            if (activeCount > 0) {
+                requestAnimationFrame(animateConfetti);
+            }
+        }
+
+        // Logique du tirage au sort (7 secondes)
+        let isSpinning = false;
+
+        btnSpin.addEventListener('click', () => {
+            if (isSpinning || participants.length === 0) return;
+            isSpinning = true;
+            btnSpin.disabled = true;
+            btnOpenModal.disabled = true;
+            winnerAnnouncement.textContent = "";
+            winningLine.classList.remove('glow');
+
+            // Faire sautiller uniquement les logos
+            logoLeft.classList.add('bouncing');
+            logoRight.classList.add('bouncing');
+
+            const winningIndexInOriginal = Math.floor(Math.random() * participants.length);
+            const chosenWinner = participants[winningIndexInOriginal];
+
+            const targetBlock = 20;
+            const targetIndex = (targetBlock * participants.length) + winningIndexInOriginal;
+            
+            const containerHeight = 140;
+            const centerOffset = (containerHeight / 2) - (ITEM_HEIGHT / 2);
+            const targetTranslateY = -(targetIndex * ITEM_HEIGHT) + centerOffset;
+
+            rouletteItems.style.transition = 'transform 7s cubic-bezier(0.1, 0.9, 0.1, 1)';
+            rouletteItems.style.transform = `translateY(${targetTranslateY}px)`;
+
+            setTimeout(() => {
+                isSpinning = false;
+                btnSpin.disabled = false;
+                btnOpenModal.disabled = false;
+
+                logoLeft.classList.remove('bouncing');
+                logoRight.classList.remove('bouncing');
+                winningLine.classList.add('glow');
+
+                winnerAnnouncement.textContent = `🎉 Gagnant(e) : ${chosenWinner} ! 🎉`;
+                launchConfetti();
+            }, 7000);
+        });
+    </script>
+</body>
+</html>
