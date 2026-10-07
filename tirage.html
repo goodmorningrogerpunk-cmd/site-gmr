@@ -68,6 +68,7 @@
             padding: 16px;
         }
 
+        /* Conteneur de la roulette avec Perspective 3D */
         .roulette-wrapper {
             position: relative;
             width: 100%;
@@ -80,6 +81,7 @@
             align-items: center;
             justify-content: center;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            perspective: 600px;
         }
 
         .roulette-window {
@@ -87,6 +89,7 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
+            transform-style: preserve-3d;
         }
 
         .roulette-items {
@@ -94,6 +97,7 @@
             width: 100%;
             left: 0;
             top: 0;
+            transform-style: preserve-3d;
         }
 
         .roulette-item {
@@ -110,6 +114,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            backface-visibility: hidden;
         }
 
         .winning-line-container {
@@ -257,309 +262,4 @@
         }
 
         .winner-popup-content {
-            background: linear-gradient(145deg, #161b22, #0d1117);
-            border: 2px solid #58a6ff;
-            border-radius: 20px;
-            padding: 30px 20px;
-            width: 100%;
-            max-width: 380px;
-            text-align: center;
-            box-shadow: 0 0 30px rgba(88, 166, 255, 0.5);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .winner-popup-content h3 {
-            font-size: 1.4rem;
-            color: #58a6ff;
-        }
-
-        .winner-name-highlight {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #3fb950;
-            text-shadow: 0 0 10px rgba(63, 185, 80, 0.5);
-            word-break: break-all;
-            margin: 10px 0;
-        }
-
-        .winner-announcement {
-            margin-top: 10px;
-            text-align: center;
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #3fb950;
-            min-height: 40px;
-            text-shadow: 0 0 10px rgba(63, 185, 80, 0.4);
-        }
-    </style>
-</head>
-<body>
-
-    <canvas id="confetti-canvas"></canvas>
-
-    <header>
-        <h1>Qui va gagner 2 places pour la soirée du vendredi 6 novembre au festival Mots-Zik ?</h1>
-    </header>
-
-    <div class="container">
-        <button class="btn-primary" id="btnOpenModal" type="button">Ajouter les participants</button>
-
-        <div class="roulette-wrapper">
-            <div class="winning-line-container" id="winningLine">
-                <img src="chat_tete.png" alt="Logo" class="side-logo" id="logoLeft">
-                <img src="chat_tete.png" alt="Logo" class="side-logo" id="logoRight">
-            </div>
-            <div class="roulette-window">
-                <div class="roulette-items" id="rouletteItems"></div>
-            </div>
-        </div>
-
-        <button class="btn-primary btn-action" id="btnSpin" type="button">Hop, c'est parti !</button>
-
-        <div class="winner-announcement" id="winnerAnnouncement"></div>
-    </div>
-
-    <!-- Modale édition participants -->
-    <div class="modal" id="participantsModal">
-        <div class="modal-content">
-            <h2>Liste des participants (un par ligne)</h2>
-            <textarea id="participantsInput"></textarea>
-            <div class="participant-count" id="participantCount">0 participant(s)</div>
-            <div class="modal-buttons">
-                <button class="btn-secondary" id="btnCancel" type="button">Annuler</button>
-                <button class="btn-primary" id="btnSave" type="button" style="flex:1;">Enregistrer</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pop-up Popin Gagnant -->
-    <div class="winner-popup" id="winnerPopup">
-        <div class="winner-popup-content">
-            <h3>🎉 Gagnant(e) ! 🎉</h3>
-            <div class="winner-name-highlight" id="popupWinnerName">Nom</div>
-            <button class="btn-primary" id="btnClosePopup" type="button">Fermer</button>
-        </div>
-    </div>
-
-    <!-- Éléments Audio -->
-    <audio id="soundRoulette" src="roulette.mp3" preload="auto"></audio>
-    <audio id="soundWinner" src="winner.mp3" preload="auto"></audio>
-
-    <script>
-        let participants = ["Alice", "Bob", "Charlie", "David", "Emma", "Fabien", "Gaëlle", "Hugo"];
-        const ITEM_HEIGHT = 46;
-        let baseTranslateY = 0;
-
-        const btnOpenModal = document.getElementById('btnOpenModal');
-        const modal = document.getElementById('participantsModal');
-        const btnCancel = document.getElementById('btnCancel');
-        const btnSave = document.getElementById('btnSave');
-        const participantsInput = document.getElementById('participantsInput');
-        const participantCount = document.getElementById('participantCount');
-        const btnSpin = document.getElementById('btnSpin');
-        const rouletteItems = document.getElementById('rouletteItems');
-        const winningLine = document.getElementById('winningLine');
-        const logoLeft = document.getElementById('logoLeft');
-        const logoRight = document.getElementById('logoRight');
-        const winnerAnnouncement = document.getElementById('winnerAnnouncement');
-        
-        const winnerPopup = document.getElementById('winnerPopup');
-        const popupWinnerName = document.getElementById('popupWinnerName');
-        const btnClosePopup = document.getElementById('btnClosePopup');
-
-        const soundRoulette = document.getElementById('soundRoulette');
-        const soundWinner = document.getElementById('soundWinner');
-
-        function updateCount() {
-            const lines = participantsInput.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            participantCount.textContent = lines.length + " participant(s)";
-            btnSpin.disabled = lines.length === 0;
-        }
-
-        participantsInput.oninput = updateCount;
-
-        btnOpenModal.onclick = function(e) {
-            e.preventDefault();
-            participantsInput.value = participants.join('\n');
-            updateCount();
-            modal.classList.add('active');
-        };
-
-        btnCancel.onclick = function(e) {
-            e.preventDefault();
-            modal.classList.remove('active');
-        };
-
-        btnSave.onclick = function(e) {
-            e.preventDefault();
-            const lines = participantsInput.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            if (lines.length > 0) {
-                participants = lines;
-                buildRoulette(participants);
-                modal.classList.remove('active');
-                btnSpin.disabled = false;
-                winnerAnnouncement.textContent = "";
-                winningLine.classList.remove('glow');
-                btnSpin.textContent = "Hop, c'est parti !";
-            }
-        };
-
-        function buildRoulette(list) {
-            rouletteItems.innerHTML = '';
-            // Répétition importante pour permettre un long défilement du haut vers le bas
-            const totalLoops = 200;
-            const repeated = [];
-            for (let i = 0; i < totalLoops; i++) {
-                repeated.push(...list);
-            }
-            repeated.forEach(name => {
-                const div = document.createElement('div');
-                div.className = 'roulette-item';
-                div.textContent = name;
-                rouletteItems.appendChild(div);
-            });
-
-            rouletteItems.style.transition = 'none';
-            const containerHeight = 140;
-            const centerOffset = (containerHeight / 2) - (ITEM_HEIGHT / 2) - 2;
-            
-            // On se place au milieu exact pour pouvoir défiler vers le bas
-            const initialTargetIndex = 100 * list.length;
-            baseTranslateY = -(initialTargetIndex * ITEM_HEIGHT) + centerOffset;
-            rouletteItems.style.transform = "translateY(" + baseTranslateY + "px)";
-        }
-
-        // Chargement initial immédiat
-        buildRoulette(participants);
-
-        const canvas = document.getElementById('confetti-canvas');
-        const ctx = canvas.getContext('2d');
-        let confettis = [];
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.onresize = resizeCanvas;
-        resizeCanvas();
-
-        function launchConfetti() {
-            confettis = [];
-            const colors = ['#58a6ff', '#3fb950', '#f85149', '#d29922', '#bc8cff'];
-            const leftOrigin = window.innerWidth * 0.2;
-            const rightOrigin = window.innerWidth * 0.8;
-
-            for (let i = 0; i < 120; i++) {
-                const originX = i < 60 ? leftOrigin : rightOrigin;
-                const angle = (Math.random() * Math.PI) - (Math.PI / 2);
-                const speed = Math.random() * 8 + 4;
-                confettis.push({
-                    x: originX,
-                    y: window.innerHeight / 2,
-                    vx: Math.cos(angle) * speed * (i < 60 ? -1 : 1),
-                    vy: Math.sin(angle) * speed - 3,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    size: Math.random() * 8 + 4,
-                    rotation: Math.random() * 360,
-                    vRot: Math.random() * 10 - 5
-                });
-            }
-            animateConfetti();
-        }
-
-        function animateConfetti() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            let activeCount = 0;
-            confettis.forEach(c => {
-                c.x += c.vx;
-                c.y += c.vy;
-                c.vy += 0.3;
-                c.rotation += c.vRot;
-
-                if (c.y < canvas.height + 50) {
-                    activeCount++;
-                    ctx.save();
-                    ctx.translate(c.x, c.y);
-                    ctx.rotate((c.rotation * Math.PI) / 180);
-                    ctx.fillStyle = c.color;
-                    ctx.fillRect(-c.size / 2, -c.size / 2, c.size, c.size);
-                    ctx.restore();
-                }
-            });
-
-            if (activeCount > 0) {
-                requestAnimationFrame(animateConfetti);
-            }
-        }
-
-        let isSpinning = false;
-
-        btnSpin.onclick = function(e) {
-            e.preventDefault();
-            if (isSpinning || participants.length === 0) return;
-            isSpinning = true;
-            btnSpin.disabled = true;
-            btnOpenModal.disabled = true;
-            winnerAnnouncement.textContent = "";
-            winningLine.classList.remove('glow');
-            winnerPopup.classList.remove('active');
-
-            soundRoulette.currentTime = 0;
-            soundRoulette.play().catch(err => console.log("Audio play error:", err));
-
-            logoLeft.classList.add('bouncing');
-            logoRight.classList.add('bouncing');
-
-            // Choix du gagnant aléatoire
-            const winningIndexInOriginal = Math.floor(Math.random() * participants.length);
-            const chosenWinner = participants[winningIndexInOriginal];
-
-            // Pour que ça défile de haut en bas, on avance vers des index supérieurs (blocs futurs)
-            const targetBlock = 150; 
-            const targetIndex = (targetBlock * participants.length) + winningIndexInOriginal;
-            
-            const containerHeight = 140;
-            const centerOffset = (containerHeight / 2) - (ITEM_HEIGHT / 2) - 2;
-            const targetTranslateY = -(targetIndex * ITEM_HEIGHT) + centerOffset;
-
-            // Application de l'animation de 14 secondes
-            rouletteItems.style.transition = 'transform 14s cubic-bezier(0.1, 0.85, 0.1, 1)';
-            rouletteItems.style.transform = "translateY(" + targetTranslateY + "px)";
-
-            setTimeout(function() {
-                isSpinning = false;
-                btnSpin.disabled = false;
-                btnOpenModal.disabled = false;
-
-                // Mémorisation de la position pour le prochain "Relancer"
-                baseTranslateY = targetTranslateY;
-
-                btnSpin.textContent = "Relancer";
-
-                soundRoulette.pause();
-                soundWinner.currentTime = 0;
-                soundWinner.play().catch(err => console.log("Audio play error:", err));
-
-                logoLeft.classList.remove('bouncing');
-                logoRight.classList.remove('bouncing');
-                winningLine.classList.add('glow');
-
-                winnerAnnouncement.textContent = "🎉 Gagnant(e) : " + chosenWinner + " ! 🎉";
-                
-                popupWinnerName.textContent = chosenWinner;
-                winnerPopup.classList.add('active');
-
-                launchConfetti();
-            }, 14000);
-        };
-
-        btnClosePopup.onclick = function(e) {
-            e.preventDefault();
-            winnerPopup.classList.remove('active');
-        };
-    </script>
-</body>
-</html>
+            background: linear-gradient(145deg, #16
