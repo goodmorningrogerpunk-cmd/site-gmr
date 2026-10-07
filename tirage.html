@@ -413,7 +413,7 @@
             const lines = participantsInput.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             if (lines.length > 0) {
                 participants = lines;
-                buildRoulette(participants, 100 * participants.length);
+                buildRoulette(participants, 150 * participants.length);
                 modal.classList.remove('active');
                 btnSpin.disabled = false;
                 winnerAnnouncement.textContent = "";
@@ -445,7 +445,7 @@
             rouletteItems.style.transform = "translateY(" + currentTranslateY + "px)";
         }
 
-        const initialStartIndex = 100 * participants.length;
+        const initialStartIndex = 150 * participants.length;
         buildRoulette(participants, initialStartIndex);
 
         const canvas = document.getElementById('confetti-canvas');
@@ -532,10 +532,10 @@
             const containerHeight = 140;
             const centerOffset = (containerHeight / 2) - (ITEM_HEIGHT / 2) - 2;
             
-            // Calcul propre pour défiler de haut en bas
+            // Sens inversé : le texte défile du haut vers le bas
             const currentIndexApprox = Math.round((-currentTranslateY + centerOffset) / ITEM_HEIGHT);
             const targetBlockOffset = 60; 
-            const targetLoopsIndex = Math.ceil(currentIndexApprox / participants.length) + targetBlockOffset;
+            const targetLoopsIndex = Math.floor(currentIndexApprox / participants.length) - targetBlockOffset;
             const targetIndex = (targetLoopsIndex * participants.length) + winningIndexInOriginal;
 
             const targetTranslateY = -(targetIndex * ITEM_HEIGHT) + centerOffset;
