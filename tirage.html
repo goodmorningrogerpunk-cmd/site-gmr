@@ -81,7 +81,6 @@
             align-items: center;
             justify-content: center;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-            perspective: 800px;
         }
 
         .roulette-window {
@@ -89,7 +88,6 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            transform-style: preserve-3d;
         }
 
         .roulette-items {
@@ -97,7 +95,6 @@
             width: 100%;
             left: 0;
             top: 0;
-            transform-style: preserve-3d;
         }
 
         .roulette-item {
@@ -107,14 +104,13 @@
             justify-content: center;
             font-size: 1.25rem;
             font-weight: 500;
-            color: #8b949e;
+            color: #c9d1d9;
             width: 100%;
             text-align: center;
             padding: 0 60px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            backface-visibility: hidden;
         }
 
         .winning-line-container {
@@ -126,7 +122,7 @@
             height: 46px;
             border-top: 2px solid rgba(88, 166, 255, 0.4);
             border-bottom: 2px solid rgba(88, 166, 255, 0.4);
-            background: rgba(88, 166, 255, 0.05);
+            background: rgba(88, 166, 255, 0.08);
             pointer-events: none;
             display: flex;
             align-items: center;
@@ -137,7 +133,7 @@
 
         .winning-line-container.glow {
             border-color: #58a6ff;
-            background: rgba(88, 166, 255, 0.2);
+            background: rgba(88, 166, 255, 0.25);
             box-shadow: 0 0 20px #58a6ff, inset 0 0 15px #58a6ff;
             animation: linePulse 1s infinite alternate;
         }
@@ -434,15 +430,10 @@
                 repeated.push(...list);
             }
             
-            repeated.forEach(function(name, index) {
+            repeated.forEach(function(name) {
                 const div = document.createElement('div');
                 div.className = 'roulette-item';
                 div.textContent = name;
-                
-                const offsetFromCenter = index - startIndex;
-                const rotX = offsetFromCenter * -4; 
-                div.style.transform = "rotateX(" + rotX + "deg) translateZ(40px)";
-                
                 rouletteItems.appendChild(div);
             });
 
@@ -541,7 +532,7 @@
             const containerHeight = 140;
             const centerOffset = (containerHeight / 2) - (ITEM_HEIGHT / 2) - 2;
             
-            // Défilement de HAUT en BAS (les noms descendent visuellement comme une bande qu'on tire vers le bas)
+            // Calcul propre pour défiler de haut en bas
             const currentIndexApprox = Math.round((-currentTranslateY + centerOffset) / ITEM_HEIGHT);
             const targetBlockOffset = 60; 
             const targetLoopsIndex = Math.ceil(currentIndexApprox / participants.length) + targetBlockOffset;
