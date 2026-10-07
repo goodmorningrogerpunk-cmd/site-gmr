@@ -68,7 +68,6 @@
             padding: 16px;
         }
 
-        /* Conteneur de la roulette avec Perspective 3D */
         .roulette-wrapper {
             position: relative;
             width: 100%;
@@ -262,4 +261,66 @@
         }
 
         .winner-popup-content {
-            background: linear-gradient(145deg, #16
+            background: linear-gradient(145deg, #161b22, #0d1117);
+            border: 2px solid #58a6ff;
+            border-radius: 20px;
+            padding: 30px 20px;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(88, 166, 255, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .winner-popup-content h3 {
+            font-size: 1.4rem;
+            color: #58a6ff;
+        }
+
+        .winner-name-highlight {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #3fb950;
+            text-shadow: 0 0 10px rgba(63, 185, 80, 0.5);
+            word-break: break-all;
+            margin: 10px 0;
+        }
+
+        .btn-popup-close {
+            background: linear-gradient(135deg, #238636 0%, #2ea043 100%);
+            color: white;
+            border: none;
+            padding: 10px 28px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(35, 134, 54, 0.4);
+            margin-top: 5px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .winner-announcement {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #3fb950;
+            min-height: 40px;
+            text-shadow: 0 0 10px rgba(63, 185, 80, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <header>
+        <h1>Qui va gagner 2 places pour la soirée du vendredi 6 novembre au festival Mots-Zik ?</h1>
+    </header>
+
+    <div class="container">
+        <button class="btn-primary" id="btnOpenModal"
