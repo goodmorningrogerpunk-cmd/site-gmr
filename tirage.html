@@ -109,7 +109,6 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            line-height: 46px;
         }
 
         .winning-line-container {
@@ -359,8 +358,8 @@
 
             rouletteItems.style.transition = 'none';
             const containerHeight = 140;
-            // Alignement géométrique parfait au centre exact de la ligne
-            const centerOffset = (containerHeight / 2) - (ITEM_HEIGHT / 2);
+            // Correction fine de l'offset pour un centrage parfait au milieu de la ligne de 46px
+            const centerOffset = (containerHeight / 2) - (ITEM_HEIGHT / 2) - 2;
             const initialTargetIndex = 75 * participants.length;
             const initialTranslateY = -(initialTargetIndex * ITEM_HEIGHT) + centerOffset;
             rouletteItems.style.transform = "translateY(" + initialTranslateY + "px)";
@@ -452,7 +451,7 @@
             const targetIndex = (targetBlock * participants.length) + winningIndexInOriginal;
             
             const containerHeight = 140;
-            const centerOffset = (containerHeight / 2) - (ITEM_HEIGHT / 2);
+            const centerOffset = (containerHeight / 2) - (ITEM_HEIGHT / 2) - 2;
             const targetTranslateY = -(targetIndex * ITEM_HEIGHT) + centerOffset;
 
             rouletteItems.style.transition = 'transform 14s cubic-bezier(0.1, 0.85, 0.1, 1)';
