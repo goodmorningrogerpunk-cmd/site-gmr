@@ -207,6 +207,18 @@ nav a:hover {
 }
 .concert-ville { color: #12C3FF; font-size: 0.95rem; font-weight: bold; }
 
+/* SOUS-TITRE ANNÉE CONCERTS À VENIR */
+.upcoming-year-title {
+    font-family: 'Bebas Neue', Impact, sans-serif !important;
+    font-size: 2rem;
+    color: #12C3FF;
+    text-align: left;
+    margin: 35px 0 15px 0;
+    letter-spacing: 2px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 5px;
+}
+
 /* STYLE DES CONCERTS PASSÉS (1 SEULE LIGNE COMPACTE) */
 .concert-row-past {
     display: flex;
@@ -700,6 +712,17 @@ html {
         </div>
     </a>    
 
+    <!-- CATÉGORIE & DATES 2027 -->
+    <div id="upcoming-2027-wrapper">
+        <h3 class="upcoming-year-title">2027</h3>
+        <a href="https://www.facebook.com/GoodMorningRoger/" target="_blank" class="concert-row-link" data-date="2027-03-20">
+            <div class="concert-row">
+                <div class="concert-date-box"><span class="date-day">20</span><span class="date-month">MARS</span></div>
+                <div class="concert-info"><span class="concert-lieu">Release Party - Cold Crash</span><span class="concert-ville">Rezé (44)</span></div>
+            </div>
+        </a>
+    </div>
+
     <!-- DATES 2025 -->
     <a href="https://www.facebook.com/monkeybikebar?locale=fr_FR" target="_blank" class="concert-row-link" data-date="2025-02-07">
         <div class="concert-row">
@@ -820,6 +843,12 @@ html {
     </summary>
     
     <div style="margin-top: 25px;">
+        <!-- VOLET 2027 -->
+        <details class="past-year-details" id="year-details-2027">
+            <summary class="past-summary">2027 ▼</summary>
+            <div class="concert-container" id="past-concerts-2027" style="margin-top: 10px;"></div>
+        </details>
+
         <!-- VOLET 2026 -->
         <details class="past-year-details" id="year-details-2026">
             <summary class="past-summary">2026 ▼</summary>
@@ -940,7 +969,7 @@ html {
         const concertLinks = document.querySelectorAll('.concert-row-link');
         const pastDetails = document.getElementById('past-concerts-details');
 
-        const pastCounts = { "2026": 0, "2025": 0, "2024": 0 };
+        const pastCounts = { "2027": 0, "2026": 0, "2025": 0, "2024": 0 };
 
         concertLinks.forEach(link => {
             const dateStr = link.getAttribute('data-date');
@@ -996,6 +1025,12 @@ html {
         // Masque le bloc global "CONCERTS PASSÉS" s'il n'y en a aucun
         if (totalPast === 0 && pastDetails) {
             pastDetails.style.display = 'none';
+        }
+
+        // Masque le bloc "2027" des concerts à venir s'il est vide
+        const upcoming2027Wrapper = document.getElementById('upcoming-2027-wrapper');
+        if (upcoming2027Wrapper && upcoming2027Wrapper.querySelectorAll('.concert-row-link').length === 0) {
+            upcoming2027Wrapper.style.display = 'none';
         }
     });
 </script>
